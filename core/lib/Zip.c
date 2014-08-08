@@ -15,7 +15,8 @@
 #include <string.h>
 #include <time.h>
 #include "zlib.h"
-#include "zip.h"
+#include "Zip.h"
+#include "Crypt.h"
 
 #ifdef STDC
 #  include <stddef.h>

@@ -79,7 +79,8 @@ static void init_keys(const char* passwd,unsigned long* pkeys,const unsigned lon
 #define zencode(pkeys,pcrc_32_tab,c,t) \
     (t=decrypt_byte(pkeys,pcrc_32_tab), update_keys(pkeys,pcrc_32_tab,c), t^(c))
 
-#ifdef INCLUDECRYPTINGCODE_IFCRYPTALLOWED
+#ifndef INCLUDECRYPTINGCODE_IFCRYPTALLOWED
+#define INCLUDECRYPTINGCODE_IFCRYPTALLOWED
 
 #define RAND_HEAD_LEN  12
    /* "last resort" source for second part of crypt seed pattern */
