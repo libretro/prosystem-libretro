@@ -158,7 +158,7 @@ endif
 FLAGS += -D__LIBRETRO__ $(WARNINGS)
 
 CXXFLAGS += $(FLAGS)
-CFLAGS += $(FLAGS) -std=gnu99
+CFLAGS += $(FLAGS)
 
 $(TARGET): $(OBJECTS)
 ifeq ($(STATIC_LINKING), 1)
