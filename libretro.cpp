@@ -45,135 +45,144 @@ void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_c
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
-static void display_ResetPalette32() {
-    for(uint index = 0; index < 256; index++) {
-        uint r = palette_data[(index * 3) + 0] << 16;
-        uint g = palette_data[(index * 3) + 1] << 8;
-        uint b = palette_data[(index * 3) + 2];
-        display_palette32[index] = r | g | b;
-    }
+static void display_ResetPalette32()
+{
+   for(uint index = 0; index < 256; index++)
+   {
+      uint r = palette_data[(index * 3) + 0] << 16;
+      uint g = palette_data[(index * 3) + 1] << 8;
+      uint b = palette_data[(index * 3) + 2];
+      display_palette32[index] = r | g | b;
+   }
 }
 
-static uint sound_GetSampleLength(uint length, uint unit, uint unitMax) {
-    uint sampleLength = length / unitMax;
-    uint sampleRemain = length % unitMax;
-    if(sampleRemain != 0 && sampleRemain >= unit) {
-        sampleLength++;
-    }
-    return sampleLength;
+static uint sound_GetSampleLength(uint length, uint unit, uint unitMax)
+{
+   uint sampleLength = length / unitMax;
+   uint sampleRemain = length % unitMax;
+   if(sampleRemain != 0 && sampleRemain >= unit)
+      sampleLength++;
+   return sampleLength;
 }
 
-static void sound_Resample(const byte* source, byte* target, int length) {
-    typedef struct {
-        word  wFormatTag;
-        word  nChannels;
-        uint nSamplesPerSec;
-        uint nAvgBytesPerSec;
-        word  nBlockAlign;
-        word  wBitsPerSample;
-        word  cbSize;
-        } WAVEFORMATEX;
-    
-//# define WAVE_FORMAT_PCM 0
-    
-    static const WAVEFORMATEX SOUND_DEFAULT_FORMAT = {0, 1, 48000, 48000, 1, 8, 0};
-    static WAVEFORMATEX sound_format = SOUND_DEFAULT_FORMAT;
+static void sound_Resample(const byte* source, byte* target, int length)
+{
+   typedef struct {
+      word  wFormatTag;
+      word  nChannels;
+      uint nSamplesPerSec;
+      uint nAvgBytesPerSec;
+      word  nBlockAlign;
+      word  wBitsPerSample;
+      word  cbSize;
+   } WAVEFORMATEX;
 
-    int measurement = sound_format.nSamplesPerSec;
-    int sourceIndex = 0;
-    int targetIndex = 0;
+   //# define WAVE_FORMAT_PCM 0
 
-    int max = ((prosystem_frequency * prosystem_scanlines) << 1);
-    while(targetIndex < length) {
-        if(measurement >= max) {
-            target[targetIndex++] = source[sourceIndex];
-            measurement -= max;
-        }
-        else {
-            sourceIndex++;
-            measurement += sound_format.nSamplesPerSec;
-        }
-    }
+   static const WAVEFORMATEX SOUND_DEFAULT_FORMAT = {0, 1, 48000, 48000, 1, 8, 0};
+   static WAVEFORMATEX sound_format = SOUND_DEFAULT_FORMAT;
+
+   int measurement = sound_format.nSamplesPerSec;
+   int sourceIndex = 0;
+   int targetIndex = 0;
+
+   int max = ((prosystem_frequency * prosystem_scanlines) << 1);
+   while(targetIndex < length)
+   {
+      if(measurement >= max)
+      {
+         target[targetIndex++] = source[sourceIndex];
+         measurement -= max;
+      }
+      else
+      {
+         sourceIndex++;
+         measurement += sound_format.nSamplesPerSec;
+      }
+   }
 }
 
-static void sound_Store() {
-//#define MAX_BUFFER_SIZE 8192
+static void sound_Store()
+{
+   //#define MAX_BUFFER_SIZE 8192
 
-    byte sample[8192];
-    memset(sample, 0, 8192);
-    uint length = 48000 / prosystem_frequency; /* sound_GetSampleLength(sound_format.nSamplesPerSec, prosystem_frame, prosystem_frequency); */ /* 48000 / prosystem_frequency */
-    sound_Resample(tia_buffer, sample, length);
+   byte sample[8192];
+   memset(sample, 0, 8192);
+   uint length = 48000 / prosystem_frequency; /* sound_GetSampleLength(sound_format.nSamplesPerSec, prosystem_frame, prosystem_frequency); */ /* 48000 / prosystem_frequency */
+   sound_Resample(tia_buffer, sample, length);
 
-    // Ballblazer, Commando, various homebrew and hacks
-    if(cartridge_pokey) {
-        byte pokeySample[8192];
-        memset(pokeySample, 0, 8192);
-        sound_Resample(pokey_buffer, pokeySample, length);
-        for(uint index = 0; index < length; index++) {
-            sample[index] += pokeySample[index];
-            sample[index] = sample[index] / 2;
-        }
-    }
+   // Ballblazer, Commando, various homebrew and hacks
+   if(cartridge_pokey)
+   {
+      byte pokeySample[8192];
+      memset(pokeySample, 0, 8192);
+      sound_Resample(pokey_buffer, pokeySample, length);
+      for(uint index = 0; index < length; index++)
+      {
+         sample[index] += pokeySample[index];
+         sample[index] = sample[index] / 2;
+      }
+   }
 
-    // Convert 8u to 16s
-    for(int i = 0; i != length; i ++)
-    {
-        int16_t sample16 = (sample[i] << 8) - 32768;
-        int16_t frame[2] = {sample16, sample16};
+   // Convert 8u to 16s
+   for(int i = 0; i != length; i ++)
+   {
+      int16_t sample16 = (sample[i] << 8) - 32768;
+      int16_t frame[2] = {sample16, sample16};
 
-        audio_cb((int16_t)frame[0], (int16_t)frame[1]);
-        //audio_batch_cb(frame, 2);
-    }
+      audio_cb((int16_t)frame[0], (int16_t)frame[1]);
+      //audio_batch_cb(frame, 2);
+   }
 }
 
 static void update_input()
 {
-// ----------------------------------------------------------------------------
-// SetInput
-// +----------+--------------+-------------------------------------------------
-// | Offset   | Controller   | Control
-// +----------+--------------+-------------------------------------------------
-// | 00       | Joystick 1   | Right
-// | 01       | Joystick 1   | Left
-// | 02       | Joystick 1   | Down
-// | 03       | Joystick 1   | Up
-// | 04       | Joystick 1   | Button 1
-// | 05       | Joystick 1   | Button 2
-// | 06       | Joystick 2   | Right
-// | 07       | Joystick 2   | Left
-// | 08       | Joystick 2   | Down
-// | 09       | Joystick 2   | Up
-// | 10       | Joystick 2   | Button 1
-// | 11       | Joystick 2   | Button 2
-// | 12       | Console      | Reset
-// | 13       | Console      | Select
-// | 14       | Console      | Pause
-// | 15       | Console      | Left Difficulty
-// | 16       | Console      | Right Difficulty
-// +----------+--------------+-------------------------------------------------
+   // ----------------------------------------------------------------------------
+   // SetInput
+   // +----------+--------------+-------------------------------------------------
+   // | Offset   | Controller   | Control
+   // +----------+--------------+-------------------------------------------------
+   // | 00       | Joystick 1   | Right
+   // | 01       | Joystick 1   | Left
+   // | 02       | Joystick 1   | Down
+   // | 03       | Joystick 1   | Up
+   // | 04       | Joystick 1   | Button 1
+   // | 05       | Joystick 1   | Button 2
+   // | 06       | Joystick 2   | Right
+   // | 07       | Joystick 2   | Left
+   // | 08       | Joystick 2   | Down
+   // | 09       | Joystick 2   | Up
+   // | 10       | Joystick 2   | Button 1
+   // | 11       | Joystick 2   | Button 2
+   // | 12       | Console      | Reset
+   // | 13       | Console      | Select
+   // | 14       | Console      | Pause
+   // | 15       | Console      | Left Difficulty
+   // | 16       | Console      | Right Difficulty
+   // +----------+--------------+-------------------------------------------------
 
-    if (!input_poll_cb)
-        return;
-    
-    input_poll_cb();
+   if (!input_poll_cb)
+      return;
 
-    keyboard_data[0]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
-    keyboard_data[1]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
-    keyboard_data[2]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
-    keyboard_data[3]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
-    keyboard_data[4]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
-    keyboard_data[5]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
-    keyboard_data[6]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
-    keyboard_data[7]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
-    keyboard_data[8]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
-    keyboard_data[9]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
-    keyboard_data[10] = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
-    keyboard_data[11] = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
-    keyboard_data[12] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X);
-    keyboard_data[13] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT);
-    keyboard_data[14] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START);
-    keyboard_data[15] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L);
-    keyboard_data[16] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R);
+   input_poll_cb();
+
+   keyboard_data[0]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
+   keyboard_data[1]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
+   keyboard_data[2]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
+   keyboard_data[3]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
+   keyboard_data[4]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
+   keyboard_data[5]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
+   keyboard_data[6]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
+   keyboard_data[7]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
+   keyboard_data[8]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
+   keyboard_data[9]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
+   keyboard_data[10] = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
+   keyboard_data[11] = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
+   keyboard_data[12] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X);
+   keyboard_data[13] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT);
+   keyboard_data[14] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START);
+   keyboard_data[15] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L);
+   keyboard_data[16] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R);
 }
 
 /************************************
@@ -184,7 +193,7 @@ static struct retro_system_av_info g_av_info;
 
 void retro_get_system_info(struct retro_system_info *info)
 {
-    memset(info, 0, sizeof(*info));
+   memset(info, 0, sizeof(*info));
 	info->library_name = "ProSystem";
 	info->library_version = "1.3e";
 	info->need_fullpath = false;
@@ -193,14 +202,14 @@ void retro_get_system_info(struct retro_system_info *info)
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-    memset(info, 0, sizeof(*info));
-    info->timing.fps            = cartridge_region == REGION_NTSC ? 60 : 50;
-    info->timing.sample_rate    = 48000;
-    info->geometry.base_width   = videoWidth;
-    info->geometry.base_height  = videoHeight;
-    info->geometry.max_width    = 320;
-    info->geometry.max_height   = 292;
-    info->geometry.aspect_ratio = 4.0 / 3.0;
+   memset(info, 0, sizeof(*info));
+   info->timing.fps            = cartridge_region == REGION_NTSC ? 60 : 50;
+   info->timing.sample_rate    = 48000;
+   info->geometry.base_width   = videoWidth;
+   info->geometry.base_height  = videoHeight;
+   info->geometry.max_width    = 320;
+   info->geometry.max_height   = 292;
+   info->geometry.aspect_ratio = 4.0 / 3.0;
 }
 
 void retro_set_controller_port_device(unsigned port, unsigned device)
@@ -211,18 +220,21 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void) 
 { 
+   //TODO
 	//return STATE_SIZE;
 	return 0;
 }
 
 bool retro_serialize(void *data, size_t size)
 { 
+   //TODO
 	//return prosystem_Save(fileName, false) ? true : false;
 	return false;
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
+   //TODO
 	//return prosystem_Load(fileName) ? true : false;
     return false;
 }
@@ -260,44 +272,45 @@ bool retro_load_game(const struct retro_game_info *info)
     full_path = info->path;
     const char *system_directory_c = NULL;
 
-    if (cartridge_Load(full_path)) {
-        environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
-        if (!system_directory_c)
-        {
-            if (log_cb)
-                log_cb(RETRO_LOG_WARN, "[ProSystem]: no system directory defined, unable to look for ProSystem.dat\n");
-            database_enabled = false;
-        }
-        else
-        {
-            std::string system_directory(system_directory_c);
-            std::string database_file_path = system_directory + "/ProSystem.dat";
-            std::ifstream database_file(database_file_path.c_str());
-            if (!database_file.is_open())
-            {
-                if (log_cb)
-                    log_cb(RETRO_LOG_WARN, "[ProSystem]: ProSystem.dat not found, cannot load internal ROM database\n");
-                database_enabled = false;
-            }
-            else
-            {
-                database_filename = database_file_path;
-                database_enabled = true;
-            }
-        }
+    if (cartridge_Load(full_path))
+    {
+       environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
+       if (!system_directory_c)
+       {
+          if (log_cb)
+             log_cb(RETRO_LOG_WARN, "[ProSystem]: no system directory defined, unable to look for ProSystem.dat\n");
+          database_enabled = false;
+       }
+       else
+       {
+          std::string system_directory(system_directory_c);
+          std::string database_file_path = system_directory + "/ProSystem.dat";
+          std::ifstream database_file(database_file_path.c_str());
+          if (!database_file.is_open())
+          {
+             if (log_cb)
+                log_cb(RETRO_LOG_WARN, "[ProSystem]: ProSystem.dat not found, cannot load internal ROM database\n");
+             database_enabled = false;
+          }
+          else
+          {
+             database_filename = database_file_path;
+             database_enabled = true;
+          }
+       }
 
-        // BIOS is optional
-        std::string system_directory(system_directory_c);
-        std::string bios_file_path = system_directory + "/7800 BIOS (U).rom";
-        if (bios_Load(bios_file_path))
-            bios_enabled = true;
+       // BIOS is optional
+       std::string system_directory(system_directory_c);
+       std::string bios_file_path = system_directory + "/7800 BIOS (U).rom";
+       if (bios_Load(bios_file_path))
+          bios_enabled = true;
 
-        database_Load(cartridge_digest);
-        prosystem_Reset();
+       database_Load(cartridge_digest);
+       prosystem_Reset();
 
-        display_ResetPalette32();
+       display_ResetPalette32();
 
-        return true;
+       return true;
     }
 
    return false;
@@ -339,6 +352,7 @@ size_t retro_get_memory_size(unsigned id)
 void retro_init(void)
 {
    struct retro_log_callback log;
+
    if (environ_cb(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log))
       log_cb = log.log;
    else
@@ -356,29 +370,32 @@ void retro_reset(void)
 
 void retro_run(void)
 {
-    update_input();
+   update_input();
 
-    prosystem_ExecuteFrame(keyboard_data); // wants input
+   prosystem_ExecuteFrame(keyboard_data); // wants input
 
-    videoWidth = maria_visibleArea.GetLength();
-    videoHeight = maria_visibleArea.GetHeight();
+   videoWidth = maria_visibleArea.GetLength();
+   videoHeight = maria_visibleArea.GetHeight();
 
-    const byte *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * maria_visibleArea.GetLength());
+   const byte *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * maria_visibleArea.GetLength());
 
-    uint *surface = (uint*)videoBuffer;
-    uint pitch = 320;
-    for(uint indexY = 0; indexY < videoHeight; indexY++) {
-        for(uint indexX = 0; indexX < videoWidth; indexX += 4) {
-            surface[indexX + 0] = display_palette32[buffer[indexX + 0]];
-            surface[indexX + 1] = display_palette32[buffer[indexX + 1]];
-            surface[indexX + 2] = display_palette32[buffer[indexX + 2]];
-            surface[indexX + 3] = display_palette32[buffer[indexX + 3]];
-        }
-        surface += pitch;
-        buffer += videoWidth;
-    }
+   uint *surface = (uint*)videoBuffer;
+   uint pitch = 320;
 
-    video_cb(videoBuffer, videoWidth, videoHeight, videoWidth << 2);
+   for(uint indexY = 0; indexY < videoHeight; indexY++)
+   {
+      for(uint indexX = 0; indexX < videoWidth; indexX += 4)
+      {
+         surface[indexX + 0] = display_palette32[buffer[indexX + 0]];
+         surface[indexX + 1] = display_palette32[buffer[indexX + 1]];
+         surface[indexX + 2] = display_palette32[buffer[indexX + 2]];
+         surface[indexX + 3] = display_palette32[buffer[indexX + 3]];
+      }
+      surface += pitch;
+      buffer += videoWidth;
+   }
 
-    sound_Store();
+   video_cb(videoBuffer, videoWidth, videoHeight, videoWidth << 2);
+
+   sound_Store();
 }
