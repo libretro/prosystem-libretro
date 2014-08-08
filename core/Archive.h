@@ -28,8 +28,8 @@
 #include <string>
 #include "Logger.h"
 #include "Cartridge.h"
-#include "zip.h"
-#include "unzip.h"
+#include "lib/Zip.h"
+#include "lib/unzip.h"
 
 typedef unsigned char byte;
 typedef unsigned short word;

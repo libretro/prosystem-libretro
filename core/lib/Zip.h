@@ -55,7 +55,7 @@ extern "C" {
 #endif
 
 #ifndef _ZLIBIOAPI_H
-#include "ioapi.h"
+#include "Ioapi.h"
 #endif
 
 #if defined(STRICTZIP) || defined(STRICTZIPUNZIP)

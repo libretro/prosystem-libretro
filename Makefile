@@ -131,7 +131,7 @@ all: $(TARGET)
 ifeq ($(DEBUG),1)
 FLAGS += -O0 -g
 else
-FLAGS += -O0
+FLAGS += -O2 -DNDEBUG
 endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)

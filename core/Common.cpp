@@ -22,6 +22,9 @@
 // ----------------------------------------------------------------------------
 // Common.cpp
 // ----------------------------------------------------------------------------
+#include <iostream>
+#include <algorithm>
+#include <stdio.h>
 #include "Common.h"
 
 std::string common_defaultPath;
