@@ -27,6 +27,9 @@
    Encryption is not supported.
 */
 
+#ifndef _CRYPT_HEADER_H
+#define _CRYPT_HEADER_H
+
 #define CRC32(c, b) ((*(pcrc_32_tab+(((int)(c) ^ (b)) & 0xff))) ^ ((c) >> 8))
 
 /***********************************************************************
@@ -130,4 +133,5 @@ static int crypthead(passwd, buf, bufSize, pkeys, pcrc_32_tab, crcForCrypting)
     return n;
 }
 
+#endif
 #endif
