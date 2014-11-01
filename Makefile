@@ -104,33 +104,12 @@ else
    SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
    LDFLAGS += -static-libgcc -static-libstdc++ -lwinmm
 endif
-PROSYSTEM_DIR := core
 
-PROSYSTEM_SOURCES := $(PROSYSTEM_DIR)/Archive.cpp \
-	$(PROSYSTEM_DIR)/Bios.cpp \
-	$(PROSYSTEM_DIR)/Cartridge.cpp \
-	$(PROSYSTEM_DIR)/Common.cpp \
-	$(PROSYSTEM_DIR)/Database.cpp \
-	$(PROSYSTEM_DIR)/Hash.cpp \
-	$(PROSYSTEM_DIR)/Logger.cpp \
-	$(PROSYSTEM_DIR)/Maria.cpp \
-	$(PROSYSTEM_DIR)/Memory.cpp \
-	$(PROSYSTEM_DIR)/Palette.cpp \
-	$(PROSYSTEM_DIR)/Pokey.cpp \
-	$(PROSYSTEM_DIR)/ProSystem.cpp \
-	$(PROSYSTEM_DIR)/Region.cpp \
-	$(PROSYSTEM_DIR)/Riot.cpp \
-	$(PROSYSTEM_DIR)/Sally.cpp \
-	$(PROSYSTEM_DIR)/Tia.cpp \
-	$(PROSYSTEM_DIR)/Timer.cpp
+CORE_DIR := .
 
-LIBRETRO_SOURCES := libretro.cpp
+include Makefile.common
 
-SOURCES_C := $(PROSYSTEM_DIR)/lib/Zip.c \
-	$(PROSYSTEM_DIR)/lib/Unzip.c
-
-SOURCES := $(LIBRETRO_SOURCES) $(PROSYSTEM_SOURCES)
-OBJECTS := $(SOURCES:.cpp=.o) $(SOURCES_C:.c=.o)
+OBJECTS := $(SOURCES_CXX:.cpp=.o) $(SOURCES_C:.c=.o)
 
 all: $(TARGET)
 
@@ -142,7 +121,7 @@ endif
 
 LDFLAGS += $(fpic) -lz $(SHARED)
 FLAGS += $(fpic) 
-FLAGS += -I. -Icore -Icore/lib
+FLAGS += $(INCFLAGS)
 
 ifeq ($(OLD_GCC), 1)
 WARNINGS := -Wall
