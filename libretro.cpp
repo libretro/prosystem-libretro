@@ -329,7 +329,7 @@ bool retro_load_game(const struct retro_game_info *info)
        // BIOS is optional
        std::string system_directory(system_directory_c);
        std::string bios_file_path = system_directory + "/7800 BIOS (U).rom";
-       if (bios_Load(bios_file_path))
+       if (bios_Load(bios_file_path.c_str()))
           bios_enabled = true;
 
        database_Load(cartridge_digest);

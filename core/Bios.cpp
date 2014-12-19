@@ -26,7 +26,6 @@
 #define BIOS_SOURCE "Bios.cpp"
 
 bool bios_enabled = false;
-std::string bios_filename;
 
 static byte* bios_data = NULL;
 static word bios_size = 0;
@@ -34,20 +33,14 @@ static word bios_size = 0;
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool bios_Load(std::string filename) {
-  if(filename.empty( ) || filename.length( ) == 0) {
-    logger_LogError("Bios filename is invalid.", BIOS_SOURCE);
+bool bios_Load(const char *filename) {
+  if(!filename || filename[0] == '\0')
     return false;
-  }
   
   bios_Release( );
-  logger_LogInfo("Opening bios file " + filename + ".", BIOS_SOURCE);
 
-  FILE* file = fopen(filename.c_str( ), "rb");
+  FILE* file = fopen(filename, "rb");
   if(file == NULL) {
-#ifndef WII
-     logger_LogError("Failed to open the bios file " + filename + " for reading.", BIOS_SOURCE);
-#endif
      return false;
   } 
 
@@ -74,7 +67,6 @@ bool bios_Load(std::string filename) {
 
   fclose(file);
 
-  bios_filename = filename;
   return true; 
 }
 
