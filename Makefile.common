@@ -1,7 +1,6 @@
-INCFLAGS += -I$(CORE_DIR) -I$(CORE_DIR)/core -I$(CORE_DIR)/core/lib
+INCFLAGS += -I$(CORE_DIR) -I$(CORE_DIR)/core
 
-SOURCES_CXX := $(CORE_DIR)/core/Archive.cpp \
-	$(CORE_DIR)/core/Bios.cpp \
+SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/core/Cartridge.cpp \
 	$(CORE_DIR)/core/Common.cpp \
 	$(CORE_DIR)/core/Database.cpp \
@@ -19,6 +18,4 @@ SOURCES_CXX := $(CORE_DIR)/core/Archive.cpp \
 	$(CORE_DIR)/core/Timer.cpp \
 	$(CORE_DIR)/libretro.cpp
 
-SOURCES_C := $(CORE_DIR)/core/lib/Zip.c \
-	$(CORE_DIR)/core/lib/Unzip.c \
-	$(CORE_DIR)/scrc32.c 
+SOURCES_C :=

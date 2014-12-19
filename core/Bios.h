@@ -28,7 +28,6 @@
 
 #include <string>
 #include "Memory.h"
-#include "Archive.h"
 #include "Logger.h"
 
 typedef unsigned char byte;

@@ -45,7 +45,6 @@
 #include "Hash.h"
 #include "Logger.h"
 #include "Pokey.h"
-#include "Archive.h"
 
 typedef unsigned char byte;
 typedef unsigned short word;

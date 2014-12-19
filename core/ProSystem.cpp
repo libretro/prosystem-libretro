@@ -169,27 +169,20 @@ bool prosystem_Save(std::string filename, bool compress) {
     size += 16384;
   }
   
-  if(!compress) {
-    FILE* file = fopen(filename.c_str( ), "wb");
-    if(file == NULL) {
-      logger_LogError("Failed to open the file " + filename + " for writing.", PRO_SYSTEM_SOURCE);
-      return false;
-    }
-  
-    if(fwrite(buffer, 1, size, file) != size) {
-      fclose(file);
-      logger_LogError("Failed to write the save state data to the file " + filename + ".", PRO_SYSTEM_SOURCE);
-      return false;
-    }
-  
-    fclose(file);
+  FILE* file = fopen(filename.c_str( ), "wb");
+  if(file == NULL) {
+     logger_LogError("Failed to open the file " + filename + " for writing.", PRO_SYSTEM_SOURCE);
+     return false;
   }
-  else {
-    if(!archive_Compress(filename.c_str( ), "Save.sav", buffer, size)) {
-      logger_LogError("Failed to compress the save state data to the file " + filename + ".", PRO_SYSTEM_SOURCE);
-      return false;
-    }
+
+  if(fwrite(buffer, 1, size, file) != size) {
+     fclose(file);
+     logger_LogError("Failed to write the save state data to the file " + filename + ".", PRO_SYSTEM_SOURCE);
+     return false;
   }
+
+  fclose(file);
+
   return true;
 }
 
@@ -206,8 +199,8 @@ bool prosystem_Load(const std::string filename) {
   logger_LogInfo("Loading game state from file " + filename + ".", PRO_SYSTEM_SOURCE);
   
   byte buffer[32829] = {0};
-  uint size = archive_GetUncompressedFileSize(filename);
-  if(size == 0) {
+  uint size = 0;
+  {
     FILE* file = fopen(filename.c_str( ), "rb");
     if(file == NULL) {
       logger_LogError("Failed to open the file " + filename + " for reading.", PRO_SYSTEM_SOURCE);
@@ -240,13 +233,6 @@ bool prosystem_Load(const std::string filename) {
     }
     fclose(file);
   }  
-  else if(size == 16445 || size == 32829) {
-    archive_Uncompress(filename, buffer, size);
-  }
-  else {
-    logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
-    return false;
-  }
 
   uint offset = 0;
   uint index;
