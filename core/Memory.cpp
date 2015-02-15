@@ -24,15 +24,15 @@
 // ----------------------------------------------------------------------------
 #include "Memory.h"
 
-byte memory_ram[MEMORY_SIZE] = {0};
-byte memory_rom[MEMORY_SIZE] = {0};
+uint8_t memory_ram[MEMORY_SIZE] = {0};
+uint8_t memory_rom[MEMORY_SIZE] = {0};
 
 // ----------------------------------------------------------------------------
 // Reset
 // ----------------------------------------------------------------------------
 void memory_Reset(void)
 {
-   uint index;
+   uint32_t index;
    for(index = 0; index < MEMORY_SIZE; index++)
    {
       memory_ram[index] = 0;
@@ -44,9 +44,9 @@ void memory_Reset(void)
 // ----------------------------------------------------------------------------
 // Read
 // ----------------------------------------------------------------------------
-byte memory_Read(word address)
+uint8_t memory_Read(uint16_t address)
 {
-   byte tmp_byte;
+   uint8_t tmp_uint8_t;
 
    switch ( address )
    {
@@ -57,9 +57,9 @@ byte memory_Read(word address)
          break;
       case INTFLG:
       case INTFLG | 0x2:
-         tmp_byte = memory_ram[INTFLG];
+         tmp_uint8_t = memory_ram[INTFLG];
          memory_ram[INTFLG] &= 0x7f;
-         return tmp_byte; 
+         return tmp_uint8_t; 
          break;
       default:
          return memory_ram[address];
@@ -70,7 +70,7 @@ byte memory_Read(word address)
 // ----------------------------------------------------------------------------
 // Write
 // ----------------------------------------------------------------------------
-void memory_Write(word address, byte data)
+void memory_Write(uint16_t address, uint8_t data)
 {
    if(!memory_rom[address])
    {
@@ -161,11 +161,11 @@ void memory_Write(word address, byte data)
 // ----------------------------------------------------------------------------
 // WriteROM
 // ----------------------------------------------------------------------------
-void memory_WriteROM(word address, word size, const byte* data)
+void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data)
 {
    if((address + size) <= MEMORY_SIZE && data != NULL)
    {
-      for(uint index = 0; index < size; index++)
+      for(uint32_t index = 0; index < size; index++)
       {
          memory_ram[address + index] = data[index];
          memory_rom[address + index] = 1;
@@ -176,11 +176,11 @@ void memory_WriteROM(word address, word size, const byte* data)
 // ----------------------------------------------------------------------------
 // ClearROM
 // ----------------------------------------------------------------------------
-void memory_ClearROM(word address, word size)
+void memory_ClearROM(uint16_t address, uint16_t size)
 {
    if((address + size) <= MEMORY_SIZE)
    {
-      for(uint index = 0; index < size; index++)
+      for(uint32_t index = 0; index < size; index++)
       {
          memory_ram[address + index] = 0;
          memory_rom[address + index] = 0;

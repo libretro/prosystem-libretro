@@ -36,9 +36,9 @@
 #define CARTRIDGE_CONTROLLER_LIGHTGUN 2
 #define CARTRIDGE_WSYNC_MASK 2
 #define CARTRIDGE_CYCLE_STEALING_MASK 1
-//#define NULL 0
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string>
 #include "Equates.h"
 #include "Memory.h"
@@ -46,14 +46,10 @@
 #include "Logger.h"
 #include "Pokey.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern bool cartridge_Load(std::string filename);
 extern void cartridge_Store(void);
-extern void cartridge_StoreBank(byte bank);
-extern void cartridge_Write(word address, byte data);
+extern void cartridge_StoreBank(uint8_t bank);
+extern void cartridge_Write(uint16_t address, uint8_t data);
 extern bool cartridge_IsLoaded(void);
 extern void cartridge_Release(void);
 extern std::string cartridge_digest;
@@ -62,11 +58,11 @@ extern std::string cartridge_description;
 extern std::string cartridge_year;
 extern std::string cartridge_maker;
 extern std::string cartridge_filename;
-extern byte cartridge_type;
-extern byte cartridge_region;
+extern uint8_t cartridge_type;
+extern uint8_t cartridge_region;
 extern bool cartridge_pokey;
-extern byte cartridge_controller[2];
-extern byte cartridge_bank;
-extern uint cartridge_flags;
+extern uint8_t cartridge_controller[2];
+extern uint8_t cartridge_bank;
+extern uint32_t cartridge_flags;
 
 #endif

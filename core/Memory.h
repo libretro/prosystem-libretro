@@ -33,16 +33,12 @@
 #include "Tia.h"
 #include "Riot.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void memory_Reset(void);
-extern byte memory_Read(word address);
-extern void memory_Write(word address, byte data);
-extern void memory_WriteROM(word address, word size, const byte* data);
-extern void memory_ClearROM(word address, word size);
-extern byte memory_ram[MEMORY_SIZE];
-extern byte memory_rom[MEMORY_SIZE];
+extern uint8_t memory_Read(uint16_t address);
+extern void memory_Write(uint16_t address, uint8_t data);
+extern void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data);
+extern void memory_ClearROM(uint16_t address, uint16_t size);
+extern uint8_t memory_ram[MEMORY_SIZE];
+extern uint8_t memory_rom[MEMORY_SIZE];
 
 #endif

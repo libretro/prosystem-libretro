@@ -32,17 +32,13 @@
 #include "Rect.h"
 #include "Sally.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void maria_Reset(void);
-extern uint maria_RenderScanline(void);
+extern uint32_t maria_RenderScanline(void);
 extern void maria_Clear(void);
 
 extern rect maria_displayArea;
 extern rect maria_visibleArea;
-extern byte maria_surface[MARIA_SURFACE_SIZE];
-extern word maria_scanline;
+extern uint8_t maria_surface[MARIA_SURFACE_SIZE];
+extern uint16_t maria_scanline;
 
 #endif

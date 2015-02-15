@@ -42,17 +42,15 @@
 #define TIA_H
 #define TIA_BUFFER_SIZE 624
 
+#include <stdint.h>
 #include "Equates.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
+extern void tia_Reset(void);
+extern void tia_SetRegister(uint16_t address, uint8_t data);
+extern void tia_Clear(void);
 
-extern void tia_Reset( );
-extern void tia_SetRegister(word address, byte data);
-extern void tia_Clear( );
-extern void tia_Process(uint length);
-extern byte tia_buffer[TIA_BUFFER_SIZE];
-extern uint tia_size;
+extern void tia_Process(uint32_t length);
+extern uint8_t tia_buffer[TIA_BUFFER_SIZE];
+extern uint32_t tia_size;
 
 #endif

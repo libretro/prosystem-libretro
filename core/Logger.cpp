@@ -26,7 +26,7 @@
 #define LOGGER_FILENAME "ProSystem.log"
 #include <iostream>
 
-byte logger_level = LOGGER_LEVEL_DEBUG;
+uint8_t logger_level = LOGGER_LEVEL_DEBUG;
 static FILE* logger_file = NULL;
 char a[255]="";
 
@@ -43,7 +43,7 @@ static std::string logger_GetTime( ) {
 // ----------------------------------------------------------------------------
 // Log
 // ----------------------------------------------------------------------------
-static void logger_Log(std::string message, byte level, std::string source) {
+static void logger_Log(std::string message, uint8_t level, std::string source) {
   if(logger_file != NULL) {
     std::string entry = "[" + logger_GetTime( ) + "]";
     switch(level) {

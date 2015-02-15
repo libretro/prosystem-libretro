@@ -24,20 +24,17 @@
 // ----------------------------------------------------------------------------
 #ifndef PALETTE_H
 #define PALETTE_H
-#define PALETTE_SIZE 768
-//#define NULL 0
 
+#define PALETTE_SIZE 768
+
+#include <stdint.h>
 #include <string>
 #include "Logger.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern bool palette_Load(std::string filename);
-extern void palette_Load(const byte* data);
+extern void palette_Load(const uint8_t* data);
 extern std::string palette_filename;
-extern byte palette_data[PALETTE_SIZE];
+extern uint8_t palette_data[PALETTE_SIZE];
 extern bool palette_default;
 
 #endif

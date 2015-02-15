@@ -40,6 +40,7 @@
 // ----------------------------------------------------------------------------
 #ifndef POKEY_H
 #define POKEY_H
+
 #define POKEY_BUFFER_SIZE 624
 #define POKEY_AUDF1 0x4000
 #define POKEY_AUDC1 0x4001
@@ -51,16 +52,14 @@
 #define POKEY_AUDC4 0x4007
 #define POKEY_AUDCTL 0x4008
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
+#include <stdint.h>
 
 extern void pokey_Reset(void);
-extern void pokey_SetRegister(word address, byte value);
-extern void pokey_Process(uint length);
+extern void pokey_SetRegister(uint16_t address, uint8_t value);
+extern void pokey_Process(uint32_t length);
 extern void pokey_Clear(void);
 
-extern byte pokey_buffer[POKEY_BUFFER_SIZE];
-extern uint pokey_size;
+extern uint8_t pokey_buffer[POKEY_BUFFER_SIZE];
+extern uint32_t pokey_size;
 
 #endif

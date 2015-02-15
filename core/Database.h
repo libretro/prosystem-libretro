@@ -30,10 +30,6 @@
 #include "Logger.h"
 #include "Common.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void database_Initialize(void);
 extern bool database_Load(const char *digest);
 extern bool database_enabled;

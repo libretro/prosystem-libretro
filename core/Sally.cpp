@@ -24,42 +24,42 @@
 // ----------------------------------------------------------------------------
 #include "Sally.h"
 
-byte sally_a = 0;
-byte sally_x = 0;
-byte sally_y = 0;
-byte sally_p = 0;
-byte sally_s = 0;
+uint8_t sally_a = 0;
+uint8_t sally_x = 0;
+uint8_t sally_y = 0;
+uint8_t sally_p = 0;
+uint8_t sally_s = 0;
 pair sally_pc = {0};
 
-static byte sally_opcode;
+static uint8_t sally_opcode;
 static pair sally_address;
-static uint sally_cycles;
+static uint32_t sally_cycles;
 
 struct Flag
 {
-   byte C;
-   byte Z;
-   byte I;
-   byte D;
-   byte B;
-   byte R;
-   byte V;
-   byte N;
+   uint8_t C;
+   uint8_t Z;
+   uint8_t I;
+   uint8_t D;
+   uint8_t B;
+   uint8_t R;
+   uint8_t V;
+   uint8_t N;
 };
 
 static const Flag SALLY_FLAG = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
 struct Vector
 {
-   word H;
-   word L;
+   uint16_t H;
+   uint16_t L;
 };
 
 static const Vector SALLY_RES = {65533, 65532};
 static const Vector SALLY_NMI = {65531, 65530};
 static const Vector SALLY_IRQ = {65535, 65534}; 
 
-static const byte SALLY_CYCLES[256] = {
+static const uint8_t SALLY_CYCLES[256] = {
 	7,6,0,0,0,3,5,0,3,2,2,0,0,4,6,0,
 	2,5,0,0,0,4,6,0,2,4,0,0,0,4,7,0,
 	6,6,0,0,3,3,5,0,4,2,2,0,4,4,6,0,
@@ -81,7 +81,7 @@ static const byte SALLY_CYCLES[256] = {
 // ----------------------------------------------------------------------------
 // Push
 // ----------------------------------------------------------------------------
-static void sally_Push(byte data)
+static void sally_Push(uint8_t data)
 {
    memory_Write(sally_s + 256, data);
    sally_s--;
@@ -90,7 +90,7 @@ static void sally_Push(byte data)
 // ----------------------------------------------------------------------------
 // Pop
 // ----------------------------------------------------------------------------
-static byte sally_Pop(void)
+static uint8_t sally_Pop(void)
 {
   sally_s++;
   return memory_Read(sally_s + 256);
@@ -99,7 +99,7 @@ static byte sally_Pop(void)
 // ----------------------------------------------------------------------------
 // Flags
 // ----------------------------------------------------------------------------
-static void sally_Flags(byte data)
+static void sally_Flags(uint8_t data)
 {
    if(!data)
       sally_p |= SALLY_FLAG.Z;
@@ -115,7 +115,7 @@ static void sally_Flags(byte data)
 // ----------------------------------------------------------------------------
 // Branch
 // ----------------------------------------------------------------------------
-static void sally_Branch(byte branch)
+static void sally_Branch(uint8_t branch)
 {
    if (branch)
    {
@@ -132,7 +132,7 @@ static void sally_Branch(byte branch)
 // ----------------------------------------------------------------------------
 // Delay
 // ----------------------------------------------------------------------------
-static void sally_Delay(byte delta)
+static void sally_Delay(uint8_t delta)
 {
   pair address1 = sally_address;
   pair address2 = sally_address;
@@ -239,11 +239,11 @@ static void sally_ZeroPageY( ) {
 // ADC
 // ----------------------------------------------------------------------------
 static void sally_ADC( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
     
   if(sally_p & SALLY_FLAG.D) {
-    word al = (sally_a & 15) + (data & 15) + (sally_p & SALLY_FLAG.C);
-    word ah = (sally_a >> 4) + (data >> 4);
+    uint16_t al = (sally_a & 15) + (data & 15) + (sally_p & SALLY_FLAG.C);
+    uint16_t ah = (sally_a >> 4) + (data >> 4);
 
     if(al > 9) {
       al += 6;
@@ -323,7 +323,7 @@ static void sally_ASLA(void)
 // ----------------------------------------------------------------------------
 static void sally_ASL(void)
 {
-   byte data = memory_Read(sally_address.w);
+   uint8_t data = memory_Read(sally_address.w);
 
    if(data & 128)
       sally_p |= SALLY_FLAG.C;
@@ -360,7 +360,7 @@ static void sally_BEQ( ) {
 // BIT
 // ----------------------------------------------------------------------------
 static void sally_BIT( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
     
   if(!(data & sally_a)) {
     sally_p |= SALLY_FLAG.Z;
@@ -458,7 +458,7 @@ static void sally_CLV( ) {
 // CMP
 // ----------------------------------------------------------------------------
 static void sally_CMP( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
     
   if(sally_a >= data) {
     sally_p |= SALLY_FLAG.C;
@@ -474,7 +474,7 @@ static void sally_CMP( ) {
 // CPX
 // ----------------------------------------------------------------------------
 static void sally_CPX( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
     
   if(sally_x >= data) {
     sally_p |= SALLY_FLAG.C;  
@@ -490,7 +490,7 @@ static void sally_CPX( ) {
 // CPY
 // ----------------------------------------------------------------------------
 static void sally_CPY( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
 
   if(sally_y >= data) {
     sally_p |= SALLY_FLAG.C;
@@ -506,7 +506,7 @@ static void sally_CPY( ) {
 // DEC
 // ----------------------------------------------------------------------------
 static void sally_DEC( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
   memory_Write(sally_address.w, --data);
   sally_Flags(data);
 }
@@ -537,7 +537,7 @@ static void sally_EOR( ) {
 // INC
 // ----------------------------------------------------------------------------
 static void sally_INC( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
   memory_Write(sally_address.w, ++data);
   sally_Flags(data);
 }
@@ -613,7 +613,7 @@ static void sally_LSRA( ) {
 // LSR
 // ----------------------------------------------------------------------------
 static void sally_LSR( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
     
   sally_p &= ~SALLY_FLAG.C;
   sally_p |= data & 1;
@@ -670,7 +670,7 @@ static void sally_PLP( ) {
 // ROLA
 // ----------------------------------------------------------------------------
 static void sally_ROLA( ) {
-  byte temp = sally_p;
+  uint8_t temp = sally_p;
 
   if(sally_a & 128) {
     sally_p |= SALLY_FLAG.C;  
@@ -688,8 +688,8 @@ static void sally_ROLA( ) {
 // ROL
 // ----------------------------------------------------------------------------
 static void sally_ROL( ) {
-  byte data = memory_Read(sally_address.w);
-  byte temp = sally_p;
+  uint8_t data = memory_Read(sally_address.w);
+  uint8_t temp = sally_p;
     
   if(data & 128) {
     sally_p |= SALLY_FLAG.C;
@@ -708,7 +708,7 @@ static void sally_ROL( ) {
 // RORA
 // ----------------------------------------------------------------------------
 static void sally_RORA( ) {
-  byte temp = sally_p;
+  uint8_t temp = sally_p;
 
   sally_p &= ~SALLY_FLAG.C;
   sally_p |= sally_a & 1;
@@ -725,8 +725,8 @@ static void sally_RORA( ) {
 // ROR
 // ----------------------------------------------------------------------------
 static void sally_ROR( ) {
-  byte data = memory_Read(sally_address.w);
-  byte temp = sally_p;
+  uint8_t data = memory_Read(sally_address.w);
+  uint8_t temp = sally_p;
     
   sally_p &= ~SALLY_FLAG.C;
   sally_p |= data & 1;
@@ -762,11 +762,11 @@ static void sally_RTS( ) {
 // SBC
 // ----------------------------------------------------------------------------
 static void sally_SBC( ) {
-  byte data = memory_Read(sally_address.w);
+  uint8_t data = memory_Read(sally_address.w);
 
   if(sally_p & SALLY_FLAG.D) {
-    word al = (sally_a & 15) - (data & 15) - !(sally_p & SALLY_FLAG.C);
-    word ah = (sally_a >> 4) - (data >> 4);
+    uint16_t al = (sally_a & 15) - (data & 15) - !(sally_p & SALLY_FLAG.C);
+    uint16_t ah = (sally_a >> 4) - (data >> 4);
         
     if(al > 9) {
       al -= 6;
@@ -924,7 +924,7 @@ void sally_Reset( ) {
 // ----------------------------------------------------------------------------
 // ExecuteInstruction
 // ----------------------------------------------------------------------------
-uint sally_ExecuteInstruction(void)
+uint32_t sally_ExecuteInstruction(void)
 {
    sally_opcode = memory_Read(sally_pc.w++);
    sally_cycles = SALLY_CYCLES[sally_opcode];
@@ -1689,7 +1689,7 @@ uint sally_ExecuteInstruction(void)
 // ----------------------------------------------------------------------------
 // ExecuteRES
 // ----------------------------------------------------------------------------
-uint sally_ExecuteRES(void)
+uint32_t sally_ExecuteRES(void)
 {
    sally_p = SALLY_FLAG.I | SALLY_FLAG.R | SALLY_FLAG.Z;
    sally_pc.b.l = memory_ram[SALLY_RES.L];
@@ -1700,7 +1700,7 @@ uint sally_ExecuteRES(void)
 // ----------------------------------------------------------------------------
 // ExecuteNMI
 // ----------------------------------------------------------------------------
-uint sally_ExecuteNMI(void)
+uint32_t sally_ExecuteNMI(void)
 {
    sally_Push(sally_pc.b.h);
    sally_Push(sally_pc.b.l);
@@ -1715,7 +1715,7 @@ uint sally_ExecuteNMI(void)
 // ----------------------------------------------------------------------------
 // Execute IRQ
 // ----------------------------------------------------------------------------
-uint sally_ExecuteIRQ(void)
+uint32_t sally_ExecuteIRQ(void)
 {
    if(!(sally_p & SALLY_FLAG.I))
    {

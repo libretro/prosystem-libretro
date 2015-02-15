@@ -28,7 +28,7 @@
 // ----------------------------------------------------------------------------
 // Step1
 // ----------------------------------------------------------------------------
-static uint hash_Step1(uint w, uint x, uint y, uint z, uint data, uint s)
+static uint32_t hash_Step1(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s)
 {
    w += (z ^ (x & (y ^ z))) + data;
    w = w << s | w >> (32 - s);
@@ -39,7 +39,7 @@ static uint hash_Step1(uint w, uint x, uint y, uint z, uint data, uint s)
 // ----------------------------------------------------------------------------
 // Step2
 // ----------------------------------------------------------------------------
-static uint hash_Step2(uint w, uint x, uint y, uint z, uint data, uint s)
+static uint32_t hash_Step2(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s)
 {
    w += (y ^ (z & (x ^ y))) + data;
    w = w << s | w >> (32 - s);
@@ -50,7 +50,7 @@ static uint hash_Step2(uint w, uint x, uint y, uint z, uint data, uint s)
 // ----------------------------------------------------------------------------
 // Step3
 // ----------------------------------------------------------------------------
-static uint hash_Step3(uint w, uint x, uint y, uint z, uint data, uint s) {
+static uint32_t hash_Step3(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s) {
   w += (x ^ y ^ z) + data;  
   w = w << s | w >> (32 - s);
   w += x;
@@ -60,7 +60,7 @@ static uint hash_Step3(uint w, uint x, uint y, uint z, uint data, uint s) {
 // ----------------------------------------------------------------------------
 // Step4
 // ----------------------------------------------------------------------------
-static uint hash_Step4(uint w, uint x, uint y, uint z, uint data, uint s) {
+static uint32_t hash_Step4(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s) {
   w += (y ^ (x | ~z)) + data;  
   w = w << s | w >> (32 - s);
   w += x;
@@ -70,8 +70,8 @@ static uint hash_Step4(uint w, uint x, uint y, uint z, uint data, uint s) {
 // ----------------------------------------------------------------------------
 // Transform
 // ----------------------------------------------------------------------------
-static void hash_Transform(uint out[4], uint in[16]) {
-  uint a, b, c, d;
+static void hash_Transform(uint32_t out[4], uint32_t in[16]) {
+  uint32_t a, b, c, d;
 
   a = out[0];
   b = out[1];
@@ -155,15 +155,15 @@ static void hash_Transform(uint out[4], uint in[16]) {
 // ----------------------------------------------------------------------------
 // Compute
 // ----------------------------------------------------------------------------
-std::string hash_Compute(const byte* source, uint length)
+std::string hash_Compute(const uint8_t* source, uint32_t length)
 {
-  uint buffer1[4] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476};
-  uint buffer2[2] = {0};
-  byte buffer3[64] = {0};
+  uint32_t buffer1[4] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476};
+  uint32_t buffer2[2] = {0};
+  uint8_t buffer3[64] = {0};
 
-  uint temp = buffer2[0];
+  uint32_t temp = buffer2[0];
 
-  if((buffer2[0] = temp + ((uint)length << 3)) < temp)
+  if((buffer2[0] = temp + ((uint32_t)length << 3)) < temp)
 	  buffer2[1]++;
 
   buffer2[1] += length >> 29;
@@ -171,64 +171,64 @@ std::string hash_Compute(const byte* source, uint length)
   temp = (temp >> 3) & 0x3f;
   if(temp)
   {
-	  byte* ptr = (byte*)buffer3 + temp;
+	  uint8_t* ptr = (uint8_t*)buffer3 + temp;
 	  temp = 64 - temp;
 
 	  if(length < temp)
      {
-      for(uint index = 0; index < length; index++)
+      for(uint32_t index = 0; index < length; index++)
         ptr[index] = source[index];
 	  }
 	  
-    for(uint index = 0; index < temp; index++)
+    for(uint32_t index = 0; index < temp; index++)
       ptr[index] = source[index];
 
-	  hash_Transform(buffer1, (uint*)buffer3);
+	  hash_Transform(buffer1, (uint32_t*)buffer3);
 	  source += temp;
 	  length -= temp;
   }
 
   while(length >= 64)
   {
-    for(uint index = 0; index < 64; index++)
+    for(uint32_t index = 0; index < 64; index++)
       buffer3[index] = source[index];
-	  hash_Transform(buffer1, (uint*)buffer3);
+	  hash_Transform(buffer1, (uint32_t*)buffer3);
 	  source += 64;
 	  length -= 64;
   }
 
-  for(uint index = 0; index < length; index++)
+  for(uint32_t index = 0; index < length; index++)
     buffer3[index] = source[index];
 
-  uint count = (buffer2[0] >> 3) & 0x3f;
-  byte* ptr = buffer3 + count;
+  uint32_t count = (buffer2[0] >> 3) & 0x3f;
+  uint8_t* ptr = buffer3 + count;
   *ptr++ = 0x80;
 
   count = 63 - count;
 
   if(count < 8)
   {
-    for(uint index = 0; index < count; index++)
+    for(uint32_t index = 0; index < count; index++)
       ptr[index] = 0;
-	  hash_Transform(buffer1, (uint*)buffer3);
+	  hash_Transform(buffer1, (uint32_t*)buffer3);
     
-    for(uint index = 0; index < 56; index++)
+    for(uint32_t index = 0; index < 56; index++)
       buffer3[index] = 0;
   } 
   else
   {
-    for(uint index = 0; index < count - 8; index++)
+    for(uint32_t index = 0; index < count - 8; index++)
       ptr[index] = 0;
   }
 
-  ((uint*)buffer3)[14] = buffer2[0];
-  ((uint*)buffer3)[15] = buffer2[1];
+  ((uint32_t*)buffer3)[14] = buffer2[0];
+  ((uint32_t*)buffer3)[15] = buffer2[1];
 
-  hash_Transform(buffer1, (uint*)buffer3);
+  hash_Transform(buffer1, (uint32_t*)buffer3);
   
-  byte digest[16];
-  byte* bufferptr = (byte*)buffer1;
-  for(uint index = 0; index < 16; index++)
+  uint8_t digest[16];
+  uint8_t* bufferptr = (uint8_t*)buffer1;
+  for(uint32_t index = 0; index < 16; index++)
     digest[index] = bufferptr[index];
 
   char buffer[33] = {0};

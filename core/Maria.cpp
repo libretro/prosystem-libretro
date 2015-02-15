@@ -27,25 +27,25 @@
 
 rect maria_displayArea = {0, 16, 319, 258};
 rect maria_visibleArea = {0, 26, 319, 248};
-byte maria_surface[MARIA_SURFACE_SIZE] = {0};
-word maria_scanline = 1;
+uint8_t maria_surface[MARIA_SURFACE_SIZE] = {0};
+uint16_t maria_scanline = 1;
 
-static byte maria_lineRAM[MARIA_LINERAM_SIZE];
-static uint maria_cycles;
+static uint8_t maria_lineRAM[MARIA_LINERAM_SIZE];
+static uint32_t maria_cycles;
 static pair maria_dpp;
 static pair maria_dp;
 static pair maria_pp;
-static byte maria_horizontal;
-static byte maria_palette;
+static uint8_t maria_horizontal;
+static uint8_t maria_palette;
 static char maria_offset;
-static byte maria_h08;
-static byte maria_h16;
-static byte maria_wmode;
+static uint8_t maria_h08;
+static uint8_t maria_h16;
+static uint8_t maria_wmode;
 
 // ----------------------------------------------------------------------------
 // StoreCell
 // ----------------------------------------------------------------------------
-static void maria_StoreCell(byte data)
+static void maria_StoreCell(uint8_t data)
 {
    if(maria_horizontal < MARIA_LINERAM_SIZE)
    {
@@ -53,7 +53,7 @@ static void maria_StoreCell(byte data)
          maria_lineRAM[maria_horizontal] = maria_palette | data;
       else
       {
-         byte kmode = memory_ram[CTRL] & 4;
+         uint8_t kmode = memory_ram[CTRL] & 4;
          if(kmode)
             maria_lineRAM[maria_horizontal] = 0;
       }
@@ -65,7 +65,7 @@ static void maria_StoreCell(byte data)
 // ----------------------------------------------------------------------------
 // StoreCell
 // ----------------------------------------------------------------------------
-static void maria_StoreCell(byte high, byte low)
+static void maria_StoreCell(uint8_t high, uint8_t low)
 {
   if(maria_horizontal < MARIA_LINERAM_SIZE)
   {
@@ -73,7 +73,7 @@ static void maria_StoreCell(byte high, byte low)
       maria_lineRAM[maria_horizontal] = (maria_palette & 16) | high | low;
     else
     { 
-      byte kmode = memory_ram[CTRL] & 4;
+      uint8_t kmode = memory_ram[CTRL] & 4;
       if(kmode)
         maria_lineRAM[maria_horizontal] = 0;
     }
@@ -99,7 +99,7 @@ static bool maria_IsHolyDMA(void)
 // ----------------------------------------------------------------------------
 // GetColor
 // ----------------------------------------------------------------------------
-static byte maria_GetColor(byte data)
+static uint8_t maria_GetColor(uint8_t data)
 {
   if(data & 3)
     return memory_ram[BACKGRND + data];
@@ -111,7 +111,7 @@ static byte maria_GetColor(byte data)
 // ----------------------------------------------------------------------------
 static void maria_StoreGraphic(void)
 {
-   byte data = memory_ram[maria_pp.w];
+   uint8_t data = memory_ram[maria_pp.w];
    if(maria_wmode)
    {
       if(maria_IsHolyDMA( ))
@@ -148,15 +148,15 @@ static void maria_StoreGraphic(void)
 // ----------------------------------------------------------------------------
 // WriteLineRAM
 // ----------------------------------------------------------------------------
-static void maria_WriteLineRAM(byte* buffer)
+static void maria_WriteLineRAM(uint8_t* buffer)
 {
-   byte rmode = memory_ram[CTRL] & 3;
+   uint8_t rmode = memory_ram[CTRL] & 3;
 
    if(rmode == 0)
    {
       int pixel = 0;
       for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
-         byte color;
+         uint8_t color;
          color = maria_GetColor(maria_lineRAM[index + 0]);
          buffer[pixel++] = color;
          buffer[pixel++] = color;
@@ -209,11 +209,11 @@ static void maria_StoreLineRAM(void)
   for(int index = 0; index < MARIA_LINERAM_SIZE; index++)
     maria_lineRAM[index] = 0;
   
-  byte mode = memory_ram[maria_dp.w + 1];
+  uint8_t mode = memory_ram[maria_dp.w + 1];
   while(mode & 0x5f)
   {
-     byte width;
-     byte indirect = 0;
+     uint8_t width;
+     uint8_t indirect = 0;
 
      maria_pp.b.l = memory_ram[maria_dp.w];
      maria_pp.b.h = memory_ram[maria_dp.w + 2];
@@ -245,7 +245,7 @@ static void maria_StoreLineRAM(void)
         }
      }
      else {
-        byte cwidth = memory_ram[CTRL] & 16;
+        uint8_t cwidth = memory_ram[CTRL] & 16;
         pair basePP = maria_pp;
         for(int index = 0; index < width; index++) {
            maria_cycles += 3;
@@ -277,7 +277,7 @@ void maria_Reset(void)
 // ----------------------------------------------------------------------------
 // RenderScanline
 // ----------------------------------------------------------------------------
-uint maria_RenderScanline(void)
+uint32_t maria_RenderScanline(void)
 {
    maria_cycles = 0;
    if((memory_ram[CTRL] & 96) == 64 && maria_scanline >= maria_displayArea.top && maria_scanline <= maria_displayArea.bottom)

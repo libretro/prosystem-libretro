@@ -24,9 +24,12 @@
 // ----------------------------------------------------------------------------
 #ifndef REGION_H
 #define REGION_H
+
 #define REGION_NTSC 0
 #define REGION_PAL 1
 #define REGION_AUTO 2
+
+#include <stdint.h>
 
 #include "Cartridge.h"
 #include "ProSystem.h"
@@ -34,11 +37,7 @@
 #include "Palette.h"
 #include "Tia.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void region_Reset(void);
-extern byte region_type;
+extern uint8_t region_type;
 
 #endif

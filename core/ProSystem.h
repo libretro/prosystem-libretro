@@ -24,8 +24,8 @@
 // ----------------------------------------------------------------------------
 #ifndef PRO_SYSTEM_H
 #define PRO_SYSTEM_H
-//#define NULL 0
 
+#include <stdint.h>
 #include <string>
 #include <stdio.h>
 #include "Equates.h"
@@ -39,12 +39,8 @@
 #include "Tia.h"
 #include "Pokey.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void prosystem_Reset(void);
-extern void prosystem_ExecuteFrame(const byte* input);
+extern void prosystem_ExecuteFrame(const uint8_t* input);
 extern bool prosystem_Save(std::string filename, bool compress);
 extern bool prosystem_Load(std::string filename);
 extern void prosystem_Pause(bool pause);
@@ -52,9 +48,9 @@ extern void prosystem_Close(void);
 
 extern bool prosystem_active;
 extern bool prosystem_paused;
-extern word prosystem_frequency;
-extern byte prosystem_frame;
-extern word prosystem_scanlines;
-extern uint prosystem_cycles;
+extern uint16_t prosystem_frequency;
+extern uint8_t prosystem_frame;
+extern uint16_t prosystem_scanlines;
+extern uint32_t prosystem_cycles;
 
 #endif

@@ -27,8 +27,8 @@
 
 bool bios_enabled = false;
 
-static byte* bios_data = NULL;
-static word bios_size = 0;
+static uint8_t* bios_data = NULL;
+static uint16_t bios_size = 0;
 
 // ----------------------------------------------------------------------------
 // Load
@@ -59,7 +59,7 @@ bool bios_Load(const char *filename)
       return false;
    }
 
-   bios_data = new byte[bios_size];
+   bios_data = new uint8_t[bios_size];
    if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file))
    {
       fclose(file);

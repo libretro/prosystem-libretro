@@ -25,28 +25,26 @@
 #ifndef RECT_H
 #define RECT_H
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
+#include <stdint.h>
 
 struct Rects
 {
-   uint left;
-   uint top;
-   uint right;
-   uint bottom;
+   uint32_t left;
+   uint32_t top;
+   uint32_t right;
+   uint32_t bottom;
 
-   uint GetArea()
+   uint32_t GetArea()
    {
       return GetLength( ) * GetHeight( );
    }
 
-   uint GetLength()
+   uint32_t GetLength()
    {
       return (right - left) + 1;
    }
 
-   uint GetHeight()
+   uint32_t GetHeight()
    {
       return (bottom - top) + 1;
    }

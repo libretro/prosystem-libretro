@@ -31,20 +31,20 @@ std::string cartridge_year;
 std::string cartridge_maker;
 std::string cartridge_digest;
 std::string cartridge_filename;
-byte cartridge_type;
-byte cartridge_region;
+uint8_t cartridge_type;
+uint8_t cartridge_region;
 bool cartridge_pokey;
-byte cartridge_controller[2];
-byte cartridge_bank;
-uint cartridge_flags;
+uint8_t cartridge_controller[2];
+uint8_t cartridge_bank;
+uint32_t cartridge_flags;
 
-static byte* cartridge_buffer = NULL;
-static uint cartridge_size = 0;
+static uint8_t* cartridge_buffer = NULL;
+static uint32_t cartridge_size = 0;
 
 // ----------------------------------------------------------------------------
 // HasHeader
 // ----------------------------------------------------------------------------
-static bool cartridge_HasHeader(const byte* header)
+static bool cartridge_HasHeader(const uint8_t* header)
 {
   const char HEADER_ID[ ] = {"ATARI7800"};
   for(int index = 0; index < 9; index++)
@@ -58,7 +58,7 @@ static bool cartridge_HasHeader(const byte* header)
 // ----------------------------------------------------------------------------
 // Header for CC2 hack
 // ----------------------------------------------------------------------------
-static bool cartridge_CC2(const byte* header)
+static bool cartridge_CC2(const uint8_t* header)
 {
   const char HEADER_ID[ ] = {">>"};
   for(int index = 0; index < 2; index++)
@@ -72,7 +72,7 @@ static bool cartridge_CC2(const byte* header)
 // ----------------------------------------------------------------------------
 // GetBankOffset
 // ----------------------------------------------------------------------------
-static uint cartridge_GetBankOffset(byte bank)
+static uint32_t cartridge_GetBankOffset(uint8_t bank)
 {
    if (
          (
@@ -92,9 +92,9 @@ static uint cartridge_GetBankOffset(byte bank)
 // ----------------------------------------------------------------------------
 // WriteBank
 // ----------------------------------------------------------------------------
-static void cartridge_WriteBank(word address, byte bank)
+static void cartridge_WriteBank(uint16_t address, uint8_t bank)
 {
-  uint offset = cartridge_GetBankOffset(bank);
+  uint32_t offset = cartridge_GetBankOffset(bank);
 
   if(offset < cartridge_size)
   {
@@ -106,7 +106,7 @@ static void cartridge_WriteBank(word address, byte bank)
 // ----------------------------------------------------------------------------
 // ReadHeader
 // ----------------------------------------------------------------------------
-static void cartridge_ReadHeader(const byte* header)
+static void cartridge_ReadHeader(const uint8_t* header)
 {
    char temp[33] = {0};
 
@@ -152,10 +152,10 @@ static void cartridge_ReadHeader(const byte* header)
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-static bool cartridge_Load(const byte* data, uint size)
+static bool cartridge_Load(const uint8_t* data, uint32_t size)
 {
    int index;
-   byte header[128] = {0};
+   uint8_t header[128] = {0};
 
    if(size <= 128)
    {
@@ -175,7 +175,7 @@ static bool cartridge_Load(const byte* data, uint size)
       return false;
    }
 
-   uint offset = 0;
+   uint32_t offset = 0;
    if(cartridge_HasHeader(header))
    {
       cartridge_ReadHeader(header);
@@ -186,7 +186,7 @@ static bool cartridge_Load(const byte* data, uint size)
    else
       cartridge_size = size;
 
-   cartridge_buffer = new byte[cartridge_size];
+   cartridge_buffer = new uint8_t[cartridge_size];
 
    for(index = 0; index < cartridge_size; index++)
       cartridge_buffer[index] = data[index + offset];
@@ -201,8 +201,8 @@ static bool cartridge_Load(const byte* data, uint size)
 // ----------------------------------------------------------------------------
 bool cartridge_Load(std::string filename)
 {
-   byte* data = NULL;
-   uint size = 0;
+   uint8_t* data = NULL;
+   uint32_t size = 0;
 
    if(filename.empty( ) || filename.length( ) == 0)
    {
@@ -238,7 +238,7 @@ bool cartridge_Load(std::string filename)
          return false;
       }
 
-      data = new byte[size];
+      data = new uint8_t[size];
 
       if(fread(data, 1, size, file) != size && ferror(file))
       {
@@ -252,7 +252,7 @@ bool cartridge_Load(std::string filename)
       fclose(file);    
    }
    else
-      data = new byte[size];
+      data = new uint8_t[size];
 
    if(!cartridge_Load(data, size))
    {
@@ -324,7 +324,7 @@ void cartridge_Store(void)
 // ----------------------------------------------------------------------------
 // Write
 // ----------------------------------------------------------------------------
-void cartridge_Write(word address, byte data)
+void cartridge_Write(uint16_t address, uint8_t data)
 {
    switch(cartridge_type)
    {
@@ -386,7 +386,7 @@ void cartridge_Write(word address, byte data)
 // ----------------------------------------------------------------------------
 // StoreBank
 // ----------------------------------------------------------------------------
-void cartridge_StoreBank(byte bank)
+void cartridge_StoreBank(uint8_t bank)
 {
    switch(cartridge_type)
    {

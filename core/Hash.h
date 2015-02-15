@@ -25,12 +25,10 @@
 #ifndef HASH_H
 #define HASH_H
 
+#include <stdint.h>
+#include <stdlib.h>
 #include <string>
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
-extern std::string hash_Compute(const byte* source, uint length);
+extern std::string hash_Compute(const uint8_t* source, uint32_t length);
 
 #endif

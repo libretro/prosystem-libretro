@@ -25,17 +25,18 @@
 #ifndef PAIR_H
 #define PAIR_H
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
+#include <stdint.h>
 
-union Pair { 
-  word w;
-  struct Join {
-    byte l; 
-    byte h;
-  } b;
+union Pair 
+{
+   uint16_t w;
+   struct Join
+   {
+      uint8_t l; 
+      uint8_t h;
+   } b;
 };
 
 typedef Pair pair;
+
 #endif

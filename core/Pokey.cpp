@@ -65,30 +65,30 @@
 #define POKEY_CHANNEL4 3
 #define POKEY_SAMPLE 4
 
-byte pokey_buffer[POKEY_BUFFER_SIZE] = {0};
-uint pokey_size = 524;
+uint8_t pokey_buffer[POKEY_BUFFER_SIZE] = {0};
+uint32_t pokey_size = 524;
 
-static uint pokey_frequency = 1787520;
-static uint pokey_sampleRate = 31440;
-static uint pokey_soundCntr = 0;
-static byte pokey_audf[4];
-static byte pokey_audc[4];
-static byte pokey_audctl;
-static byte pokey_output[4];
-static byte pokey_outVol[4];
-static byte pokey_poly04[POKEY_POLY4_SIZE] = {1,1,0,1,1,1,0,0,0,0,1,0,1,0,0};
-static byte pokey_poly05[POKEY_POLY5_SIZE] = {0,0,1,1,0,0,0,1,1,1,1,0,0,1,0,1,0,1,1,0,1,1,1,0,1,0,0,0,0,0,1};
-static byte pokey_poly17[POKEY_POLY17_SIZE];
-static uint pokey_poly17Size;
-static uint pokey_polyAdjust;
-static uint pokey_poly04Cntr;
-static uint pokey_poly05Cntr;
-static uint pokey_poly17Cntr;
-static uint pokey_divideMax[4];
-static uint pokey_divideCount[4];
-static uint pokey_sampleMax;
-static uint pokey_sampleCount[2];
-static uint pokey_baseMultiplier;
+static uint32_t pokey_frequency = 1787520;
+static uint32_t pokey_sampleRate = 31440;
+static uint32_t pokey_soundCntr = 0;
+static uint8_t pokey_audf[4];
+static uint8_t pokey_audc[4];
+static uint8_t pokey_audctl;
+static uint8_t pokey_output[4];
+static uint8_t pokey_outVol[4];
+static uint8_t pokey_poly04[POKEY_POLY4_SIZE] = {1,1,0,1,1,1,0,0,0,0,1,0,1,0,0};
+static uint8_t pokey_poly05[POKEY_POLY5_SIZE] = {0,0,1,1,0,0,0,1,1,1,1,0,0,1,0,1,0,1,1,0,1,1,1,0,1,0,0,0,0,0,1};
+static uint8_t pokey_poly17[POKEY_POLY17_SIZE];
+static uint32_t pokey_poly17Size;
+static uint32_t pokey_polyAdjust;
+static uint32_t pokey_poly04Cntr;
+static uint32_t pokey_poly05Cntr;
+static uint32_t pokey_poly17Cntr;
+static uint32_t pokey_divideMax[4];
+static uint32_t pokey_divideCount[4];
+static uint32_t pokey_sampleMax;
+static uint32_t pokey_sampleCount[2];
+static uint32_t pokey_baseMultiplier;
 
 // ----------------------------------------------------------------------------
 // Reset
@@ -103,7 +103,7 @@ void pokey_Reset(void)
    pokey_poly05Cntr = 0;
    pokey_poly17Cntr = 0;
 
-   pokey_sampleMax = ((uint)pokey_frequency << 8) / pokey_sampleRate;
+   pokey_sampleMax = ((uint32_t)pokey_frequency << 8) / pokey_sampleRate;
 
    pokey_sampleCount[0] = 0;
    pokey_sampleCount[1] = 0;
@@ -127,9 +127,9 @@ void pokey_Reset(void)
 // ----------------------------------------------------------------------------
 // SetRegister
 // ----------------------------------------------------------------------------
-void pokey_SetRegister(word address, byte value)
+void pokey_SetRegister(uint16_t address, uint8_t value)
 {
-   byte channelMask;
+   uint8_t channelMask;
    switch(address)
    {
       case POKEY_AUDF1:
@@ -195,7 +195,7 @@ void pokey_SetRegister(word address, byte value)
          break;
    }
 
-   uint newValue = 0;
+   uint32_t newValue = 0;
 
    if(channelMask & (1 << POKEY_CHANNEL1))
    {
@@ -267,7 +267,7 @@ void pokey_SetRegister(word address, byte value)
       }
    }
 
-   for(byte channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
+   for(uint8_t channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
    {
       if(channelMask & (1 << channel))
       {
@@ -284,19 +284,19 @@ void pokey_SetRegister(word address, byte value)
 // ----------------------------------------------------------------------------
 // Process
 // ----------------------------------------------------------------------------
-void pokey_Process(uint length)
+void pokey_Process(uint32_t length)
 {
-   byte* buffer = pokey_buffer + pokey_soundCntr;
-   uint* sampleCntrPtr = (uint*)((byte*)(&pokey_sampleCount[0]) + 1);
-   uint size = length;
+   uint8_t* buffer = pokey_buffer + pokey_soundCntr;
+   uint32_t* sampleCntrPtr = (uint32_t*)((uint8_t*)(&pokey_sampleCount[0]) + 1);
+   uint32_t size = length;
 
    while(length)
    {
-      byte currentValue;
-      byte nextEvent = POKEY_SAMPLE;
-      uint eventMin = *sampleCntrPtr;
+      uint8_t currentValue;
+      uint8_t nextEvent = POKEY_SAMPLE;
+      uint32_t eventMin = *sampleCntrPtr;
 
-      byte channel;
+      uint8_t channel;
       for(channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
       {
          if(pokey_divideCount[channel] <= eventMin)

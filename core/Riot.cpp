@@ -25,14 +25,14 @@
 #include "Riot.h"
 
 bool riot_timing = false;
-word riot_timer = TIM64T;
-byte riot_intervals;
+uint16_t riot_timer = TIM64T;
+uint8_t riot_intervals;
 
-static byte riot_dra = 0;
-static byte riot_drb = 0;
+static uint8_t riot_dra = 0;
+static uint8_t riot_drb = 0;
 static bool riot_elapsed;
 static int riot_currentTime;
-static word riot_clocks;
+static uint16_t riot_clocks;
 
 void riot_Reset(void)
 {
@@ -63,7 +63,7 @@ void riot_Reset(void)
 // | 15       | Console      | Left Difficulty
 // | 16       | Console      | Right Difficulty
 // +----------+--------------+-------------------------------------------------
-void riot_SetInput(const byte* input)
+void riot_SetInput(const uint8_t* input)
 {
 
    /*gdement: 	Comments are messy, but wanted to document how this all works.
@@ -189,17 +189,17 @@ also see 7800 schematic and RIOT datasheet  */
 }
 
 /***********************************************************************************
-* riot_setDRA(byte data) and riot_setDRB(byte data)		gdement
+* riot_setDRA(uint8_t data) and riot_setDRB(uint8_t data)		gdement
 * -------------------------------------------------
 * Stores a value written to SWCHA/SWCHB into the RIOT's internal DRA/DRB registers.
 * These are distinct from what you see when reading SWCHA/SWCHB.
 ***********************************************************************************/
-void riot_SetDRA(byte data)
+void riot_SetDRA(uint8_t data)
 {
 	riot_dra=data;
 }
 
-void riot_SetDRB(byte data)
+void riot_SetDRB(uint8_t data)
 {
 	riot_drb=data;
 }
@@ -208,7 +208,7 @@ void riot_SetDRB(byte data)
 // ----------------------------------------------------------------------------
 // SetTimer
 // ----------------------------------------------------------------------------
-void riot_SetTimer(word timer, byte intervals)
+void riot_SetTimer(uint16_t timer, uint8_t intervals)
 {
    riot_timer = timer;
    riot_intervals = intervals;
@@ -243,7 +243,7 @@ void riot_SetTimer(word timer, byte intervals)
 // ----------------------------------------------------------------------------
 // UpdateTimer
 // ----------------------------------------------------------------------------
-void riot_UpdateTimer(byte cycles)
+void riot_UpdateTimer(uint8_t cycles)
 {
    riot_currentTime -= cycles;
    if(!riot_elapsed && riot_currentTime > 0)

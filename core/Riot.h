@@ -25,22 +25,19 @@
 #ifndef RIOT_H
 #define RIOT_H
 
+#include <stdint.h>
 #include "Equates.h"
 #include "Memory.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void riot_Reset(void);
-extern void riot_SetInput(const byte* input);
-extern void riot_SetDRA(byte data);
-extern void riot_SetDRB(byte data);
-extern void riot_SetTimer(word timer, byte intervals);
-extern void riot_UpdateTimer(byte cycles);
+extern void riot_SetInput(const uint8_t* input);
+extern void riot_SetDRA(uint8_t data);
+extern void riot_SetDRB(uint8_t data);
+extern void riot_SetTimer(uint16_t timer, uint8_t intervals);
+extern void riot_UpdateTimer(uint8_t cycles);
 
 extern bool riot_timing;
-extern word riot_timer;
-extern byte riot_intervals;
+extern uint16_t riot_timer;
+extern uint8_t riot_intervals;
 
 #endif

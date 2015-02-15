@@ -27,8 +27,8 @@
 static uint32_t videoBuffer[320*292*4];
 static int videoWidth  = 320;
 static int videoHeight = 240;
-static uint display_palette32[256] = {0};
-static byte keyboard_data[17] = {0};
+static uint32_t display_palette32[256] = {0};
+static uint8_t keyboard_data[17] = {0};
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -47,34 +47,34 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 static void display_ResetPalette32()
 {
-   for(uint index = 0; index < 256; index++)
+   for(uint32_t index = 0; index < 256; index++)
    {
-      uint r = palette_data[(index * 3) + 0] << 16;
-      uint g = palette_data[(index * 3) + 1] << 8;
-      uint b = palette_data[(index * 3) + 2];
+      uint32_t r = palette_data[(index * 3) + 0] << 16;
+      uint32_t g = palette_data[(index * 3) + 1] << 8;
+      uint32_t b = palette_data[(index * 3) + 2];
       display_palette32[index] = r | g | b;
    }
 }
 
-static uint sound_GetSampleLength(uint length, uint unit, uint unitMax)
+static uint32_t sound_GetSampleLength(uint32_t length, uint32_t unit, uint32_t unitMax)
 {
-   uint sampleLength = length / unitMax;
-   uint sampleRemain = length % unitMax;
+   uint32_t sampleLength = length / unitMax;
+   uint32_t sampleRemain = length % unitMax;
    if(sampleRemain != 0 && sampleRemain >= unit)
       sampleLength++;
    return sampleLength;
 }
 
-static void sound_Resample(const byte* source, byte* target, int length)
+static void sound_Resample(const uint8_t* source, uint8_t* target, int length)
 {
    typedef struct {
-      word  wFormatTag;
-      word  nChannels;
-      uint nSamplesPerSec;
-      uint nAvgBytesPerSec;
-      word  nBlockAlign;
-      word  wBitsPerSample;
-      word  cbSize;
+      uint16_t  wFormatTag;
+      uint16_t  nChannels;
+      uint32_t nSamplesPerSec;
+      uint32_t nAvgBytesPerSec;
+      uint16_t  nBlockAlign;
+      uint16_t  wBitsPerSample;
+      uint16_t  cbSize;
    } WAVEFORMATEX;
 
    //# define WAVE_FORMAT_PCM 0
@@ -106,18 +106,18 @@ static void sound_Store()
 {
    //#define MAX_BUFFER_SIZE 8192
 
-   byte sample[8192];
+   uint8_t sample[8192];
    memset(sample, 0, 8192);
-   uint length = 48000 / prosystem_frequency; /* sound_GetSampleLength(sound_format.nSamplesPerSec, prosystem_frame, prosystem_frequency); */ /* 48000 / prosystem_frequency */
+   uint32_t length = 48000 / prosystem_frequency; /* sound_GetSampleLength(sound_format.nSamplesPerSec, prosystem_frame, prosystem_frequency); */ /* 48000 / prosystem_frequency */
    sound_Resample(tia_buffer, sample, length);
 
    // Ballblazer, Commando, various homebrew and hacks
    if(cartridge_pokey)
    {
-      byte pokeySample[8192];
+      uint8_t pokeySample[8192];
       memset(pokeySample, 0, 8192);
       sound_Resample(pokey_buffer, pokeySample, length);
-      for(uint index = 0; index < length; index++)
+      for(uint32_t index = 0; index < length; index++)
       {
          sample[index] += pokeySample[index];
          sample[index] = sample[index] / 2;
@@ -407,14 +407,14 @@ void retro_run(void)
    videoWidth = maria_visibleArea.GetLength();
    videoHeight = maria_visibleArea.GetHeight();
 
-   const byte *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * maria_visibleArea.GetLength());
+   const uint8_t *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * maria_visibleArea.GetLength());
 
-   uint *surface = (uint*)videoBuffer;
-   uint pitch = 320;
+   uint32_t *surface = (uint32_t*)videoBuffer;
+   uint32_t pitch = 320;
 
-   for(uint indexY = 0; indexY < videoHeight; indexY++)
+   for(uint32_t indexY = 0; indexY < videoHeight; indexY++)
    {
-      for(uint indexX = 0; indexX < videoWidth; indexX += 4)
+      for(uint32_t indexX = 0; indexX < videoWidth; indexX += 4)
       {
          surface[indexX + 0] = display_palette32[buffer[indexX + 0]];
          surface[indexX + 1] = display_palette32[buffer[indexX + 1]];

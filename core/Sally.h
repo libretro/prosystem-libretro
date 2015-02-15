@@ -25,24 +25,21 @@
 #ifndef SALLY_H
 #define SALLY_H
 
+#include <stdint.h>
 #include "Memory.h"
 #include "Pair.h"
 
-typedef unsigned char byte;
-typedef unsigned short word;
-typedef unsigned int uint;
-
 extern void sally_Reset(void);
-extern uint sally_ExecuteInstruction(void);
-extern uint sally_ExecuteRES(void);
-extern uint sally_ExecuteNMI(void);
-extern uint sally_ExecuteIRQ(void);
+extern uint32_t sally_ExecuteInstruction(void);
+extern uint32_t sally_ExecuteRES(void);
+extern uint32_t sally_ExecuteNMI(void);
+extern uint32_t sally_ExecuteIRQ(void);
 
-extern byte sally_a;
-extern byte sally_x;
-extern byte sally_y;
-extern byte sally_p;
-extern byte sally_s;
+extern uint8_t sally_a;
+extern uint8_t sally_x;
+extern uint8_t sally_y;
+extern uint8_t sally_p;
+extern uint8_t sally_s;
 extern pair sally_pc;
 
 #endif

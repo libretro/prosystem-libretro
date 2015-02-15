@@ -24,21 +24,21 @@
 // ----------------------------------------------------------------------------
 #include "Region.h"
 
-byte region_type = REGION_AUTO;
+uint8_t region_type = REGION_AUTO;
 
 static const rect REGION_VISIBLE_AREA_NTSC = {0, 26, 319, 248};
 static const rect REGION_VISIBLE_AREA_PAL = {0, 26, 319, 297};
 static const rect REGION_DISPLAY_AREA_NTSC = {0, 16, 319, 258};
 static const rect REGION_DISPLAY_AREA_PAL = {0, 16, 319, 306};
-static const byte REGION_FREQUENCY_NTSC = 60;
-static const word REGION_SCANLINES_NTSC = 262;
-static const byte REGION_FREQUENCY_PAL = 50;
-static const word REGION_SCANLINES_PAL = 312;
+static const uint8_t REGION_FREQUENCY_NTSC = 60;
+static const uint16_t REGION_SCANLINES_NTSC = 262;
+static const uint8_t REGION_FREQUENCY_PAL = 50;
+static const uint16_t REGION_SCANLINES_PAL = 312;
 
 // ----------------------------------------------------------------------------
 // PALETTE NTSC
 // ----------------------------------------------------------------------------
-static const byte REGION_PALETTE_NTSC[ ] = {
+static const uint8_t REGION_PALETTE_NTSC[ ] = {
 0x00,0x00,0x00,0x25,0x25,0x25,0x34,0x34,0x34,0x4F,0x4F,0x4F,
 0x5B,0x5B,0x5B,0x69,0x69,0x69,0x7B,0x7B,0x7B,0x8A,0x8A,0x8A,
 0xA7,0xA7,0xA7,0xB9,0xB9,0xB9,0xC5,0xC5,0xC5,0xD0,0xD0,0xD0,
@@ -108,7 +108,7 @@ static const byte REGION_PALETTE_NTSC[ ] = {
 // --------------------------------------------------------------------------------------
 // PALETTE PAL
 // --------------------------------------------------------------------------------------
-static const byte REGION_PALETTE_PAL[ ] = {
+static const uint8_t REGION_PALETTE_PAL[ ] = {
   0x00,0x00,0x00,0x1c,0x1c,0x1c,0x39,0x39,0x39,0x59,0x59,0x59,
   0x79,0x79,0x79,0x92,0x92,0x92,0xab,0xab,0xab,0xbc,0xbc,0xbc,
   0xcd,0xcd,0xcd,0xd9,0xd9,0xd9,0xe6,0xe6,0xe6,0xec,0xec,0xec,

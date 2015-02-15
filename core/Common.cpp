@@ -49,7 +49,7 @@ std::string common_Format(double value, std::string specification)
 // ----------------------------------------------------------------------------
 // Format
 // ----------------------------------------------------------------------------
-std::string common_Format(uint value)
+std::string common_Format(uint32_t value)
 {
    char buffer[11] = {0};
    sprintf(buffer, "%d", value);
@@ -59,7 +59,7 @@ std::string common_Format(uint value)
 // ----------------------------------------------------------------------------
 // Format
 // ----------------------------------------------------------------------------
-std::string common_Format(word value)
+std::string common_Format(uint16_t value)
 {
    char buffer[6] = {0};
    sprintf(buffer, "%d", value);
@@ -69,7 +69,7 @@ std::string common_Format(word value)
 // ----------------------------------------------------------------------------
 // Format
 // ----------------------------------------------------------------------------
-std::string common_Format(byte value)
+std::string common_Format(uint8_t value)
 {
    char buffer[4] = {0};
    sprintf(buffer, "%d", value);
@@ -87,25 +87,25 @@ std::string common_Format(bool value)
 // ----------------------------------------------------------------------------
 // ParseUint
 // ----------------------------------------------------------------------------
-uint common_ParseUint(std::string text)
+uint32_t common_ParseUint(std::string text)
 {
-   return (uint)atoi(text.c_str( ));
+   return (uint32_t)atoi(text.c_str( ));
 }
 
 // ----------------------------------------------------------------------------
 // ParseWord
 // ----------------------------------------------------------------------------
-word common_ParseWord(std::string text)
+uint16_t common_ParseWord(std::string text)
 {
-   return (word)atoi(text.c_str( ));
+   return (uint16_t)atoi(text.c_str( ));
 }
 
 // ----------------------------------------------------------------------------
 // ParseByte
 // ----------------------------------------------------------------------------
-byte common_ParseByte(std::string text)
+uint8_t common_ParseByte(std::string text)
 {
-   return (byte)atoi(text.c_str( ));
+   return (uint8_t)atoi(text.c_str( ));
 }
 
 // ----------------------------------------------------------------------------

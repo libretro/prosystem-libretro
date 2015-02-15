@@ -28,10 +28,10 @@
 
 bool prosystem_active = false;
 bool prosystem_paused = false;
-word prosystem_frequency = 60;
-byte prosystem_frame = 0;
-word prosystem_scanlines = 262;
-uint prosystem_cycles = 0;
+uint16_t prosystem_frequency = 60;
+uint8_t prosystem_frame = 0;
+uint16_t prosystem_scanlines = 262;
+uint32_t prosystem_cycles = 0;
 
 // ----------------------------------------------------------------------------
 // Reset
@@ -65,13 +65,13 @@ void prosystem_Reset(void)
 // ----------------------------------------------------------------------------
 // ExecuteFrame
 // ----------------------------------------------------------------------------
-void prosystem_ExecuteFrame(const byte* input)
+void prosystem_ExecuteFrame(const uint8_t* input)
 {
    riot_SetInput(input);
 
    for(maria_scanline = 1; maria_scanline <= prosystem_scanlines; maria_scanline++)
    {
-      uint cycles;
+      uint32_t cycles;
       if(maria_scanline == maria_displayArea.top)
          memory_ram[MSTAT] = 0;
       if(maria_scanline == maria_displayArea.bottom)
@@ -136,10 +136,10 @@ bool prosystem_Save(std::string filename, bool compress)
 
    logger_LogInfo("Saving game state to file " + filename + ".", PRO_SYSTEM_SOURCE);
 
-   byte buffer[32829] = {0};
-   uint size = 0;
+   uint8_t buffer[32829] = {0};
+   uint32_t size = 0;
 
-   uint index;
+   uint32_t index;
    for(index = 0; index < 16; index++)
       buffer[size + index] = PRO_SYSTEM_STATE_HEADER[index];
    size += 16;
@@ -205,8 +205,8 @@ bool prosystem_Load(const std::string filename)
 
    logger_LogInfo("Loading game state from file " + filename + ".", PRO_SYSTEM_SOURCE);
 
-   byte buffer[32829] = {0};
-   uint size = 0;
+   uint8_t buffer[32829] = {0};
+   uint32_t size = 0;
    {
       FILE* file = fopen(filename.c_str( ), "rb");
       if(file == NULL) {
@@ -245,8 +245,8 @@ bool prosystem_Load(const std::string filename)
       fclose(file);
    }  
 
-   uint offset = 0;
-   uint index;
+   uint32_t offset = 0;
+   uint32_t index;
    for(index = 0; index < 16; index++)
    {
       if(buffer[offset + index] != PRO_SYSTEM_STATE_HEADER[index])
@@ -256,9 +256,9 @@ bool prosystem_Load(const std::string filename)
       }
    }
    offset += 16;
-   byte version = buffer[offset++];
+   uint8_t version = buffer[offset++];
 
-   uint date = 0;
+   uint32_t date = 0;
    for(index = 0; index < 4; index++);
    offset += 4;
 

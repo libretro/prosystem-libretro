@@ -27,7 +27,7 @@
 
 std::string palette_filename;
 bool palette_default = true;
-byte palette_data[PALETTE_SIZE] = {
+uint8_t palette_data[PALETTE_SIZE] = {
 0x00,0x00,0x00,0x25,0x25,0x25,0x34,0x34,0x34,0x4F,0x4F,0x4F,
 0x5B,0x5B,0x5B,0x69,0x69,0x69,0x7B,0x7B,0x7B,0x8A,0x8A,0x8A,
 0xA7,0xA7,0xA7,0xB9,0xB9,0xB9,0xC5,0xC5,0xC5,0xD0,0xD0,0xD0,
@@ -129,8 +129,9 @@ bool palette_Load(std::string filename)
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-void palette_Load(const byte* data)
+void palette_Load(const uint8_t* data)
 {
-  for(int index = 0; index < PALETTE_SIZE; index++)
-    palette_data[index] = data[index];
+   int index;
+   for(index = 0; index < PALETTE_SIZE; index++)
+      palette_data[index] = data[index];
 }
