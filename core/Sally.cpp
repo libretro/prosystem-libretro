@@ -132,19 +132,20 @@ static void sally_Branch(byte branch)
 // ----------------------------------------------------------------------------
 // Delay
 // ----------------------------------------------------------------------------
-static void sally_Delay(byte delta) {
+static void sally_Delay(byte delta)
+{
   pair address1 = sally_address;
   pair address2 = sally_address;
   address1.w -= delta;
-  if(address1.b.h != address2.b.h) {
+  if(address1.b.h != address2.b.h)
     sally_cycles++;
-  }
 }
 
 // ----------------------------------------------------------------------------
 // Absolute
 // ----------------------------------------------------------------------------
-static void sally_Absolute( ) {
+static void sally_Absolute(void)
+{
   sally_address.b.l = memory_Read(sally_pc.w++);
   sally_address.b.h = memory_Read(sally_pc.w++);
 }
@@ -249,67 +250,56 @@ static void sally_ADC( ) {
       ah++;
     }
 
-    if(!(sally_a + data + (sally_p & SALLY_FLAG.C))) {
+    if(!(sally_a + data + (sally_p & SALLY_FLAG.C)))
       sally_p |= SALLY_FLAG.Z;
-    }
-    else {
+    else
       sally_p &= ~SALLY_FLAG.Z;
-    }
 
-    if((ah & 8) != 0) {
+    if((ah & 8) != 0)
       sally_p |= SALLY_FLAG.N;      
-    }
-    else {
+    else
       sally_p &= ~SALLY_FLAG.N;
-    }
 
-    if(~(sally_a ^ data) & ((ah << 4) ^ sally_a) & 128) {
+    if(~(sally_a ^ data) & ((ah << 4) ^ sally_a) & 128)
       sally_p |= SALLY_FLAG.V;
-    }
-    else {
+    else
       sally_p &= ~SALLY_FLAG.V;
-    }
 
-    if(ah > 9) {
+    if(ah > 9)
       ah += 6;
-    }
 
-    if(ah > 15) {
+    if(ah > 15)
       sally_p |= SALLY_FLAG.C;      
-    }
-    else {
+    else
       sally_p &= ~SALLY_FLAG.C;
-    }
 
     sally_a = (ah << 4) | (al & 15);
   }
-  else {
-    pair temp;
-    temp.w = sally_a + data + (sally_p & SALLY_FLAG.C);
+  else
+  {
+     pair temp;
+     temp.w = sally_a + data + (sally_p & SALLY_FLAG.C);
 
-    if(temp.b.h) {
-      sally_p |= SALLY_FLAG.C;
-    }
-    else {
-      sally_p &= ~SALLY_FLAG.C;
-    }
-        
-    if(~(sally_a ^ data) & (sally_a ^ temp.b.l) & 128) {
-      sally_p |= SALLY_FLAG.V;
-    }
-    else {
-      sally_p &= ~SALLY_FLAG.V;
-    }
-        
-    sally_Flags(temp.b.l);
-    sally_a = temp.b.l;
+     if(temp.b.h)
+        sally_p |= SALLY_FLAG.C;
+     else
+        sally_p &= ~SALLY_FLAG.C;
+
+     if(~(sally_a ^ data) & (sally_a ^ temp.b.l) & 128)
+        sally_p |= SALLY_FLAG.V;
+     else
+        sally_p &= ~SALLY_FLAG.V;
+
+     sally_Flags(temp.b.l);
+     sally_a = temp.b.l;
   }
 }
 
 // ----------------------------------------------------------------------------
 // AND
 // ----------------------------------------------------------------------------
-static void sally_AND( ) {
+static void sally_AND(void)
+{
   sally_a &= memory_Read(sally_address.w);
   sally_Flags(sally_a);
 }
@@ -317,34 +307,32 @@ static void sally_AND( ) {
 // ----------------------------------------------------------------------------
 // ASLA
 // ----------------------------------------------------------------------------
-static void sally_ASLA( ) {
-  if(sally_a & 128) {
-    sally_p |= SALLY_FLAG.C;
-  }
-  else {
-    sally_p &= ~SALLY_FLAG.C;
-  }
+static void sally_ASLA(void)
+{
+   if(sally_a & 128)
+      sally_p |= SALLY_FLAG.C;
+   else
+      sally_p &= ~SALLY_FLAG.C;
 
-  sally_a <<= 1;
-  sally_Flags(sally_a);
+   sally_a <<= 1;
+   sally_Flags(sally_a);
 }
 
 // ----------------------------------------------------------------------------
 // ASL
 // ----------------------------------------------------------------------------
-static void sally_ASL( ) {
-  byte data = memory_Read(sally_address.w);
-    
-  if(data & 128) {
-    sally_p |= SALLY_FLAG.C;
-  }
-  else {
-    sally_p &= ~SALLY_FLAG.C;
-  }
+static void sally_ASL(void)
+{
+   byte data = memory_Read(sally_address.w);
 
-  data <<= 1;
-  memory_Write(sally_address.w, data);
-  sally_Flags(data);
+   if(data & 128)
+      sally_p |= SALLY_FLAG.C;
+   else
+      sally_p &= ~SALLY_FLAG.C;
+
+   data <<= 1;
+   memory_Write(sally_address.w, data);
+   sally_Flags(data);
 }
 
 // ----------------------------------------------------------------------------
@@ -936,803 +924,808 @@ void sally_Reset( ) {
 // ----------------------------------------------------------------------------
 // ExecuteInstruction
 // ----------------------------------------------------------------------------
-uint sally_ExecuteInstruction( ) {
-  sally_opcode = memory_Read(sally_pc.w++);
-  sally_cycles = SALLY_CYCLES[sally_opcode];
-  
-  switch(sally_opcode) {
-    case 0x00:
-      sally_BRK( ); 
-      break;
-
-    case 0x01:
-      sally_IndirectX( ); 
-      sally_ORA( ); 
-      break;
-    
-    case 0x05:
-      sally_ZeroPage( );  
-      sally_ORA( ); 
-      break;
-
-    case 0x06: 
-      sally_ZeroPage( );
-      sally_ASL( );
-      break;
-
-    case 0x08: 
-      sally_PHP( );
-      break;
-
-    case 0x09: 
-      sally_Immediate( ); 
-      sally_ORA( ); 
-      break;        
-
-    case 0x0a: 
-      sally_ASLA( ); 
-      break;        
-
-    case 0x0d: 
-      sally_Absolute( );  
-      sally_ORA( ); 
-      break;
-
-    case 0x0e: 
-      sally_Absolute( );  
-      sally_ASL( ); 
-      break;
-
-    case 0x10: 
-      sally_Relative( );
-      sally_BPL( );
-      break;        
-
-    case 0x11: 
-      sally_IndirectY( ); 
-      sally_ORA( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0x15: 
-      sally_ZeroPageX( ); 
-      sally_ORA( ); 
-      break;
-
-    case 0x16: 
-      sally_ZeroPageX( ); 
-      sally_ASL( ); 
-      break;
-
-    case 0x18: 
-      sally_CLC( );
-      break;
-
-    case 0x19: 
-      sally_AbsoluteY( ); 
-      sally_ORA( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0x1d: 
-      sally_AbsoluteX( ); 
-      sally_ORA( ); 
-      sally_Delay(sally_x); 
-      break;
-
-    case 0x1e: 
-      sally_AbsoluteX( ); 
-      sally_ASL( ); 
-      break;
-
-    case 0x20: 
-      sally_Absolute( );  
-      sally_JSR( ); 
-      break;
-
-    case 0x21: 
-      sally_IndirectX( );
-      sally_AND( );
-      break;
-
-    case 0x24: 
-      sally_ZeroPage( );
-      sally_BIT( );
-      break;
-
-    case 0x25: 
-      sally_ZeroPage( );
-      sally_AND( ); 
-      break;
-
-    case 0x26: 
-      sally_ZeroPage( );
-      sally_ROL( );
-      break;
-
-    case 0x28:
-      sally_PLP( );
-      break;
-
-    case 0x29:
-      sally_Immediate( );
-      sally_AND( );
-      break;
-
-    case 0x2a: 
-      sally_ROLA( );
-      break;
-
-    case 0x2c: 
-      sally_Absolute( );
-      sally_BIT( );
-      break;
-
-    case 0x2d: 
-      sally_Absolute( );
-      sally_AND( );
-      break;
-
-    case 0x2e: 
-      sally_Absolute( );
-      sally_ROL( );
-      break;
-
-    case 0x30:
-      sally_Relative( );
-      sally_BMI( );
-      break;
-
-    case 0x31: 
-      sally_IndirectY( );
-      sally_AND( );
-      sally_Delay(sally_y);
-      break;
-
-    case 0x35: 
-      sally_ZeroPageX( ); 
-      sally_AND( ); 
-      break;
-
-    case 0x36: 
-      sally_ZeroPageX( ); 
-      sally_ROL( ); 
-      break;
-
-    case 0x38: 
-      sally_SEC( );
-      break;
-
-    case 0x39: 
-      sally_AbsoluteY( );
-      sally_AND( );
-      sally_Delay(sally_y);
-      break;
-
-    case 0x3d: 
-      sally_AbsoluteX( ); 
-      sally_AND( );
-      sally_Delay(sally_x);
-      break;
-
-    case 0x3e: 
-      sally_AbsoluteX( );
-      sally_ROL( );
-      break;
-
-    case 0x40: 
-      sally_RTI( );
-      break;
-
-    case 0x41: 
-      sally_IndirectX( ); 
-      sally_EOR( ); 
-      break;
-
-    case 0x45: 
-      sally_ZeroPage( );
-      sally_EOR( );
-      break;
-
-    case 0x46: 
-      sally_ZeroPage( );
-      sally_LSR( );
-      break;
-
-    case 0x48: 
-      sally_PHA( );
-      break;
-
-    case 0x49: 
-      sally_Immediate( ); 
-      sally_EOR( ); 
-      break;  
-    
-    case 0x4a: 
-      sally_LSRA( ); 
-      break; 
-    
-    case 0x4c: 
-      sally_Absolute( );  
-      sally_JMP( ); 
-      break;
-
-    case 0x4d: 
-      sally_Absolute( );  
-      sally_EOR( ); 
-      break;
-
-    case 0x4e: 
-      sally_Absolute( );
-      sally_LSR( );
-      break;
-
-    case 0x50: 
-      sally_Relative( );
-      sally_BVC( );
-      break;
-
-    case 0x51: 
-      sally_IndirectY( ); 
-      sally_EOR( ); 
-      sally_Delay(sally_y); 
-      break;      
-
-    case 0x55: 
-      sally_ZeroPageX( ); 
-      sally_EOR( ); 
-      break;
-
-    case 0x56: 
-      sally_ZeroPageX( ); 
-      sally_LSR( ); 
-      break;
-
-    case 0x58: 
-      sally_CLI( );
-      break;
-
-    case 0x59: 
-      sally_AbsoluteY( ); 
-      sally_EOR( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0x5d: 
-      sally_AbsoluteX( ); 
-      sally_EOR( ); 
-      sally_Delay(sally_x); 
-      break;
-
-    case 0x5e: 
-      sally_AbsoluteX( ); 
-      sally_LSR( ); 
-      break;
-
-    case 0x60: 
-      sally_RTS( );
-      break;
-
-    case 0x61: 
-      sally_IndirectX( ); 
-      sally_ADC( ); 
-      break;
-
-    case 0x65: 
-      sally_ZeroPage( );
-      sally_ADC( ); 
-      break;
-
-    case 0x66: 
-      sally_ZeroPage( );  
-      sally_ROR( ); 
-      break;
-
-    case 0x68: 
-      sally_PLA( );
-      break;
-
-    case 0x69: 
-      sally_Immediate( ); 
-      sally_ADC( ); 
-      break;
-
-    case 0x6a: 
-      sally_RORA( ); 
-      break;
-
-    case 0x6c: 
-      sally_Indirect( );
-      sally_JMP( ); 
-      break;
-
-    case 0x6d: 
-      sally_Absolute( );
-      sally_ADC( ); 
-      break;
-    
-    case 0x6e: 
-      sally_Absolute( );  
-      sally_ROR( ); 
-      break;
-
-    case 0x70: 
-      sally_Relative( );  
-      sally_BVS( );
-      break;
-
-    case 0x71: 
-      sally_IndirectY( ); 
-      sally_ADC( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0x75: 
-      sally_ZeroPageX( ); 
-      sally_ADC( ); 
-      break;
-
-    case 0x76: 
-      sally_ZeroPageX( ); 
-      sally_ROR( ); 
-      break;
-
-    case 0x78: 
-      sally_SEI( );
-      break;
-
-    case 0x79: 
-      sally_AbsoluteY( ); 
-      sally_ADC( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0x7d: 
-      sally_AbsoluteX( ); 
-      sally_ADC( ); 
-      sally_Delay(sally_x); 
-      break;
-
-    case 0x7e: 
-      sally_AbsoluteX( ); 
-      sally_ROR( ); 
-      break;
-
-    case 0x81: 
-      sally_IndirectX( ); 
-      sally_STA( ); 
-      break;
-
-    case 0x84: 
-      sally_ZeroPage( );  
-      sally_STY( ); 
-      break;
-
-    case 0x85: 
-      sally_ZeroPage( );  
-      sally_STA( ); 
-      break;
-
-    case 0x86: 
-      sally_ZeroPage( );  
-      sally_stx( ); 
-      break;
-
-    case 0x88: 
-      sally_DEY( );
-      break;
-
-    case 0x8a: 
-      sally_TXA( );
-      break;
-
-    case 0x8c: 
-      sally_Absolute( );  
-      sally_STY( ); 
-      break;
-
-    case 0x8d: 
-      sally_Absolute( );  
-      sally_STA( ); 
-      break;
-
-    case 0x8e: 
-      sally_Absolute( );  
-      sally_stx( ); 
-      break;
-
-    case 0x90: 
-      sally_Relative( );
-      sally_BCC( );
-      break;
-
-    case 0x91: 
-      sally_IndirectY( ); 
-      sally_STA( ); 
-      break;
-
-    case 0x94: 
-      sally_ZeroPageX( ); 
-      sally_STY( ); 
-      break;
-
-    case 0x95: 
-      sally_ZeroPageX( ); 
-      sally_STA( ); 
-      break;
-
-    case 0x96: 
-      sally_ZeroPageY( ); 
-      sally_stx( ); 
-      break;
-
-    case 0x98: 
-      sally_TYA( );
-      break;
-
-    case 0x99: 
-      sally_AbsoluteY( ); 
-      sally_STA( ); 
-      break;
-
-    case 0x9a: 
-      sally_TXS( );
-      break;
-
-    case 0x9d: 
-      sally_AbsoluteX( ); 
-      sally_STA( ); 
-      break;
-
-    case 0xa0: 
-      sally_Immediate( ); 
-      sally_LDY( ); 
-      break;
-
-    case 0xa1: 
-      sally_IndirectX( ); 
-      sally_LDA( ); 
-      break;
-
-    case 0xa2: 
-      sally_Immediate( ); 
-      sally_LDX( ); 
-      break;
-
-    case 0xa4: 
-      sally_ZeroPage( );  
-      sally_LDY( ); 
-      break;
-
-    case 0xa5: 
-      sally_ZeroPage( );  
-      sally_LDA( ); 
-      break;
-
-    case 0xa6: 
-      sally_ZeroPage( );  
-      sally_LDX( ); 
-      break;
-
-    case 0xa8: 
-      sally_TAY( );
-      break;
-
-    case 0xa9: 
-      sally_Immediate( ); 
-      sally_LDA( ); 
-      break;
-
-    case 0xaa: 
-      sally_TAX( );
-      break;
-
-    case 0xac: 
-      sally_Absolute( );  
-      sally_LDY( ); 
-      break;
-
-    case 0xad: 
-      sally_Absolute( );  
-      sally_LDA( ); 
-      break;
-
-    case 0xae: 
-      sally_Absolute( );  
-      sally_LDX( ); 
-      break;
-
-    case 0xb0: 
-      sally_Relative( );  
-      sally_BCS( );
-      break;
-
-    case 0xb1: 
-      sally_IndirectY( ); 
-      sally_LDA( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xb4: 
-      sally_ZeroPageX( ); 
-      sally_LDY( ); 
-      break;
-
-    case 0xb5: 
-      sally_ZeroPageX( ); 
-      sally_LDA( ); 
-      break;
-
-    case 0xb6: 
-      sally_ZeroPageY( ); 
-      sally_LDX( ); 
-      break;
-
-    case 0xb8: 
-      sally_CLV( );
-      break;
-
-    case 0xb9: 
-      sally_AbsoluteY( ); 
-      sally_LDA( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xba: 
-      sally_TSX( );
-      break;
-
-    case 0xbc: 
-      sally_AbsoluteX( ); 
-      sally_LDY( ); 
-      sally_Delay(sally_x); 
-      break;
-
-    case 0xbd: 
-      sally_AbsoluteX( ); 
-      sally_LDA( ); 
-      sally_Delay(sally_x);
-      break;
-
-    case 0xbe: 
-      sally_AbsoluteY( ); 
-      sally_LDX( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xc0: 
-      sally_Immediate( ); 
-      sally_CPY( ); 
-      break;
-
-    case 0xc1: 
-      sally_IndirectX( ); 
-      sally_CMP( ); 
-      break;
-
-    case 0xc4: 
-      sally_ZeroPage( );  
-      sally_CPY( ); 
-      break;
-
-    case 0xc5: 
-      sally_ZeroPage( );  
-      sally_CMP( ); 
-      break;
-
-    case 0xc6: 
-      sally_ZeroPage( );  
-      sally_DEC( ); 
-      break;
-
-    case 0xc8: 
-      sally_INY( );
-      break;
-
-    case 0xc9: 
-      sally_Immediate( ); 
-      sally_CMP( ); 
-      break;
-
-    case 0xca: 
-      sally_DEX( );
-      break;
-
-    case 0xcc: 
-      sally_Absolute( );  
-      sally_CPY( ); 
-      break;
-
-    case 0xcd: 
-      sally_Absolute( );  
-      sally_CMP( ); 
-      break;
-
-    case 0xce: 
-      sally_Absolute( );  
-      sally_DEC( ); 
-      break;
-
-    case 0xd0: 
-      sally_Relative( );  
-      sally_BNE( );
-      break;          
-
-    case 0xd1: 
-      sally_IndirectY( ); 
-      sally_CMP( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xd5: 
-      sally_ZeroPageX( ); 
-      sally_CMP( ); 
-      break;
-
-    case 0xd6: 
-      sally_ZeroPageX( ); 
-      sally_DEC( ); 
-      break;
-
-    case 0xd8: 
-      sally_CLD( );
-      break;
-
-    case 0xd9: 
-      sally_AbsoluteY( ); 
-      sally_CMP( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xdd: 
-      sally_AbsoluteX( ); 
-      sally_CMP( ); 
-      sally_Delay(sally_x); 
-      break;
-
-    case 0xde: 
-      sally_AbsoluteX( ); 
-      sally_DEC( ); 
-      break;
-
-    case 0xe0: 
-      sally_Immediate( ); 
-      sally_CPX( ); 
-      break;
-
-    case 0xe1: 
-      sally_IndirectX( ); 
-      sally_SBC( ); 
-      break;
-
-    case 0xe4: 
-      sally_ZeroPage( );  
-      sally_CPX( ); 
-      break;
-
-    case 0xe5: 
-      sally_ZeroPage( );  
-      sally_SBC( ); 
-      break;
-
-    case 0xe6: 
-      sally_ZeroPage( );  
-      sally_INC( ); 
-      break;
-
-    case 0xe8: 
-      sally_INX( );
-      break;
-
-    case 0xe9: 
-      sally_Immediate( ); 
-      sally_SBC( ); 
-      break;
-
-    case 0xea:
-      sally_NOP( );
-      break;
-
-    case 0xec: 
-      sally_Absolute( );  
-      sally_CPX( ); 
-      break;
-
-    case 0xed: 
-      sally_Absolute( );  
-      sally_SBC( ); 
-      break;
-
-    case 0xee: 
-      sally_Absolute( );  
-      sally_INC( ); 
-      break;
-
-    case 0xf0: 
-      sally_Relative( );
-      sally_BEQ( );
-      break;
-
-    case 0xf1: 
-      sally_IndirectY( ); 
-      sally_SBC( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xf5: 
-      sally_ZeroPageX( ); 
-      sally_SBC( ); 
-      break;
-
-    case 0xf6: 
-      sally_ZeroPageX( ); 
-      sally_INC( ); 
-      break;
-
-    case 0xf8: 
-      sally_SED( );
-      break;
-
-    case 0xf9: 
-      sally_AbsoluteY( ); 
-      sally_SBC( ); 
-      sally_Delay(sally_y); 
-      break;
-
-    case 0xfd: 
-      sally_AbsoluteX( ); 
-      sally_SBC( ); 
-      sally_Delay(sally_x); 
-      break;
-
-    case 0xfe: 
-      sally_AbsoluteX( ); 
-      sally_INC( ); 
-      break;
-
-    default:
-      break;
-  }
-
-  return sally_cycles;
+uint sally_ExecuteInstruction(void)
+{
+   sally_opcode = memory_Read(sally_pc.w++);
+   sally_cycles = SALLY_CYCLES[sally_opcode];
+
+   switch(sally_opcode) {
+      case 0x00:
+         sally_BRK( ); 
+         break;
+
+      case 0x01:
+         sally_IndirectX( ); 
+         sally_ORA( ); 
+         break;
+
+      case 0x05:
+         sally_ZeroPage( );  
+         sally_ORA( ); 
+         break;
+
+      case 0x06: 
+         sally_ZeroPage( );
+         sally_ASL( );
+         break;
+
+      case 0x08: 
+         sally_PHP( );
+         break;
+
+      case 0x09: 
+         sally_Immediate( ); 
+         sally_ORA( ); 
+         break;        
+
+      case 0x0a: 
+         sally_ASLA( ); 
+         break;        
+
+      case 0x0d: 
+         sally_Absolute( );  
+         sally_ORA( ); 
+         break;
+
+      case 0x0e: 
+         sally_Absolute( );  
+         sally_ASL( ); 
+         break;
+
+      case 0x10: 
+         sally_Relative( );
+         sally_BPL( );
+         break;        
+
+      case 0x11: 
+         sally_IndirectY( ); 
+         sally_ORA( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0x15: 
+         sally_ZeroPageX( ); 
+         sally_ORA( ); 
+         break;
+
+      case 0x16: 
+         sally_ZeroPageX( ); 
+         sally_ASL( ); 
+         break;
+
+      case 0x18: 
+         sally_CLC( );
+         break;
+
+      case 0x19: 
+         sally_AbsoluteY( ); 
+         sally_ORA( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0x1d: 
+         sally_AbsoluteX( ); 
+         sally_ORA( ); 
+         sally_Delay(sally_x); 
+         break;
+
+      case 0x1e: 
+         sally_AbsoluteX( ); 
+         sally_ASL( ); 
+         break;
+
+      case 0x20: 
+         sally_Absolute( );  
+         sally_JSR( ); 
+         break;
+
+      case 0x21: 
+         sally_IndirectX( );
+         sally_AND( );
+         break;
+
+      case 0x24: 
+         sally_ZeroPage( );
+         sally_BIT( );
+         break;
+
+      case 0x25: 
+         sally_ZeroPage( );
+         sally_AND( ); 
+         break;
+
+      case 0x26: 
+         sally_ZeroPage( );
+         sally_ROL( );
+         break;
+
+      case 0x28:
+         sally_PLP( );
+         break;
+
+      case 0x29:
+         sally_Immediate( );
+         sally_AND( );
+         break;
+
+      case 0x2a: 
+         sally_ROLA( );
+         break;
+
+      case 0x2c: 
+         sally_Absolute( );
+         sally_BIT( );
+         break;
+
+      case 0x2d: 
+         sally_Absolute( );
+         sally_AND( );
+         break;
+
+      case 0x2e: 
+         sally_Absolute( );
+         sally_ROL( );
+         break;
+
+      case 0x30:
+         sally_Relative( );
+         sally_BMI( );
+         break;
+
+      case 0x31: 
+         sally_IndirectY( );
+         sally_AND( );
+         sally_Delay(sally_y);
+         break;
+
+      case 0x35: 
+         sally_ZeroPageX( ); 
+         sally_AND( ); 
+         break;
+
+      case 0x36: 
+         sally_ZeroPageX( ); 
+         sally_ROL( ); 
+         break;
+
+      case 0x38: 
+         sally_SEC( );
+         break;
+
+      case 0x39: 
+         sally_AbsoluteY( );
+         sally_AND( );
+         sally_Delay(sally_y);
+         break;
+
+      case 0x3d: 
+         sally_AbsoluteX( ); 
+         sally_AND( );
+         sally_Delay(sally_x);
+         break;
+
+      case 0x3e: 
+         sally_AbsoluteX( );
+         sally_ROL( );
+         break;
+
+      case 0x40: 
+         sally_RTI( );
+         break;
+
+      case 0x41: 
+         sally_IndirectX( ); 
+         sally_EOR( ); 
+         break;
+
+      case 0x45: 
+         sally_ZeroPage( );
+         sally_EOR( );
+         break;
+
+      case 0x46: 
+         sally_ZeroPage( );
+         sally_LSR( );
+         break;
+
+      case 0x48: 
+         sally_PHA( );
+         break;
+
+      case 0x49: 
+         sally_Immediate( ); 
+         sally_EOR( ); 
+         break;  
+
+      case 0x4a: 
+         sally_LSRA( ); 
+         break; 
+
+      case 0x4c: 
+         sally_Absolute( );  
+         sally_JMP( ); 
+         break;
+
+      case 0x4d: 
+         sally_Absolute( );  
+         sally_EOR( ); 
+         break;
+
+      case 0x4e: 
+         sally_Absolute( );
+         sally_LSR( );
+         break;
+
+      case 0x50: 
+         sally_Relative( );
+         sally_BVC( );
+         break;
+
+      case 0x51: 
+         sally_IndirectY( ); 
+         sally_EOR( ); 
+         sally_Delay(sally_y); 
+         break;      
+
+      case 0x55: 
+         sally_ZeroPageX( ); 
+         sally_EOR( ); 
+         break;
+
+      case 0x56: 
+         sally_ZeroPageX( ); 
+         sally_LSR( ); 
+         break;
+
+      case 0x58: 
+         sally_CLI( );
+         break;
+
+      case 0x59: 
+         sally_AbsoluteY( ); 
+         sally_EOR( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0x5d: 
+         sally_AbsoluteX( ); 
+         sally_EOR( ); 
+         sally_Delay(sally_x); 
+         break;
+
+      case 0x5e: 
+         sally_AbsoluteX( ); 
+         sally_LSR( ); 
+         break;
+
+      case 0x60: 
+         sally_RTS( );
+         break;
+
+      case 0x61: 
+         sally_IndirectX( ); 
+         sally_ADC( ); 
+         break;
+
+      case 0x65: 
+         sally_ZeroPage( );
+         sally_ADC( ); 
+         break;
+
+      case 0x66: 
+         sally_ZeroPage( );  
+         sally_ROR( ); 
+         break;
+
+      case 0x68: 
+         sally_PLA( );
+         break;
+
+      case 0x69: 
+         sally_Immediate( ); 
+         sally_ADC( ); 
+         break;
+
+      case 0x6a: 
+         sally_RORA( ); 
+         break;
+
+      case 0x6c: 
+         sally_Indirect( );
+         sally_JMP( ); 
+         break;
+
+      case 0x6d: 
+         sally_Absolute( );
+         sally_ADC( ); 
+         break;
+
+      case 0x6e: 
+         sally_Absolute( );  
+         sally_ROR( ); 
+         break;
+
+      case 0x70: 
+         sally_Relative( );  
+         sally_BVS( );
+         break;
+
+      case 0x71: 
+         sally_IndirectY( ); 
+         sally_ADC( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0x75: 
+         sally_ZeroPageX( ); 
+         sally_ADC( ); 
+         break;
+
+      case 0x76: 
+         sally_ZeroPageX( ); 
+         sally_ROR( ); 
+         break;
+
+      case 0x78: 
+         sally_SEI( );
+         break;
+
+      case 0x79: 
+         sally_AbsoluteY( ); 
+         sally_ADC( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0x7d: 
+         sally_AbsoluteX( ); 
+         sally_ADC( ); 
+         sally_Delay(sally_x); 
+         break;
+
+      case 0x7e: 
+         sally_AbsoluteX( ); 
+         sally_ROR( ); 
+         break;
+
+      case 0x81: 
+         sally_IndirectX( ); 
+         sally_STA( ); 
+         break;
+
+      case 0x84: 
+         sally_ZeroPage( );  
+         sally_STY( ); 
+         break;
+
+      case 0x85: 
+         sally_ZeroPage( );  
+         sally_STA( ); 
+         break;
+
+      case 0x86: 
+         sally_ZeroPage( );  
+         sally_stx( ); 
+         break;
+
+      case 0x88: 
+         sally_DEY( );
+         break;
+
+      case 0x8a: 
+         sally_TXA( );
+         break;
+
+      case 0x8c: 
+         sally_Absolute( );  
+         sally_STY( ); 
+         break;
+
+      case 0x8d: 
+         sally_Absolute( );  
+         sally_STA( ); 
+         break;
+
+      case 0x8e: 
+         sally_Absolute( );  
+         sally_stx( ); 
+         break;
+
+      case 0x90: 
+         sally_Relative( );
+         sally_BCC( );
+         break;
+
+      case 0x91: 
+         sally_IndirectY( ); 
+         sally_STA( ); 
+         break;
+
+      case 0x94: 
+         sally_ZeroPageX( ); 
+         sally_STY( ); 
+         break;
+
+      case 0x95: 
+         sally_ZeroPageX( ); 
+         sally_STA( ); 
+         break;
+
+      case 0x96: 
+         sally_ZeroPageY( ); 
+         sally_stx( ); 
+         break;
+
+      case 0x98: 
+         sally_TYA( );
+         break;
+
+      case 0x99: 
+         sally_AbsoluteY( ); 
+         sally_STA( ); 
+         break;
+
+      case 0x9a: 
+         sally_TXS( );
+         break;
+
+      case 0x9d: 
+         sally_AbsoluteX( ); 
+         sally_STA( ); 
+         break;
+
+      case 0xa0: 
+         sally_Immediate( ); 
+         sally_LDY( ); 
+         break;
+
+      case 0xa1: 
+         sally_IndirectX( ); 
+         sally_LDA( ); 
+         break;
+
+      case 0xa2: 
+         sally_Immediate( ); 
+         sally_LDX( ); 
+         break;
+
+      case 0xa4: 
+         sally_ZeroPage( );  
+         sally_LDY( ); 
+         break;
+
+      case 0xa5: 
+         sally_ZeroPage( );  
+         sally_LDA( ); 
+         break;
+
+      case 0xa6: 
+         sally_ZeroPage( );  
+         sally_LDX( ); 
+         break;
+
+      case 0xa8: 
+         sally_TAY( );
+         break;
+
+      case 0xa9: 
+         sally_Immediate( ); 
+         sally_LDA( ); 
+         break;
+
+      case 0xaa: 
+         sally_TAX( );
+         break;
+
+      case 0xac: 
+         sally_Absolute( );  
+         sally_LDY( ); 
+         break;
+
+      case 0xad: 
+         sally_Absolute( );  
+         sally_LDA( ); 
+         break;
+
+      case 0xae: 
+         sally_Absolute( );  
+         sally_LDX( ); 
+         break;
+
+      case 0xb0: 
+         sally_Relative( );  
+         sally_BCS( );
+         break;
+
+      case 0xb1: 
+         sally_IndirectY( ); 
+         sally_LDA( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xb4: 
+         sally_ZeroPageX( ); 
+         sally_LDY( ); 
+         break;
+
+      case 0xb5: 
+         sally_ZeroPageX( ); 
+         sally_LDA( ); 
+         break;
+
+      case 0xb6: 
+         sally_ZeroPageY( ); 
+         sally_LDX( ); 
+         break;
+
+      case 0xb8: 
+         sally_CLV( );
+         break;
+
+      case 0xb9: 
+         sally_AbsoluteY( ); 
+         sally_LDA( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xba: 
+         sally_TSX( );
+         break;
+
+      case 0xbc: 
+         sally_AbsoluteX( ); 
+         sally_LDY( ); 
+         sally_Delay(sally_x); 
+         break;
+
+      case 0xbd: 
+         sally_AbsoluteX( ); 
+         sally_LDA( ); 
+         sally_Delay(sally_x);
+         break;
+
+      case 0xbe: 
+         sally_AbsoluteY( ); 
+         sally_LDX( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xc0: 
+         sally_Immediate( ); 
+         sally_CPY( ); 
+         break;
+
+      case 0xc1: 
+         sally_IndirectX( ); 
+         sally_CMP( ); 
+         break;
+
+      case 0xc4: 
+         sally_ZeroPage( );  
+         sally_CPY( ); 
+         break;
+
+      case 0xc5: 
+         sally_ZeroPage( );  
+         sally_CMP( ); 
+         break;
+
+      case 0xc6: 
+         sally_ZeroPage( );  
+         sally_DEC( ); 
+         break;
+
+      case 0xc8: 
+         sally_INY( );
+         break;
+
+      case 0xc9: 
+         sally_Immediate( ); 
+         sally_CMP( ); 
+         break;
+
+      case 0xca: 
+         sally_DEX( );
+         break;
+
+      case 0xcc: 
+         sally_Absolute( );  
+         sally_CPY( ); 
+         break;
+
+      case 0xcd: 
+         sally_Absolute( );  
+         sally_CMP( ); 
+         break;
+
+      case 0xce: 
+         sally_Absolute( );  
+         sally_DEC( ); 
+         break;
+
+      case 0xd0: 
+         sally_Relative( );  
+         sally_BNE( );
+         break;          
+
+      case 0xd1: 
+         sally_IndirectY( ); 
+         sally_CMP( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xd5: 
+         sally_ZeroPageX( ); 
+         sally_CMP( ); 
+         break;
+
+      case 0xd6: 
+         sally_ZeroPageX( ); 
+         sally_DEC( ); 
+         break;
+
+      case 0xd8: 
+         sally_CLD( );
+         break;
+
+      case 0xd9: 
+         sally_AbsoluteY( ); 
+         sally_CMP( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xdd: 
+         sally_AbsoluteX( ); 
+         sally_CMP( ); 
+         sally_Delay(sally_x); 
+         break;
+
+      case 0xde: 
+         sally_AbsoluteX( ); 
+         sally_DEC( ); 
+         break;
+
+      case 0xe0: 
+         sally_Immediate( ); 
+         sally_CPX( ); 
+         break;
+
+      case 0xe1: 
+         sally_IndirectX( ); 
+         sally_SBC( ); 
+         break;
+
+      case 0xe4: 
+         sally_ZeroPage( );  
+         sally_CPX( ); 
+         break;
+
+      case 0xe5: 
+         sally_ZeroPage( );  
+         sally_SBC( ); 
+         break;
+
+      case 0xe6: 
+         sally_ZeroPage( );  
+         sally_INC( ); 
+         break;
+
+      case 0xe8: 
+         sally_INX( );
+         break;
+
+      case 0xe9: 
+         sally_Immediate( ); 
+         sally_SBC( ); 
+         break;
+
+      case 0xea:
+         sally_NOP( );
+         break;
+
+      case 0xec: 
+         sally_Absolute( );  
+         sally_CPX( ); 
+         break;
+
+      case 0xed: 
+         sally_Absolute( );  
+         sally_SBC( ); 
+         break;
+
+      case 0xee: 
+         sally_Absolute( );  
+         sally_INC( ); 
+         break;
+
+      case 0xf0: 
+         sally_Relative( );
+         sally_BEQ( );
+         break;
+
+      case 0xf1: 
+         sally_IndirectY( ); 
+         sally_SBC( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xf5: 
+         sally_ZeroPageX( ); 
+         sally_SBC( ); 
+         break;
+
+      case 0xf6: 
+         sally_ZeroPageX( ); 
+         sally_INC( ); 
+         break;
+
+      case 0xf8: 
+         sally_SED( );
+         break;
+
+      case 0xf9: 
+         sally_AbsoluteY( ); 
+         sally_SBC( ); 
+         sally_Delay(sally_y); 
+         break;
+
+      case 0xfd: 
+         sally_AbsoluteX( ); 
+         sally_SBC( ); 
+         sally_Delay(sally_x); 
+         break;
+
+      case 0xfe: 
+         sally_AbsoluteX( ); 
+         sally_INC( ); 
+         break;
+
+      default:
+         break;
+   }
+
+   return sally_cycles;
 }
 
 // ----------------------------------------------------------------------------
 // ExecuteRES
 // ----------------------------------------------------------------------------
-uint sally_ExecuteRES( ) {
-  sally_p = SALLY_FLAG.I | SALLY_FLAG.R | SALLY_FLAG.Z;
-  sally_pc.b.l = memory_ram[SALLY_RES.L];
-  sally_pc.b.h = memory_ram[SALLY_RES.H];
-  return 6;
+uint sally_ExecuteRES(void)
+{
+   sally_p = SALLY_FLAG.I | SALLY_FLAG.R | SALLY_FLAG.Z;
+   sally_pc.b.l = memory_ram[SALLY_RES.L];
+   sally_pc.b.h = memory_ram[SALLY_RES.H];
+   return 6;
 }
 
 // ----------------------------------------------------------------------------
 // ExecuteNMI
 // ----------------------------------------------------------------------------
-uint sally_ExecuteNMI( ) {
-  sally_Push(sally_pc.b.h);
-  sally_Push(sally_pc.b.l);
-  sally_p &= ~SALLY_FLAG.B;
-  sally_Push(sally_p);
-  sally_p |= SALLY_FLAG.I;
-  sally_pc.b.l = memory_ram[SALLY_NMI.L];
-  sally_pc.b.h = memory_ram[SALLY_NMI.H];
-  return 7;
+uint sally_ExecuteNMI(void)
+{
+   sally_Push(sally_pc.b.h);
+   sally_Push(sally_pc.b.l);
+   sally_p &= ~SALLY_FLAG.B;
+   sally_Push(sally_p);
+   sally_p |= SALLY_FLAG.I;
+   sally_pc.b.l = memory_ram[SALLY_NMI.L];
+   sally_pc.b.h = memory_ram[SALLY_NMI.H];
+   return 7;
 }
 
 // ----------------------------------------------------------------------------
 // Execute IRQ
 // ----------------------------------------------------------------------------
-uint sally_ExecuteIRQ( ) {
-  if(!(sally_p & SALLY_FLAG.I)) {
-    sally_Push(sally_pc.b.h);
-    sally_Push(sally_pc.b.l);
-    sally_p &= ~SALLY_FLAG.B;
-    sally_Push(sally_p);
-    sally_p |= SALLY_FLAG.I;
-    sally_pc.b.l = memory_ram[SALLY_IRQ.L];
-    sally_pc.b.h = memory_ram[SALLY_IRQ.H];
-  }
-  return 7;
+uint sally_ExecuteIRQ(void)
+{
+   if(!(sally_p & SALLY_FLAG.I))
+   {
+      sally_Push(sally_pc.b.h);
+      sally_Push(sally_pc.b.l);
+      sally_p &= ~SALLY_FLAG.B;
+      sally_Push(sally_p);
+      sally_p |= SALLY_FLAG.I;
+      sally_pc.b.l = memory_ram[SALLY_IRQ.L];
+      sally_pc.b.h = memory_ram[SALLY_IRQ.H];
+   }
+   return 7;
 }
