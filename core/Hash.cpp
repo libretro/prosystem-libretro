@@ -169,36 +169,36 @@ std::string hash_Compute(const byte* source, uint length)
   buffer2[1] += length >> 29;
 
   temp = (temp >> 3) & 0x3f;
-  if(temp) {
+  if(temp)
+  {
 	  byte* ptr = (byte*)buffer3 + temp;
 	  temp = 64 - temp;
-	  if(length < temp) {
-      for(uint index = 0; index < length; index++) {
+
+	  if(length < temp)
+     {
+      for(uint index = 0; index < length; index++)
         ptr[index] = source[index];
-      }
 	  }
 	  
-    for(uint index = 0; index < temp; index++) {
+    for(uint index = 0; index < temp; index++)
       ptr[index] = source[index];
-    }
 
 	  hash_Transform(buffer1, (uint*)buffer3);
 	  source += temp;
 	  length -= temp;
   }
 
-  while(length >= 64) {
-    for(uint index = 0; index < 64; index++) {
+  while(length >= 64)
+  {
+    for(uint index = 0; index < 64; index++)
       buffer3[index] = source[index];
-    }
 	  hash_Transform(buffer1, (uint*)buffer3);
 	  source += 64;
 	  length -= 64;
   }
 
-  for(uint index = 0; index < length; index++) {
+  for(uint index = 0; index < length; index++)
     buffer3[index] = source[index];
-  }
 
   uint count = (buffer2[0] >> 3) & 0x3f;
   byte* ptr = buffer3 + count;
@@ -206,20 +206,19 @@ std::string hash_Compute(const byte* source, uint length)
 
   count = 63 - count;
 
-  if(count < 8) {
-    for(uint index = 0; index < count; index++) {
+  if(count < 8)
+  {
+    for(uint index = 0; index < count; index++)
       ptr[index] = 0;
-    }
 	  hash_Transform(buffer1, (uint*)buffer3);
     
-    for(uint index = 0; index < 56; index++) {
+    for(uint index = 0; index < 56; index++)
       buffer3[index] = 0;
-    }
   } 
-  else {
-    for(uint index = 0; index < count - 8; index++) {
+  else
+  {
+    for(uint index = 0; index < count - 8; index++)
       ptr[index] = 0;
-    }
   }
 
   ((uint*)buffer3)[14] = buffer2[0];
@@ -229,9 +228,8 @@ std::string hash_Compute(const byte* source, uint length)
   
   byte digest[16];
   byte* bufferptr = (byte*)buffer1;
-  for(uint index = 0; index < 16; index++) {
+  for(uint index = 0; index < 16; index++)
     digest[index] = bufferptr[index];
-  }
 
   char buffer[33] = {0};
   sprintf(buffer, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]);
