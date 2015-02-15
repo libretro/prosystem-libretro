@@ -44,12 +44,13 @@ static uint cartridge_size = 0;
 // ----------------------------------------------------------------------------
 // HasHeader
 // ----------------------------------------------------------------------------
-static bool cartridge_HasHeader(const byte* header) {
+static bool cartridge_HasHeader(const byte* header)
+{
   const char HEADER_ID[ ] = {"ATARI7800"};
-  for(int index = 0; index < 9; index++) {
-    if(HEADER_ID[index] != header[index + 1]) {
+  for(int index = 0; index < 9; index++)
+  {
+    if(HEADER_ID[index] != header[index + 1])
       return false;
-    }
   }
   return true;
 }
@@ -57,12 +58,13 @@ static bool cartridge_HasHeader(const byte* header) {
 // ----------------------------------------------------------------------------
 // Header for CC2 hack
 // ----------------------------------------------------------------------------
-static bool cartridge_CC2(const byte* header) {
+static bool cartridge_CC2(const byte* header)
+{
   const char HEADER_ID[ ] = {">>"};
-  for(int index = 0; index < 2; index++) {
-    if(HEADER_ID[index] != header[index+1]) {
+  for(int index = 0; index < 2; index++)
+  {
+    if(HEADER_ID[index] != header[index+1])
       return false;
-    }
   }
   return true;
 }
@@ -70,22 +72,32 @@ static bool cartridge_CC2(const byte* header) {
 // ----------------------------------------------------------------------------
 // GetBankOffset
 // ----------------------------------------------------------------------------
-static uint cartridge_GetBankOffset(byte bank) {
-  if ((cartridge_type == CARTRIDGE_TYPE_SUPERCART || cartridge_type == CARTRIDGE_TYPE_SUPERCART_ROM || cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM) && cartridge_size <= 65536) {
-    // for some of these carts, there are only 4 banks. in this case we ignore bit 3
-    // previously, games of this type had to be doubled. The first 4 banks needed to be duplicated at the end of the ROM
+static uint cartridge_GetBankOffset(byte bank)
+{
+   if (
+         (
+          cartridge_type == CARTRIDGE_TYPE_SUPERCART || 
+          cartridge_type == CARTRIDGE_TYPE_SUPERCART_ROM || 
+          cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM) && cartridge_size <= 65536
+      )
+   {
+      // for some of these carts, there are only 4 banks. in this case we ignore bit 3
+      // previously, games of this type had to be doubled. The first 4 banks needed to be duplicated at the end of the ROM
       return (bank & 3) * 16384;
-  }
+   }
 
-  return bank * 16384;
+   return bank * 16384;
 }
 
 // ----------------------------------------------------------------------------
 // WriteBank
 // ----------------------------------------------------------------------------
-static void cartridge_WriteBank(word address, byte bank) {
+static void cartridge_WriteBank(word address, byte bank)
+{
   uint offset = cartridge_GetBankOffset(bank);
-  if(offset < cartridge_size) {
+
+  if(offset < cartridge_size)
+  {
     memory_WriteROM(address, 16384, cartridge_buffer + offset);
     cartridge_bank = bank;
   }
@@ -94,52 +106,47 @@ static void cartridge_WriteBank(word address, byte bank) {
 // ----------------------------------------------------------------------------
 // ReadHeader
 // ----------------------------------------------------------------------------
-static void cartridge_ReadHeader(const byte* header) {
-  char temp[33] = {0};
-  for(int index = 0; index < 32; index++) {
-    temp[index] = header[index + 17];  
-  }
-  cartridge_title = temp;
-  
-  cartridge_size  = header[49] << 32;
-  cartridge_size |= header[50] << 16;
-  cartridge_size |= header[51] << 8;
-  cartridge_size |= header[52];
+static void cartridge_ReadHeader(const byte* header)
+{
+   char temp[33] = {0};
 
-  if(header[53] == 0) {
-    if(cartridge_size > 131072) {
-      cartridge_type = CARTRIDGE_TYPE_SUPERCART_LARGE;
-    }
-    else if(header[54] == 2 || header[54] == 3) {
-      cartridge_type = CARTRIDGE_TYPE_SUPERCART;
-    }
-    else if(header[54] == 4 || header[54] == 5 || header[54] == 6 || header[54] == 7) {
-      cartridge_type = CARTRIDGE_TYPE_SUPERCART_RAM;
-    }
-    else if(header[54] == 8 || header[54] == 9 || header[54] == 10 || header[54] == 11) {
-      cartridge_type = CARTRIDGE_TYPE_SUPERCART_ROM;
-    }
-    else {
-      cartridge_type = CARTRIDGE_TYPE_NORMAL;
-    }
-  }
-  else {
-    if(header[53] == 1) {
-      cartridge_type = CARTRIDGE_TYPE_ABSOLUTE;
-    }
-    else if(header[53] == 2) {
-      cartridge_type = CARTRIDGE_TYPE_ACTIVISION;
-    }
-    else {
-      cartridge_type = CARTRIDGE_TYPE_NORMAL;
-    }
-  }
-  
-  cartridge_pokey = (header[54] & 1)? true: false;
-  cartridge_controller[0] = header[55];
-  cartridge_controller[1] = header[56];
-  cartridge_region = header[57];
-  cartridge_flags = 0;
+   for(int index = 0; index < 32; index++)
+      temp[index] = header[index + 17];  
+   cartridge_title = temp;
+
+   cartridge_size  = header[49] << 32;
+   cartridge_size |= header[50] << 16;
+   cartridge_size |= header[51] << 8;
+   cartridge_size |= header[52];
+
+   if(header[53] == 0)
+   {
+      if(cartridge_size > 131072)
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART_LARGE;
+      else if(header[54] == 2 || header[54] == 3)
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART;
+      else if(header[54] == 4 || header[54] == 5 || header[54] == 6 || header[54] == 7)
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART_RAM;
+      else if(header[54] == 8 || header[54] == 9 || header[54] == 10 || header[54] == 11)
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART_ROM;
+      else
+         cartridge_type = CARTRIDGE_TYPE_NORMAL;
+   }
+   else
+   {
+      if(header[53] == 1)
+         cartridge_type = CARTRIDGE_TYPE_ABSOLUTE;
+      else if(header[53] == 2)
+         cartridge_type = CARTRIDGE_TYPE_ACTIVISION;
+      else
+         cartridge_type = CARTRIDGE_TYPE_NORMAL;
+   }
+
+   cartridge_pokey = (header[54] & 1)? true: false;
+   cartridge_controller[0] = header[55];
+   cartridge_controller[1] = header[56];
+   cartridge_region = header[57];
+   cartridge_flags = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -417,10 +424,10 @@ bool cartridge_IsLoaded(void)
 // ----------------------------------------------------------------------------
 void cartridge_Release(void)
 {
-  if(cartridge_buffer != NULL)
-  {
-    delete [ ] cartridge_buffer;
-    cartridge_size = 0;
-    cartridge_buffer = NULL;
-  }
+   if(!cartridge_buffer)
+      return;
+
+   delete [ ] cartridge_buffer;
+   cartridge_size = 0;
+   cartridge_buffer = NULL;
 }

@@ -15,7 +15,6 @@ SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/core/Riot.cpp \
 	$(CORE_DIR)/core/Sally.cpp \
 	$(CORE_DIR)/core/Tia.cpp \
-	$(CORE_DIR)/core/Timer.cpp \
 	$(CORE_DIR)/libretro.cpp
 
 SOURCES_C :=

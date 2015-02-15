@@ -58,7 +58,8 @@ bool database_Load(const char *digest)
       }
 
       char buffer[256];
-      while(fgets(buffer, 256, file) != NULL) {
+      while(fgets(buffer, 256, file) != NULL)
+      {
          std::string line = buffer;
          if(line.compare(1, 32, digest) == 0)
          {
