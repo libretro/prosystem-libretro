@@ -43,12 +43,13 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-extern void prosystem_Reset( );
+extern void prosystem_Reset(void);
 extern void prosystem_ExecuteFrame(const byte* input);
 extern bool prosystem_Save(std::string filename, bool compress);
 extern bool prosystem_Load(std::string filename);
 extern void prosystem_Pause(bool pause);
-extern void prosystem_Close( );
+extern void prosystem_Close(void);
+
 extern bool prosystem_active;
 extern bool prosystem_paused;
 extern word prosystem_frequency;

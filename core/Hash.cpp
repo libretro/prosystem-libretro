@@ -28,21 +28,23 @@
 // ----------------------------------------------------------------------------
 // Step1
 // ----------------------------------------------------------------------------
-static uint hash_Step1(uint w, uint x, uint y, uint z, uint data, uint s) {
-  w += (z ^ (x & (y ^ z))) + data;
-  w = w << s | w >> (32 - s);
-  w += x;
-  return w;
+static uint hash_Step1(uint w, uint x, uint y, uint z, uint data, uint s)
+{
+   w += (z ^ (x & (y ^ z))) + data;
+   w = w << s | w >> (32 - s);
+   w += x;
+   return w;
 }
 
 // ----------------------------------------------------------------------------
 // Step2
 // ----------------------------------------------------------------------------
-static uint hash_Step2(uint w, uint x, uint y, uint z, uint data, uint s) {
-  w += (y ^ (z & (x ^ y))) + data;
-  w = w << s | w >> (32 - s);
-  w += x;
-  return w;
+static uint hash_Step2(uint w, uint x, uint y, uint z, uint data, uint s)
+{
+   w += (y ^ (z & (x ^ y))) + data;
+   w = w << s | w >> (32 - s);
+   w += x;
+   return w;
 }
 
 // ----------------------------------------------------------------------------
@@ -153,15 +155,17 @@ static void hash_Transform(uint out[4], uint in[16]) {
 // ----------------------------------------------------------------------------
 // Compute
 // ----------------------------------------------------------------------------
-std::string hash_Compute(const byte* source, uint length) {
+std::string hash_Compute(const byte* source, uint length)
+{
   uint buffer1[4] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476};
   uint buffer2[2] = {0};
   byte buffer3[64] = {0};
 
   uint temp = buffer2[0];
-  if((buffer2[0] = temp + ((uint)length << 3)) < temp) {
+
+  if((buffer2[0] = temp + ((uint)length << 3)) < temp)
 	  buffer2[1]++;
-  }
+
   buffer2[1] += length >> 29;
 
   temp = (temp >> 3) & 0x3f;

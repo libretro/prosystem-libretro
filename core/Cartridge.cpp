@@ -145,256 +145,280 @@ static void cartridge_ReadHeader(const byte* header) {
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-static bool cartridge_Load(const byte* data, uint size) {
-  if(size <= 128) {
-    logger_LogError("Cartridge data is invalid.", CARTRIDGE_SOURCE);
-    return false;
-  }
+static bool cartridge_Load(const byte* data, uint size)
+{
+   int index;
+   byte header[128] = {0};
 
-  cartridge_Release( );
-  
-  byte header[128] = {0};
-  for(int index = 0; index < 128; index++) {
-    header[index] = data[index];
-  }
+   if(size <= 128)
+   {
+      logger_LogError("Cartridge data is invalid.", CARTRIDGE_SOURCE);
+      return false;
+   }
 
-if (cartridge_CC2(header)) {
-    logger_LogError("Prosystem doesn't support CC2 hacks.", CARTRIDGE_SOURCE);
-    return false;
-  }
+   cartridge_Release( );
 
-  uint offset = 0;
-  if(cartridge_HasHeader(header)) {
-    cartridge_ReadHeader(header);
-    size -= 128;
-    offset = 128;
-    cartridge_size = size;
-  }
-  else {
-    cartridge_size = size;
-  }
-  
-  cartridge_buffer = new byte[cartridge_size];
-  for(int index = 0; index < cartridge_size; index++) {
-    cartridge_buffer[index] = data[index + offset];
-  }
-  
-  cartridge_digest = hash_Compute(cartridge_buffer, cartridge_size);
-  
-  return true;
+
+   for(index = 0; index < 128; index++)
+      header[index] = data[index];
+
+   if (cartridge_CC2(header))
+   {
+      logger_LogError("Prosystem doesn't support CC2 hacks.", CARTRIDGE_SOURCE);
+      return false;
+   }
+
+   uint offset = 0;
+   if(cartridge_HasHeader(header))
+   {
+      cartridge_ReadHeader(header);
+      size -= 128;
+      offset = 128;
+      cartridge_size = size;
+   }
+   else
+      cartridge_size = size;
+
+   cartridge_buffer = new byte[cartridge_size];
+
+   for(index = 0; index < cartridge_size; index++)
+      cartridge_buffer[index] = data[index + offset];
+
+   cartridge_digest = hash_Compute(cartridge_buffer, cartridge_size);
+
+   return true;
 }
 
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool cartridge_Load(std::string filename) {
-  if(filename.empty( ) || filename.length( ) == 0) {
-    logger_LogError("Cartridge filename is invalid.", CARTRIDGE_SOURCE);
-    return false;
-  }
-  
-  cartridge_Release( );
-  logger_LogInfo("Opening cartridge file " + filename + ".", CARTRIDGE_SOURCE);
-  
-  byte* data = NULL;
-  //uint size = archive_GetUncompressedFileSize(filename);
-  uint size = 0;
+bool cartridge_Load(std::string filename)
+{
+   byte* data = NULL;
+   uint size = 0;
 
-  if(size == 0) {
-    FILE *file = fopen(filename.c_str( ), "rb");
-    if(file == NULL) {
-      logger_LogError("Failed to open the cartridge file " + filename + " for reading.", CARTRIDGE_SOURCE);
-      return false;  
-    }
+   if(filename.empty( ) || filename.length( ) == 0)
+   {
+      logger_LogError("Cartridge filename is invalid.", CARTRIDGE_SOURCE);
+      return false;
+   }
 
-    if(fseek(file, 0, SEEK_END)) {
-      fclose(file);
-      logger_LogError("Failed to find the end of the cartridge file.", CARTRIDGE_SOURCE);
-      return false;
-    }
-    size = ftell(file);
-    if(fseek(file, 0, SEEK_SET)) {
-      fclose(file);
-      logger_LogError("Failed to find the size of the cartridge file.", CARTRIDGE_SOURCE);
-      return false;
-    }
-  
-    data = new byte[size];
-    if(fread(data, 1, size, file) != size && ferror(file)) {
-      fclose(file);
-      logger_LogError("Failed to read the cartridge data.", CARTRIDGE_SOURCE);
-      cartridge_Release( );
+   cartridge_Release( );
+   logger_LogInfo("Opening cartridge file " + filename + ".", CARTRIDGE_SOURCE);
+
+   if(size == 0)
+   {
+      FILE *file = fopen(filename.c_str( ), "rb");
+      if(file == NULL)
+      {
+         logger_LogError("Failed to open the cartridge file " + filename + " for reading.", CARTRIDGE_SOURCE);
+         return false;  
+      }
+
+      if(fseek(file, 0, SEEK_END))
+      {
+         fclose(file);
+         logger_LogError("Failed to find the end of the cartridge file.", CARTRIDGE_SOURCE);
+         return false;
+      }
+
+      size = ftell(file);
+
+      if(fseek(file, 0, SEEK_SET))
+      {
+         fclose(file);
+         logger_LogError("Failed to find the size of the cartridge file.", CARTRIDGE_SOURCE);
+         return false;
+      }
+
+      data = new byte[size];
+
+      if(fread(data, 1, size, file) != size && ferror(file))
+      {
+         fclose(file);
+         logger_LogError("Failed to read the cartridge data.", CARTRIDGE_SOURCE);
+         cartridge_Release( );
+         delete [ ] data;
+         return false;
+      }    
+
+      fclose(file);    
+   }
+   else
+      data = new byte[size];
+
+   if(!cartridge_Load(data, size))
+   {
+      logger_LogError("Failed to load the cartridge data into memory.", CARTRIDGE_SOURCE);
       delete [ ] data;
       return false;
-    }    
+   }
 
-    fclose(file);    
-  }
-  else {
-    data = new byte[size];
-    //archive_Uncompress(filename, data, size);
-  }
-  
-  if(!cartridge_Load(data, size)) {
-    logger_LogError("Failed to load the cartridge data into memory.", CARTRIDGE_SOURCE);
-    delete [ ] data;
-    return false;
-  }
-  if(data != NULL) {
-    delete [ ] data;
-  }
-  
-  cartridge_filename = filename;
-  return true;
+   if(data != NULL)
+      delete [ ] data;
+
+   cartridge_filename = filename;
+   return true;
 }
 
 // ----------------------------------------------------------------------------
 // Store
 // ----------------------------------------------------------------------------
-void cartridge_Store( ) {
-  switch(cartridge_type) {
-    case CARTRIDGE_TYPE_NORMAL:
-      memory_WriteROM(65536 - cartridge_size, cartridge_size, cartridge_buffer);
-      break;
-    case CARTRIDGE_TYPE_SUPERCART:
-      if(cartridge_GetBankOffset(7) < cartridge_size) {
-        memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(7));
-      }
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_LARGE:
-      if(cartridge_GetBankOffset(8) < cartridge_size) {
-        memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(8));
-        memory_WriteROM(16384, 16384, cartridge_buffer + cartridge_GetBankOffset(0));
-      }
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_RAM:
-      if(cartridge_GetBankOffset(7) < cartridge_size) {
-        memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(7));
-        memory_ClearROM(16384, 16384);
-      }
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_ROM:
-      if(cartridge_GetBankOffset(7) < cartridge_size && cartridge_GetBankOffset(6) < cartridge_size) {
-        memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(7));
-        memory_WriteROM(16384, 16384, cartridge_buffer + cartridge_GetBankOffset(6));
-      }
-      break;
-    case CARTRIDGE_TYPE_ABSOLUTE:
-      memory_WriteROM(16384, 16384, cartridge_buffer);
-      memory_WriteROM(32768, 32768, cartridge_buffer + cartridge_GetBankOffset(2));
-      break;
-    case CARTRIDGE_TYPE_ACTIVISION:
-      if(122880 < cartridge_size) {
-        memory_WriteROM(40960, 16384, cartridge_buffer);
-        memory_WriteROM(16384, 8192, cartridge_buffer + 106496);
-        memory_WriteROM(24576, 8192, cartridge_buffer + 98304);
-        memory_WriteROM(32768, 8192, cartridge_buffer + 122880);
-        memory_WriteROM(57344, 8192, cartridge_buffer + 114688);
-      }
-      break;
-  }
+void cartridge_Store(void)
+{
+   switch(cartridge_type)
+   {
+      case CARTRIDGE_TYPE_NORMAL:
+         memory_WriteROM(65536 - cartridge_size, cartridge_size, cartridge_buffer);
+         break;
+      case CARTRIDGE_TYPE_SUPERCART:
+         if(cartridge_GetBankOffset(7) < cartridge_size)
+            memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(7));
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_LARGE:
+         if(cartridge_GetBankOffset(8) < cartridge_size)
+         {
+            memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(8));
+            memory_WriteROM(16384, 16384, cartridge_buffer + cartridge_GetBankOffset(0));
+         }
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_RAM:
+         if(cartridge_GetBankOffset(7) < cartridge_size)
+         {
+            memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(7));
+            memory_ClearROM(16384, 16384);
+         }
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_ROM:
+         if(cartridge_GetBankOffset(7) < cartridge_size && 
+               cartridge_GetBankOffset(6) < cartridge_size)
+         {
+            memory_WriteROM(49152, 16384, cartridge_buffer + cartridge_GetBankOffset(7));
+            memory_WriteROM(16384, 16384, cartridge_buffer + cartridge_GetBankOffset(6));
+         }
+         break;
+      case CARTRIDGE_TYPE_ABSOLUTE:
+         memory_WriteROM(16384, 16384, cartridge_buffer);
+         memory_WriteROM(32768, 32768, cartridge_buffer + cartridge_GetBankOffset(2));
+         break;
+      case CARTRIDGE_TYPE_ACTIVISION:
+         if(122880 < cartridge_size)
+         {
+            memory_WriteROM(40960, 16384, cartridge_buffer);
+            memory_WriteROM(16384, 8192, cartridge_buffer + 106496);
+            memory_WriteROM(24576, 8192, cartridge_buffer + 98304);
+            memory_WriteROM(32768, 8192, cartridge_buffer + 122880);
+            memory_WriteROM(57344, 8192, cartridge_buffer + 114688);
+         }
+         break;
+   }
 }
 
 // ----------------------------------------------------------------------------
 // Write
 // ----------------------------------------------------------------------------
-void cartridge_Write(word address, byte data) {
-  switch(cartridge_type) {
-    case CARTRIDGE_TYPE_SUPERCART:
-    case CARTRIDGE_TYPE_SUPERCART_RAM:
-    case CARTRIDGE_TYPE_SUPERCART_ROM:
-      if(address >= 32768 && address < 49152 && data < 9) {
-        cartridge_StoreBank(data);
-      }
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_LARGE:
-      if(address >= 32768 && address < 49152 && data < 9) {
-        cartridge_StoreBank(data + 1);
-      }
-      break;
-    case CARTRIDGE_TYPE_ABSOLUTE:
-      if(address == 32768 && (data == 1 || data == 2)) {
-        cartridge_StoreBank(data - 1);
-      }
-      break;
-    case CARTRIDGE_TYPE_ACTIVISION:
-      if(address >= 65408) {
-        cartridge_StoreBank(address & 7);
-      }
-      break;
-  }
+void cartridge_Write(word address, byte data)
+{
+   switch(cartridge_type)
+   {
+      case CARTRIDGE_TYPE_SUPERCART:
+      case CARTRIDGE_TYPE_SUPERCART_RAM:
+      case CARTRIDGE_TYPE_SUPERCART_ROM:
+         if(address >= 32768 && address < 49152 && data < 9)
+            cartridge_StoreBank(data);
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_LARGE:
+         if(address >= 32768 && address < 49152 && data < 9)
+            cartridge_StoreBank(data + 1);
+         break;
+      case CARTRIDGE_TYPE_ABSOLUTE:
+         if(address == 32768 && (data == 1 || data == 2))
+            cartridge_StoreBank(data - 1);
+         break;
+      case CARTRIDGE_TYPE_ACTIVISION:
+         if(address >= 65408)
+            cartridge_StoreBank(address & 7);
+         break;
+   }
 
-  if(cartridge_pokey && address >= 0x4000 && address < 0x4009) {
-    switch(address) {
-      case POKEY_AUDF1:
-        pokey_SetRegister(POKEY_AUDF1, data);
-        break;
-      case POKEY_AUDC1:
-        pokey_SetRegister(POKEY_AUDC1, data);
-        break;
-      case POKEY_AUDF2:
-        pokey_SetRegister(POKEY_AUDF2, data);
-        break;
-      case POKEY_AUDC2:
-        pokey_SetRegister(POKEY_AUDC2, data);
-        break;
-      case POKEY_AUDF3:
-        pokey_SetRegister(POKEY_AUDF3, data);
-        break;
-      case POKEY_AUDC3:
-        pokey_SetRegister(POKEY_AUDC3, data);
-        break;
-      case POKEY_AUDF4:
-        pokey_SetRegister(POKEY_AUDF4, data);
-        break;
-      case POKEY_AUDC4:
-        pokey_SetRegister(POKEY_AUDC4, data);
-        break;
-      case POKEY_AUDCTL:
-        pokey_SetRegister(POKEY_AUDCTL, data);
-        break;
-    }
-  }
+   if(cartridge_pokey && address >= 0x4000 && address < 0x4009)
+   {
+      switch(address)
+      {
+         case POKEY_AUDF1:
+            pokey_SetRegister(POKEY_AUDF1, data);
+            break;
+         case POKEY_AUDC1:
+            pokey_SetRegister(POKEY_AUDC1, data);
+            break;
+         case POKEY_AUDF2:
+            pokey_SetRegister(POKEY_AUDF2, data);
+            break;
+         case POKEY_AUDC2:
+            pokey_SetRegister(POKEY_AUDC2, data);
+            break;
+         case POKEY_AUDF3:
+            pokey_SetRegister(POKEY_AUDF3, data);
+            break;
+         case POKEY_AUDC3:
+            pokey_SetRegister(POKEY_AUDC3, data);
+            break;
+         case POKEY_AUDF4:
+            pokey_SetRegister(POKEY_AUDF4, data);
+            break;
+         case POKEY_AUDC4:
+            pokey_SetRegister(POKEY_AUDC4, data);
+            break;
+         case POKEY_AUDCTL:
+            pokey_SetRegister(POKEY_AUDCTL, data);
+            break;
+      }
+   }
 }
 
 // ----------------------------------------------------------------------------
 // StoreBank
 // ----------------------------------------------------------------------------
-void cartridge_StoreBank(byte bank) {
-  switch(cartridge_type) {
-    case CARTRIDGE_TYPE_SUPERCART:
-      cartridge_WriteBank(32768, bank);
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_RAM:
-      cartridge_WriteBank(32768, bank);
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_ROM:
-      cartridge_WriteBank(32768, bank);
-      break;
-    case CARTRIDGE_TYPE_SUPERCART_LARGE:
-      cartridge_WriteBank(32768, bank);        
-      break;
-    case CARTRIDGE_TYPE_ABSOLUTE:
-      cartridge_WriteBank(16384, bank);
-      break;
-    case CARTRIDGE_TYPE_ACTIVISION:
-      cartridge_WriteBank(40960, bank);
-      break;
-  }  
+void cartridge_StoreBank(byte bank)
+{
+   switch(cartridge_type)
+   {
+      case CARTRIDGE_TYPE_SUPERCART:
+         cartridge_WriteBank(32768, bank);
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_RAM:
+         cartridge_WriteBank(32768, bank);
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_ROM:
+         cartridge_WriteBank(32768, bank);
+         break;
+      case CARTRIDGE_TYPE_SUPERCART_LARGE:
+         cartridge_WriteBank(32768, bank);        
+         break;
+      case CARTRIDGE_TYPE_ABSOLUTE:
+         cartridge_WriteBank(16384, bank);
+         break;
+      case CARTRIDGE_TYPE_ACTIVISION:
+         cartridge_WriteBank(40960, bank);
+         break;
+   }  
 }
 
 // ----------------------------------------------------------------------------
 // IsLoaded
 // ----------------------------------------------------------------------------
-bool cartridge_IsLoaded( ) {
+bool cartridge_IsLoaded(void)
+{
   return (cartridge_buffer != NULL)? true: false;
 }
 
 // ----------------------------------------------------------------------------
 // Release
 // ----------------------------------------------------------------------------
-void cartridge_Release( ) {
-  if(cartridge_buffer != NULL) {
+void cartridge_Release(void)
+{
+  if(cartridge_buffer != NULL)
+  {
     delete [ ] cartridge_buffer;
     cartridge_size = 0;
     cartridge_buffer = NULL;

@@ -332,7 +332,7 @@ bool retro_load_game(const struct retro_game_info *info)
        if (bios_Load(bios_file_path.c_str()))
           bios_enabled = true;
 
-       database_Load(cartridge_digest);
+       database_Load(cartridge_digest.c_str());
        prosystem_Reset();
 
        display_ResetPalette32();

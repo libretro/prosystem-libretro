@@ -36,280 +36,296 @@ uint prosystem_cycles = 0;
 // ----------------------------------------------------------------------------
 // Reset
 // ----------------------------------------------------------------------------
-void prosystem_Reset( ) {
-  if(cartridge_IsLoaded( )) {
-    prosystem_paused = false;
-    prosystem_frame = 0;
-    region_Reset( );
-    tia_Clear( );
-    tia_Reset( );
-    pokey_Clear( );
-    pokey_Reset( );
-    memory_Reset( );
-    maria_Clear( );
-    maria_Reset( );
-	riot_Reset ( );
-    if(bios_enabled) {
+void prosystem_Reset(void)
+{
+   if(!cartridge_IsLoaded())
+      return;
+
+   prosystem_paused = false;
+   prosystem_frame = 0;
+   region_Reset( );
+   tia_Clear( );
+   tia_Reset( );
+   pokey_Clear( );
+   pokey_Reset( );
+   memory_Reset( );
+   maria_Clear( );
+   maria_Reset( );
+   riot_Reset ( );
+
+   if(bios_enabled)
       bios_Store( );
-    }
-    else {
+   else
       cartridge_Store( );
-    }
-    prosystem_cycles = sally_ExecuteRES( );
-    prosystem_active = true;
-  }
+
+   prosystem_cycles = sally_ExecuteRES( );
+   prosystem_active = true;
 }
 
 // ----------------------------------------------------------------------------
 // ExecuteFrame
 // ----------------------------------------------------------------------------
-void prosystem_ExecuteFrame(const byte* input) {
-  riot_SetInput(input);
-  
-  for(maria_scanline = 1; maria_scanline <= prosystem_scanlines; maria_scanline++) {
-    if(maria_scanline == maria_displayArea.top) {
-      memory_ram[MSTAT] = 0;
-    }
-    if(maria_scanline == maria_displayArea.bottom) {
-      memory_ram[MSTAT] = 128;
-    }
-    
-    uint cycles;
-    prosystem_cycles %= 456;
-    while(prosystem_cycles < 28) {
-      cycles = sally_ExecuteInstruction( );
-      prosystem_cycles += (cycles << 2);
-      if(riot_timing) {
-        riot_UpdateTimer(cycles);
+void prosystem_ExecuteFrame(const byte* input)
+{
+   riot_SetInput(input);
+
+   for(maria_scanline = 1; maria_scanline <= prosystem_scanlines; maria_scanline++)
+   {
+      uint cycles;
+      if(maria_scanline == maria_displayArea.top)
+         memory_ram[MSTAT] = 0;
+      if(maria_scanline == maria_displayArea.bottom)
+         memory_ram[MSTAT] = 128;
+
+      prosystem_cycles %= 456;
+      while(prosystem_cycles < 28)
+      {
+         cycles = sally_ExecuteInstruction();
+         prosystem_cycles += (cycles << 2);
+
+         if(riot_timing)
+            riot_UpdateTimer(cycles);
+
+         if(memory_ram[WSYNC] && !(cartridge_flags & CARTRIDGE_WSYNC_MASK))
+         {
+            prosystem_cycles = 456;
+            memory_ram[WSYNC] = false;
+            break;
+         }
       }
-      if(memory_ram[WSYNC] && !(cartridge_flags & CARTRIDGE_WSYNC_MASK)) {
-        prosystem_cycles = 456;
-        memory_ram[WSYNC] = false;
-        break;
+
+      cycles = maria_RenderScanline( );
+      if(cartridge_flags & CARTRIDGE_CYCLE_STEALING_MASK)
+         prosystem_cycles += cycles;
+
+      while(prosystem_cycles < 456)
+      {
+         cycles = sally_ExecuteInstruction( );
+         prosystem_cycles += (cycles << 2);
+         if(riot_timing)
+            riot_UpdateTimer(cycles);
+
+         if(memory_ram[WSYNC] && !(cartridge_flags & CARTRIDGE_WSYNC_MASK))
+         {
+            prosystem_cycles = 456;
+            memory_ram[WSYNC] = false;
+            break;
+         }
       }
-    }
-    
-    cycles = maria_RenderScanline( );
-    if(cartridge_flags & CARTRIDGE_CYCLE_STEALING_MASK) {
-      prosystem_cycles += cycles;
-    }
-    
-    while(prosystem_cycles < 456) {
-      cycles = sally_ExecuteInstruction( );
-      prosystem_cycles += (cycles << 2);
-      if(riot_timing) {
-        riot_UpdateTimer(cycles);
-      }
-      if(memory_ram[WSYNC] && !(cartridge_flags & CARTRIDGE_WSYNC_MASK)) {
-        prosystem_cycles = 456;
-        memory_ram[WSYNC] = false;
-        break;
-      }
-    }
-    tia_Process(2);
-    if(cartridge_pokey) {
-      pokey_Process(2);
-    }
-  }
-  prosystem_frame++;
-  if(prosystem_frame >= prosystem_frequency) {
-    prosystem_frame = 0;
-  }
+      tia_Process(2);
+      if(cartridge_pokey)
+         pokey_Process(2);
+   }
+
+   prosystem_frame++;
+
+   if(prosystem_frame >= prosystem_frequency)
+      prosystem_frame = 0;
 }
 
 // ----------------------------------------------------------------------------
 // Save
 // ----------------------------------------------------------------------------
-bool prosystem_Save(std::string filename, bool compress) {
-  if(filename.empty( ) || filename.length( ) == 0) {
-    logger_LogError("Filename is invalid.", PRO_SYSTEM_SOURCE);
-    return false;
-  }
+bool prosystem_Save(std::string filename, bool compress)
+{
+   if(filename.empty( ) || filename.length( ) == 0)
+   {
+      logger_LogError("Filename is invalid.", PRO_SYSTEM_SOURCE);
+      return false;
+   }
 
-  logger_LogInfo("Saving game state to file " + filename + ".", PRO_SYSTEM_SOURCE);
-  
-  byte buffer[32829] = {0};
-  uint size = 0;
-  
-  uint index;
-  for(index = 0; index < 16; index++) {
-    buffer[size + index] = PRO_SYSTEM_STATE_HEADER[index];
-  }
-  size += 16;
-  
-  buffer[size++] = 1;
-  for(index = 0; index < 4; index++) {
-    buffer[size + index] = 0;
-  }
-  size += 4;
+   logger_LogInfo("Saving game state to file " + filename + ".", PRO_SYSTEM_SOURCE);
 
-  for(index = 0; index < 32; index++) {
-    buffer[size + index] = cartridge_digest[index];
-  }
-  size += 32;
+   byte buffer[32829] = {0};
+   uint size = 0;
 
-  buffer[size++] = sally_a;
-  buffer[size++] = sally_x;
-  buffer[size++] = sally_y;
-  buffer[size++] = sally_p;
-  buffer[size++] = sally_s;
-  buffer[size++] = sally_pc.b.l;
-  buffer[size++] = sally_pc.b.h;
-  buffer[size++] = cartridge_bank;
+   uint index;
+   for(index = 0; index < 16; index++)
+      buffer[size + index] = PRO_SYSTEM_STATE_HEADER[index];
+   size += 16;
 
-  for(index = 0; index < 16384; index++) {
-    buffer[size + index] = memory_ram[index];
-  }
-  size += 16384;
-  
-  if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM) {
-    for(index = 0; index < 16384; index++) {
-      buffer[size + index] = memory_ram[16384 + index];
-    } 
-    size += 16384;
-  }
-  
-  FILE* file = fopen(filename.c_str( ), "wb");
-  if(file == NULL) {
-     logger_LogError("Failed to open the file " + filename + " for writing.", PRO_SYSTEM_SOURCE);
-     return false;
-  }
+   buffer[size++] = 1;
+   for(index = 0; index < 4; index++)
+      buffer[size + index] = 0;
+   size += 4;
 
-  if(fwrite(buffer, 1, size, file) != size) {
-     fclose(file);
-     logger_LogError("Failed to write the save state data to the file " + filename + ".", PRO_SYSTEM_SOURCE);
-     return false;
-  }
+   for(index = 0; index < 32; index++)
+      buffer[size + index] = cartridge_digest[index];
+   size += 32;
 
-  fclose(file);
+   buffer[size++] = sally_a;
+   buffer[size++] = sally_x;
+   buffer[size++] = sally_y;
+   buffer[size++] = sally_p;
+   buffer[size++] = sally_s;
+   buffer[size++] = sally_pc.b.l;
+   buffer[size++] = sally_pc.b.h;
+   buffer[size++] = cartridge_bank;
 
-  return true;
+   for(index = 0; index < 16384; index++)
+      buffer[size + index] = memory_ram[index];
+   size += 16384;
+
+   if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
+   {
+      for(index = 0; index < 16384; index++)
+         buffer[size + index] = memory_ram[16384 + index];
+      size += 16384;
+   }
+
+   FILE* file = fopen(filename.c_str( ), "wb");
+   if(file == NULL)
+   {
+      logger_LogError("Failed to open the file " + filename + " for writing.", PRO_SYSTEM_SOURCE);
+      return false;
+   }
+
+   if(fwrite(buffer, 1, size, file) != size)
+   {
+      fclose(file);
+      logger_LogError("Failed to write the save state data to the file " + filename + ".", PRO_SYSTEM_SOURCE);
+      return false;
+   }
+
+   fclose(file);
+
+   return true;
 }
 
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool prosystem_Load(const std::string filename) {
-  if(filename.empty( ) || filename.length( ) == 0) {
-    logger_LogError("Filename is invalid.", PRO_SYSTEM_SOURCE);    
-    return false;
-  }
-
- 
-  logger_LogInfo("Loading game state from file " + filename + ".", PRO_SYSTEM_SOURCE);
-  
-  byte buffer[32829] = {0};
-  uint size = 0;
-  {
-    FILE* file = fopen(filename.c_str( ), "rb");
-    if(file == NULL) {
-      logger_LogError("Failed to open the file " + filename + " for reading.", PRO_SYSTEM_SOURCE);
+bool prosystem_Load(const std::string filename)
+{
+   if(filename.empty( ) || filename.length( ) == 0)
+   {
+      logger_LogError("Filename is invalid.", PRO_SYSTEM_SOURCE);    
       return false;
-    }
+   }
 
-    if(fseek(file, 0, SEEK_END)) {
+   logger_LogInfo("Loading game state from file " + filename + ".", PRO_SYSTEM_SOURCE);
+
+   byte buffer[32829] = {0};
+   uint size = 0;
+   {
+      FILE* file = fopen(filename.c_str( ), "rb");
+      if(file == NULL) {
+         logger_LogError("Failed to open the file " + filename + " for reading.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
+
+      if(fseek(file, 0, SEEK_END))
+      {
+         fclose(file);
+         logger_LogError("Failed to find the end of the file.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
+
+      size = ftell(file);
+      if(fseek(file, 0, SEEK_SET))
+      {
+         fclose(file);
+         logger_LogError("Failed to find the size of the file.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
+
+      if(size != 16445 && size != 32829)
+      {
+         fclose(file);
+         logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
+
+      if(fread(buffer, 1, size, file) != size && ferror(file))
+      {
+         fclose(file);
+         logger_LogError("Failed to read the file data.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
       fclose(file);
-      logger_LogError("Failed to find the end of the file.", PRO_SYSTEM_SOURCE);
-      return false;
-    }
-  
-    size = ftell(file);
-    if(fseek(file, 0, SEEK_SET)) {
-      fclose(file);
-      logger_LogError("Failed to find the size of the file.", PRO_SYSTEM_SOURCE);
-      return false;
-    }
+   }  
 
-    if(size != 16445 && size != 32829) {
-      fclose(file);
-      logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
-      return false;
-    }
-  
-    if(fread(buffer, 1, size, file) != size && ferror(file)) {
-      fclose(file);
-      logger_LogError("Failed to read the file data.", PRO_SYSTEM_SOURCE);
-      return false;
-    }
-    fclose(file);
-  }  
+   uint offset = 0;
+   uint index;
+   for(index = 0; index < 16; index++)
+   {
+      if(buffer[offset + index] != PRO_SYSTEM_STATE_HEADER[index])
+      {
+         logger_LogError("File is not a valid ProSystem save state.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
+   }
+   offset += 16;
+   byte version = buffer[offset++];
 
-  uint offset = 0;
-  uint index;
-  for(index = 0; index < 16; index++) {
-    if(buffer[offset + index] != PRO_SYSTEM_STATE_HEADER[index]) {
-      logger_LogError("File is not a valid ProSystem save state.", PRO_SYSTEM_SOURCE);
+   uint date = 0;
+   for(index = 0; index < 4; index++);
+   offset += 4;
+
+   prosystem_Reset( );
+
+   char digest[33] = {0};
+   for(index = 0; index < 32; index++)
+      digest[index] = buffer[offset + index];
+
+   offset += 32;
+
+   if(cartridge_digest != std::string(digest))
+   {
+      logger_LogError("Load state digest [" + std::string(digest) + "] does not match loaded cartridge digest [" + cartridge_digest + "].", PRO_SYSTEM_SOURCE);
       return false;
-    }
-  }
-  offset += 16;
-  byte version = buffer[offset++];
-  
-  uint date = 0;
-  for(index = 0; index < 4; index++) {
-  }
-  offset += 4;
-  
-  prosystem_Reset( );
-  
-  char digest[33] = {0};
-  for(index = 0; index < 32; index++) {
-    digest[index] = buffer[offset + index];
-  }
-  offset += 32;
-  if(cartridge_digest != std::string(digest)) {
-    logger_LogError("Load state digest [" + std::string(digest) + "] does not match loaded cartridge digest [" + cartridge_digest + "].", PRO_SYSTEM_SOURCE);
-    return false;
-  }
-  
-  sally_a = buffer[offset++];
-  sally_x = buffer[offset++];
-  sally_y = buffer[offset++];
-  sally_p = buffer[offset++];
-  sally_s = buffer[offset++];
-  sally_pc.b.l = buffer[offset++];
-  sally_pc.b.h = buffer[offset++];
-  
-  cartridge_StoreBank(buffer[offset++]);
+   }
 
-  for(index = 0; index < 16384; index++) {
-    memory_ram[index] = buffer[offset + index];
-  }
-  offset += 16384;
+   sally_a = buffer[offset++];
+   sally_x = buffer[offset++];
+   sally_y = buffer[offset++];
+   sally_p = buffer[offset++];
+   sally_s = buffer[offset++];
+   sally_pc.b.l = buffer[offset++];
+   sally_pc.b.h = buffer[offset++];
 
-  if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM) {
-    if(size != 32829) {
-      logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
-      return false;
-    }
-    for(index = 0; index < 16384; index++) {
-      memory_ram[16384 + index] = buffer[offset + index];
-    }
-    offset += 16384; 
-  }  
+   cartridge_StoreBank(buffer[offset++]);
 
-  return true;
+   for(index = 0; index < 16384; index++)
+      memory_ram[index] = buffer[offset + index];
+   offset += 16384;
+
+   if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
+   {
+      if(size != 32829)
+      {
+         logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
+         return false;
+      }
+
+      for(index = 0; index < 16384; index++)
+         memory_ram[16384 + index] = buffer[offset + index];
+      offset += 16384; 
+   }  
+
+   return true;
 }
 
 // ----------------------------------------------------------------------------
 // Pause
 // ----------------------------------------------------------------------------
-void prosystem_Pause(bool pause) {
-  if(prosystem_active) {
+void prosystem_Pause(bool pause)
+{
+  if(prosystem_active)
     prosystem_paused = pause;
-  }
 }
 
 // ----------------------------------------------------------------------------
 // Close
 // ----------------------------------------------------------------------------
-void prosystem_Close( ) {
-  prosystem_active = false;
-  prosystem_paused = false;
-  cartridge_Release( );
-  maria_Reset( );
-  maria_Clear( );
-  memory_Reset( );
-  tia_Reset( );
-  tia_Clear( );
+void prosystem_Close(void)
+{
+   prosystem_active = false;
+   prosystem_paused = false;
+   cartridge_Release( );
+   maria_Reset( );
+   maria_Clear( );
+   memory_Reset( );
+   tia_Reset( );
+   tia_Clear( );
 }

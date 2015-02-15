@@ -37,7 +37,7 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-extern void memory_Reset( );
+extern void memory_Reset(void);
 extern byte memory_Read(word address);
 extern void memory_Write(word address, byte data);
 extern void memory_WriteROM(word address, word size, const byte* data);

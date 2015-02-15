@@ -38,64 +38,73 @@ static bool sound_muted = false;
 // ----------------------------------------------------------------------------
 // GetSampleLength
 // ----------------------------------------------------------------------------
-static uint sound_GetSampleLength(uint length, uint unit, uint unitMax) {
-  uint sampleLength = length / unitMax;
-  uint sampleRemain = length % unitMax;
-  if(sampleRemain != 0 && sampleRemain >= unit) {
-    sampleLength++;
-  }
-  return sampleLength;
+static uint sound_GetSampleLength(uint length, uint unit, uint unitMax)
+{
+   uint sampleLength = length / unitMax;
+   uint sampleRemain = length % unitMax;
+   if(sampleRemain != 0 && sampleRemain >= unit)
+      sampleLength++;
+   return sampleLength;
 }
 
 // ----------------------------------------------------------------------------
 // Resample
 // ----------------------------------------------------------------------------
-static void sound_Resample(const byte* source, byte* target, int length) {
-  int measurement = sound_format.nSamplesPerSec;
-  int sourceIndex = 0;
-  int targetIndex = 0;
-  
-  while(targetIndex < length) {
-    if(measurement >= 31440) {
-      target[targetIndex++] = source[sourceIndex];
-      measurement -= 31440;
-    }
-    else {
-      sourceIndex++;
-      measurement += sound_format.nSamplesPerSec;
-    }
-  }
+static void sound_Resample(const byte* source, byte* target, int length)
+{
+   int measurement = sound_format.nSamplesPerSec;
+   int sourceIndex = 0;
+   int targetIndex = 0;
+
+   while(targetIndex < length)
+   {
+      if(measurement >= 31440)
+      {
+         target[targetIndex++] = source[sourceIndex];
+         measurement -= 31440;
+      }
+      else
+      {
+         sourceIndex++;
+         measurement += sound_format.nSamplesPerSec;
+      }
+   }
 }
 
 // ----------------------------------------------------------------------------
 // RestoreBuffer
 // ----------------------------------------------------------------------------
-static bool sound_RestoreBuffer( ) {
-  if(sound_buffer != NULL) {
-    HRESULT hr = sound_buffer->Restore( );
-    if(FAILED(hr)) {
-      logger_LogError(IDS_SOUND1,"");
-      logger_LogError("",common_Format(hr));
-      return false;
-    }
-  }
-  return true;
+static bool sound_RestoreBuffer(void)
+{
+   if(sound_buffer != NULL)
+   {
+      HRESULT hr = sound_buffer->Restore( );
+      if(FAILED(hr))
+      {
+         logger_LogError(IDS_SOUND1,"");
+         logger_LogError("",common_Format(hr));
+         return false;
+      }
+   }
+   return true;
 }
 
 // ----------------------------------------------------------------------------
 // ReleaseBuffer
 // ----------------------------------------------------------------------------
-static bool sound_ReleaseBuffer(LPDIRECTSOUNDBUFFER buffer) {
-  if(buffer != NULL) {
-    HRESULT hr = buffer->Release( );
-    sound_buffer = NULL;
-    if(FAILED(hr)) {
-      logger_LogError(IDS_SOUND2,"");
-      logger_LogError("",common_Format(hr));
-      return false;
-    }
-  }
-  return true;
+static bool sound_ReleaseBuffer(LPDIRECTSOUNDBUFFER buffer)
+{
+   if(buffer != NULL)
+   {
+      HRESULT hr = buffer->Release( );
+      sound_buffer = NULL;
+      if(FAILED(hr)) {
+         logger_LogError(IDS_SOUND2,"");
+         logger_LogError("",common_Format(hr));
+         return false;
+      }
+   }
+   return true;
 }
 
 // ----------------------------------------------------------------------------

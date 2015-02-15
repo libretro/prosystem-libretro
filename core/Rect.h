@@ -29,23 +29,27 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-struct Rects {
-  uint left;
-  uint top;
-  uint right;
-  uint bottom;
-  
-  uint GetArea( ) {
-    return GetLength( ) * GetHeight( );
-  }
+struct Rects
+{
+   uint left;
+   uint top;
+   uint right;
+   uint bottom;
 
-  uint GetLength( ) {
-    return (right - left) + 1;
-  }
-  
-  uint GetHeight( ) {
-    return (bottom - top) + 1;
-  }
+   uint GetArea()
+   {
+      return GetLength( ) * GetHeight( );
+   }
+
+   uint GetLength()
+   {
+      return (right - left) + 1;
+   }
+
+   uint GetHeight()
+   {
+      return (bottom - top) + 1;
+   }
 };
 
 typedef Rects rect;

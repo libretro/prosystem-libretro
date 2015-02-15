@@ -32,11 +32,12 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-extern void sally_Reset( );
-extern uint sally_ExecuteInstruction( );
-extern uint sally_ExecuteRES( );
-extern uint sally_ExecuteNMI( );
-extern uint sally_ExecuteIRQ( );
+extern void sally_Reset(void);
+extern uint sally_ExecuteInstruction(void);
+extern uint sally_ExecuteRES(void);
+extern uint sally_ExecuteNMI(void);
+extern uint sally_ExecuteIRQ(void);
+
 extern byte sally_a;
 extern byte sally_x;
 extern byte sally_y;

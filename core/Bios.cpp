@@ -33,66 +33,72 @@ static word bios_size = 0;
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool bios_Load(const char *filename) {
-  if(!filename || filename[0] == '\0')
-    return false;
-  
-  bios_Release( );
+bool bios_Load(const char *filename)
+{
+   if(!filename || filename[0] == '\0')
+      return false;
 
-  FILE* file = fopen(filename, "rb");
-  if(file == NULL) {
-     return false;
-  } 
+   bios_Release();
 
-  if(fseek(file, 0, SEEK_END)) {
-     fclose(file);
-     logger_LogError("Failed to find the end of the bios file.", BIOS_SOURCE);
-     return false;
-  }
+   FILE* file = fopen(filename, "rb");
+   if(file == NULL)
+      return false;
 
-  bios_size = ftell(file);
-  if(fseek(file, 0, SEEK_SET)) {
-     fclose(file);
-     logger_LogError("Failed to find the size of the bios file.", BIOS_SOURCE);
-     return false;
-  }
+   if(fseek(file, 0, SEEK_END))
+   {
+      fclose(file);
+      logger_LogError("Failed to find the end of the bios file.", BIOS_SOURCE);
+      return false;
+   }
 
-  bios_data = new byte[bios_size];
-  if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file)) {
-     fclose(file);
-     logger_LogError("Failed to read the bios data.", BIOS_SOURCE);
-     bios_Release( );
-     return false;
-  }
+   bios_size = ftell(file);
+   if(fseek(file, 0, SEEK_SET))
+   {
+      fclose(file);
+      logger_LogError("Failed to find the size of the bios file.", BIOS_SOURCE);
+      return false;
+   }
 
-  fclose(file);
+   bios_data = new byte[bios_size];
+   if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file))
+   {
+      fclose(file);
+      logger_LogError("Failed to read the bios data.", BIOS_SOURCE);
+      bios_Release();
+      return false;
+   }
 
-  return true; 
+   fclose(file);
+
+   return true; 
 }
 
 // ----------------------------------------------------------------------------
 // IsLoaded
 // ----------------------------------------------------------------------------
-bool bios_IsLoaded( ) {
+bool bios_IsLoaded(void)
+{
   return (bios_data != NULL)? true: false;
 }
 
 // ----------------------------------------------------------------------------
 // Release
 // ----------------------------------------------------------------------------
-void bios_Release( ) {
-  if(bios_data) {
-    delete [ ] bios_data;
-    bios_size = 0;
-    bios_data = NULL;
-  }
+void bios_Release(void)
+{
+   if(bios_data)
+   {
+      delete [ ] bios_data;
+      bios_size = 0;
+      bios_data = NULL;
+   }
 }
 
 // ----------------------------------------------------------------------------
 // Store
 // ----------------------------------------------------------------------------
-void bios_Store( ) {
-  if(bios_data != NULL && bios_enabled) {
-    memory_WriteROM(65536 - bios_size, bios_size, bios_data);
-  }
+void bios_Store(void)
+{
+   if(bios_data != NULL && bios_enabled)
+      memory_WriteROM(65536 - bios_size, bios_size, bios_data);
 }

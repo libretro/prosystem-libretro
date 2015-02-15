@@ -36,9 +36,10 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-extern void maria_Reset( );
-extern uint maria_RenderScanline( );
-extern void maria_Clear( );
+extern void maria_Reset(void);
+extern uint maria_RenderScanline(void);
+extern void maria_Clear(void);
+
 extern rect maria_displayArea;
 extern rect maria_visibleArea;
 extern byte maria_surface[MARIA_SURFACE_SIZE];

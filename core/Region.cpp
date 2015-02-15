@@ -178,25 +178,28 @@ static const byte REGION_PALETTE_PAL[ ] = {
 // ----------------------------------------------------------------------------
 // Reset
 // ----------------------------------------------------------------------------
-void region_Reset( ) {
-  if(region_type == REGION_PAL || (region_type == REGION_AUTO && cartridge_region == REGION_PAL)) {
-    maria_displayArea = REGION_DISPLAY_AREA_PAL;
-    maria_visibleArea = REGION_VISIBLE_AREA_PAL;
-	if(palette_default)
-      palette_Load(REGION_PALETTE_PAL);  // Added check for default - bberlin
-    prosystem_frequency = REGION_FREQUENCY_PAL;
-    prosystem_scanlines = REGION_SCANLINES_PAL;
-    tia_size = 624;
-    pokey_size = 624;
-  }  
-  else {
-    maria_displayArea = REGION_DISPLAY_AREA_NTSC;
-    maria_visibleArea = REGION_VISIBLE_AREA_NTSC;
-	if(palette_default)
-      palette_Load(REGION_PALETTE_NTSC);  // Added check for default - bberlin
-    prosystem_frequency = REGION_FREQUENCY_NTSC;
-    prosystem_scanlines = REGION_SCANLINES_NTSC;
-    tia_size = 524;
-    pokey_size = 524;
-  }
+void region_Reset(void)
+{
+   if(region_type == REGION_PAL || (region_type == REGION_AUTO && cartridge_region == REGION_PAL))
+   {
+      maria_displayArea = REGION_DISPLAY_AREA_PAL;
+      maria_visibleArea = REGION_VISIBLE_AREA_PAL;
+      if(palette_default)
+         palette_Load(REGION_PALETTE_PAL);  // Added check for default - bberlin
+      prosystem_frequency = REGION_FREQUENCY_PAL;
+      prosystem_scanlines = REGION_SCANLINES_PAL;
+      tia_size = 624;
+      pokey_size = 624;
+   }  
+   else
+   {
+      maria_displayArea = REGION_DISPLAY_AREA_NTSC;
+      maria_visibleArea = REGION_VISIBLE_AREA_NTSC;
+      if(palette_default)
+         palette_Load(REGION_PALETTE_NTSC);  // Added check for default - bberlin
+      prosystem_frequency = REGION_FREQUENCY_NTSC;
+      prosystem_scanlines = REGION_SCANLINES_NTSC;
+      tia_size = 524;
+      pokey_size = 524;
+   }
 }

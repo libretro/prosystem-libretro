@@ -35,22 +35,24 @@ static byte sally_opcode;
 static pair sally_address;
 static uint sally_cycles;
 
-struct Flag {
-  byte C;
-  byte Z;
-  byte I;
-  byte D;
-  byte B;
-  byte R;
-  byte V;
-  byte N;
+struct Flag
+{
+   byte C;
+   byte Z;
+   byte I;
+   byte D;
+   byte B;
+   byte R;
+   byte V;
+   byte N;
 };
 
 static const Flag SALLY_FLAG = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
-struct Vector {
-  word H;
-  word L;
+struct Vector
+{
+   word H;
+   word L;
 };
 
 static const Vector SALLY_RES = {65533, 65532};
@@ -79,15 +81,17 @@ static const byte SALLY_CYCLES[256] = {
 // ----------------------------------------------------------------------------
 // Push
 // ----------------------------------------------------------------------------
-static void sally_Push(byte data) {
-  memory_Write(sally_s + 256, data);
-  sally_s--;
+static void sally_Push(byte data)
+{
+   memory_Write(sally_s + 256, data);
+   sally_s--;
 }
 
 // ----------------------------------------------------------------------------
 // Pop
 // ----------------------------------------------------------------------------
-static byte sally_Pop( ) {
+static byte sally_Pop(void)
+{
   sally_s++;
   return memory_Read(sally_s + 256);
 }
@@ -95,36 +99,34 @@ static byte sally_Pop( ) {
 // ----------------------------------------------------------------------------
 // Flags
 // ----------------------------------------------------------------------------
-static void sally_Flags(byte data) {
-  if(!data) {
-    sally_p |= SALLY_FLAG.Z;
-  }
-  else {
-    sally_p &= ~SALLY_FLAG.Z;
-  }
-  if(data & 128) {
-    sally_p |= SALLY_FLAG.N;
-  }
-  else {
-    sally_p &= ~SALLY_FLAG.N;
-  }
+static void sally_Flags(byte data)
+{
+   if(!data)
+      sally_p |= SALLY_FLAG.Z;
+   else
+      sally_p &= ~SALLY_FLAG.Z;
+
+   if(data & 128)
+      sally_p |= SALLY_FLAG.N;
+   else
+      sally_p &= ~SALLY_FLAG.N;
 }
 
 // ----------------------------------------------------------------------------
 // Branch
 // ----------------------------------------------------------------------------
-static void sally_Branch(byte branch) {
-  if(branch) {
-    pair temp = sally_pc;
-    sally_pc.w += (char)sally_address.b.l;
-       
-    if(temp.b.h != sally_pc.b.h) {
-      sally_cycles += 2;
-    }
-    else {
-      sally_cycles++;
-    }
-  }
+static void sally_Branch(byte branch)
+{
+   if (branch)
+   {
+      pair temp = sally_pc;
+      sally_pc.w += (char)sally_address.b.l;
+
+      if(temp.b.h != sally_pc.b.h)
+         sally_cycles += 2;
+      else
+         sally_cycles++;
+   }
 }
 
 // ----------------------------------------------------------------------------

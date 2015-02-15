@@ -45,34 +45,37 @@ static byte maria_wmode;
 // ----------------------------------------------------------------------------
 // StoreCell
 // ----------------------------------------------------------------------------
-static void maria_StoreCell(byte data) {
-  if(maria_horizontal < MARIA_LINERAM_SIZE) {
-    if(data) {
-      maria_lineRAM[maria_horizontal] = maria_palette | data;
-    }
-    else { 
-      byte kmode = memory_ram[CTRL] & 4;
-      if(kmode) {
-        maria_lineRAM[maria_horizontal] = 0;
+static void maria_StoreCell(byte data)
+{
+   if(maria_horizontal < MARIA_LINERAM_SIZE)
+   {
+      if(data)
+         maria_lineRAM[maria_horizontal] = maria_palette | data;
+      else
+      {
+         byte kmode = memory_ram[CTRL] & 4;
+         if(kmode)
+            maria_lineRAM[maria_horizontal] = 0;
       }
-    }
-  }
-  maria_horizontal++;
+   }
+
+   maria_horizontal++;
 }
 
 // ----------------------------------------------------------------------------
 // StoreCell
 // ----------------------------------------------------------------------------
-static void maria_StoreCell(byte high, byte low) {
-  if(maria_horizontal < MARIA_LINERAM_SIZE) {
-    if(low || high) {
+static void maria_StoreCell(byte high, byte low)
+{
+  if(maria_horizontal < MARIA_LINERAM_SIZE)
+  {
+    if(low || high)
       maria_lineRAM[maria_horizontal] = (maria_palette & 16) | high | low;
-    }
-    else { 
+    else
+    { 
       byte kmode = memory_ram[CTRL] & 4;
-      if(kmode) {
+      if(kmode)
         maria_lineRAM[maria_horizontal] = 0;
-      }
     }
   }
   maria_horizontal++;
@@ -81,232 +84,248 @@ static void maria_StoreCell(byte high, byte low) {
 // ----------------------------------------------------------------------------
 // IsHolyDMA
 // ----------------------------------------------------------------------------
-static bool maria_IsHolyDMA( ) {
-  if(maria_pp.w > 32767) {
-    if(maria_h16 && (maria_pp.w & 4096)) {
-      return true;
-    }
-    if(maria_h08 && (maria_pp.w & 2048)) {
-      return true;
-    }
-  }
+static bool maria_IsHolyDMA(void)
+{
+   if(maria_pp.w > 32767)
+   {
+      if(maria_h16 && (maria_pp.w & 4096))
+         return true;
+      if(maria_h08 && (maria_pp.w & 2048))
+         return true;
+   }
   return false;
 }
 
 // ----------------------------------------------------------------------------
 // GetColor
 // ----------------------------------------------------------------------------
-static byte maria_GetColor(byte data) {
-  if(data & 3) {
+static byte maria_GetColor(byte data)
+{
+  if(data & 3)
     return memory_ram[BACKGRND + data];
-  }
-  else {
-    return memory_ram[BACKGRND];
-  }
+  return memory_ram[BACKGRND];
 }
 
 // ----------------------------------------------------------------------------
 // StoreGraphic
 // ----------------------------------------------------------------------------
-static void maria_StoreGraphic( ) {
-  byte data = memory_ram[maria_pp.w];
-  if(maria_wmode) {
-    if(maria_IsHolyDMA( )) {
-      maria_StoreCell(0, 0);
-      maria_StoreCell(0, 0);
-    }
-    else {
-      maria_StoreCell((data & 12), (data & 192) >> 6);
-      maria_StoreCell((data & 48) >> 4, (data & 3) << 2);
-    }
-  }
-  else {
-    if(maria_IsHolyDMA( )) {
-      maria_StoreCell(0);
-      maria_StoreCell(0);
-      maria_StoreCell(0);
-      maria_StoreCell(0);
-    }
-    else {
-      maria_StoreCell((data & 192) >> 6);
-      maria_StoreCell((data & 48) >> 4);
-      maria_StoreCell((data & 12) >> 2);
-      maria_StoreCell(data & 3);
-    }
-  }
-  maria_pp.w++;
+static void maria_StoreGraphic(void)
+{
+   byte data = memory_ram[maria_pp.w];
+   if(maria_wmode)
+   {
+      if(maria_IsHolyDMA( ))
+      {
+         maria_StoreCell(0, 0);
+         maria_StoreCell(0, 0);
+      }
+      else
+      {
+         maria_StoreCell((data & 12), (data & 192) >> 6);
+         maria_StoreCell((data & 48) >> 4, (data & 3) << 2);
+      }
+   }
+   else
+   {
+      if(maria_IsHolyDMA( ))
+      {
+         maria_StoreCell(0);
+         maria_StoreCell(0);
+         maria_StoreCell(0);
+         maria_StoreCell(0);
+      }
+      else
+      {
+         maria_StoreCell((data & 192) >> 6);
+         maria_StoreCell((data & 48) >> 4);
+         maria_StoreCell((data & 12) >> 2);
+         maria_StoreCell(data & 3);
+      }
+   }
+   maria_pp.w++;
 }
 
 // ----------------------------------------------------------------------------
 // WriteLineRAM
 // ----------------------------------------------------------------------------
-static void maria_WriteLineRAM(byte* buffer) {
-  byte rmode = memory_ram[CTRL] & 3;
-  if(rmode == 0) {
-    int pixel = 0;
-    for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
-      byte color;
-      color = maria_GetColor(maria_lineRAM[index + 0]);
-      buffer[pixel++] = color;
-      buffer[pixel++] = color;
-      color = maria_GetColor(maria_lineRAM[index + 1]);
-      buffer[pixel++] = color;
-      buffer[pixel++] = color;
-      color = maria_GetColor(maria_lineRAM[index + 2]);
-      buffer[pixel++] = color;
-      buffer[pixel++] = color;
-      color = maria_GetColor(maria_lineRAM[index + 3]);
-      buffer[pixel++] = color;
-      buffer[pixel++] = color;
-    }
-  }
-  else if(rmode == 2) { 
-    int pixel = 0;
-    for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 16) | ((maria_lineRAM[index + 0] & 8) >> 3) | ((maria_lineRAM[index + 0] & 2)));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 16) | ((maria_lineRAM[index + 0] & 4) >> 2) | ((maria_lineRAM[index + 0] & 1) << 1));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 16) | ((maria_lineRAM[index + 1] & 8) >> 3) | ((maria_lineRAM[index + 1] & 2)));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 16) | ((maria_lineRAM[index + 1] & 4) >> 2) | ((maria_lineRAM[index + 1] & 1) << 1));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 16) | ((maria_lineRAM[index + 2] & 8) >> 3) | ((maria_lineRAM[index + 2] & 2)));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 16) | ((maria_lineRAM[index + 2] & 4) >> 2) | ((maria_lineRAM[index + 2] & 1) << 1));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 16) | ((maria_lineRAM[index + 3] & 8) >> 3) | ((maria_lineRAM[index + 3] & 2)));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 16) | ((maria_lineRAM[index + 3] & 4) >> 2) | ((maria_lineRAM[index + 3] & 1) << 1));
-    }
-  }
-  else if(rmode == 3) {
-    int pixel = 0;
-    for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 30));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 28) | ((maria_lineRAM[index + 0] & 1) << 1));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 30));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 28) | ((maria_lineRAM[index + 1] & 1) << 1));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 30));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 28) | ((maria_lineRAM[index + 2] & 1) << 1));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 30));
-      buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 28) | ((maria_lineRAM[index + 3] & 1) << 1));
-    }
-  }
+static void maria_WriteLineRAM(byte* buffer)
+{
+   byte rmode = memory_ram[CTRL] & 3;
+
+   if(rmode == 0)
+   {
+      int pixel = 0;
+      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
+         byte color;
+         color = maria_GetColor(maria_lineRAM[index + 0]);
+         buffer[pixel++] = color;
+         buffer[pixel++] = color;
+         color = maria_GetColor(maria_lineRAM[index + 1]);
+         buffer[pixel++] = color;
+         buffer[pixel++] = color;
+         color = maria_GetColor(maria_lineRAM[index + 2]);
+         buffer[pixel++] = color;
+         buffer[pixel++] = color;
+         color = maria_GetColor(maria_lineRAM[index + 3]);
+         buffer[pixel++] = color;
+         buffer[pixel++] = color;
+      }
+   }
+   else if(rmode == 2)
+   {
+      int pixel = 0;
+      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 16) | ((maria_lineRAM[index + 0] & 8) >> 3) | ((maria_lineRAM[index + 0] & 2)));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 16) | ((maria_lineRAM[index + 0] & 4) >> 2) | ((maria_lineRAM[index + 0] & 1) << 1));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 16) | ((maria_lineRAM[index + 1] & 8) >> 3) | ((maria_lineRAM[index + 1] & 2)));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 16) | ((maria_lineRAM[index + 1] & 4) >> 2) | ((maria_lineRAM[index + 1] & 1) << 1));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 16) | ((maria_lineRAM[index + 2] & 8) >> 3) | ((maria_lineRAM[index + 2] & 2)));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 16) | ((maria_lineRAM[index + 2] & 4) >> 2) | ((maria_lineRAM[index + 2] & 1) << 1));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 16) | ((maria_lineRAM[index + 3] & 8) >> 3) | ((maria_lineRAM[index + 3] & 2)));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 16) | ((maria_lineRAM[index + 3] & 4) >> 2) | ((maria_lineRAM[index + 3] & 1) << 1));
+      }
+   }
+   else if(rmode == 3)
+   {
+      int pixel = 0;
+      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 30));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 28) | ((maria_lineRAM[index + 0] & 1) << 1));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 30));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 28) | ((maria_lineRAM[index + 1] & 1) << 1));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 30));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 2] & 28) | ((maria_lineRAM[index + 2] & 1) << 1));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 30));
+         buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 3] & 28) | ((maria_lineRAM[index + 3] & 1) << 1));
+      }
+   }
 }
 
 // ----------------------------------------------------------------------------
 // StoreLineRAM
 // ----------------------------------------------------------------------------
-static void maria_StoreLineRAM( ) {
-  for(int index = 0; index < MARIA_LINERAM_SIZE; index++) {
+static void maria_StoreLineRAM(void)
+{
+  for(int index = 0; index < MARIA_LINERAM_SIZE; index++)
     maria_lineRAM[index] = 0;
-  }
   
   byte mode = memory_ram[maria_dp.w + 1];
-  while(mode & 0x5f) {
-    byte width;
-    byte indirect = 0;
- 
-    maria_pp.b.l = memory_ram[maria_dp.w];
-    maria_pp.b.h = memory_ram[maria_dp.w + 2];
-    
-    if(mode & 31) { 
-      maria_cycles += 8;
-      maria_palette = (memory_ram[maria_dp.w + 1] & 224) >> 3;
-      maria_horizontal = memory_ram[maria_dp.w + 3];
-      width = memory_ram[maria_dp.w + 1] & 31;
-      width = ((~width) & 31) + 1;
-      maria_dp.w += 4;
-    }
-    else { 
-      maria_cycles += 10;
-      maria_palette = (memory_ram[maria_dp.w + 3] & 224) >> 3;
-      maria_horizontal = memory_ram[maria_dp.w + 4];
-      indirect = memory_ram[maria_dp.w + 1] & 32;
-      maria_wmode = memory_ram[maria_dp.w + 1] & 128;
-      width = memory_ram[maria_dp.w + 3] & 31;
-      width = (width == 0)? 32: ((~width) & 31) + 1;
-      maria_dp.w += 5;
-    }
+  while(mode & 0x5f)
+  {
+     byte width;
+     byte indirect = 0;
 
-    if(!indirect) {
-      maria_pp.b.h += maria_offset;
-      for(int index = 0; index < width; index++) {
-        maria_cycles += 3;
-        maria_StoreGraphic( );
-      }
-    }
-    else {
-      byte cwidth = memory_ram[CTRL] & 16;
-      pair basePP = maria_pp;
-      for(int index = 0; index < width; index++) {
-        maria_cycles += 3;
-        maria_pp.b.l = memory_ram[basePP.w++];
-        maria_pp.b.h = memory_ram[CHARBASE] + maria_offset;
-        
-        maria_cycles += 6;
-        maria_StoreGraphic( );
-        if(cwidth) {
-          maria_cycles += 3;
-          maria_StoreGraphic( );
+     maria_pp.b.l = memory_ram[maria_dp.w];
+     maria_pp.b.h = memory_ram[maria_dp.w + 2];
+
+     if(mode & 31) { 
+        maria_cycles += 8;
+        maria_palette = (memory_ram[maria_dp.w + 1] & 224) >> 3;
+        maria_horizontal = memory_ram[maria_dp.w + 3];
+        width = memory_ram[maria_dp.w + 1] & 31;
+        width = ((~width) & 31) + 1;
+        maria_dp.w += 4;
+     }
+     else { 
+        maria_cycles += 10;
+        maria_palette = (memory_ram[maria_dp.w + 3] & 224) >> 3;
+        maria_horizontal = memory_ram[maria_dp.w + 4];
+        indirect = memory_ram[maria_dp.w + 1] & 32;
+        maria_wmode = memory_ram[maria_dp.w + 1] & 128;
+        width = memory_ram[maria_dp.w + 3] & 31;
+        width = (width == 0)? 32: ((~width) & 31) + 1;
+        maria_dp.w += 5;
+     }
+
+     if(!indirect) {
+        maria_pp.b.h += maria_offset;
+        for(int index = 0; index < width; index++) {
+           maria_cycles += 3;
+           maria_StoreGraphic( );
         }
-      }
-    }
-    mode = memory_ram[maria_dp.w + 1];
+     }
+     else {
+        byte cwidth = memory_ram[CTRL] & 16;
+        pair basePP = maria_pp;
+        for(int index = 0; index < width; index++) {
+           maria_cycles += 3;
+           maria_pp.b.l = memory_ram[basePP.w++];
+           maria_pp.b.h = memory_ram[CHARBASE] + maria_offset;
+
+           maria_cycles += 6;
+           maria_StoreGraphic( );
+           if(cwidth) {
+              maria_cycles += 3;
+              maria_StoreGraphic( );
+           }
+        }
+     }
+     mode = memory_ram[maria_dp.w + 1];
   }
 }
 
 // ----------------------------------------------------------------------------
 // Reset
 // ----------------------------------------------------------------------------
-void maria_Reset( ) {
+void maria_Reset(void)
+{
   maria_scanline = 1;
-  for(int index = 0; index < MARIA_SURFACE_SIZE; index++) {
+  for(int index = 0; index < MARIA_SURFACE_SIZE; index++)
     maria_surface[index] = 0;
-  }
 }
 
 // ----------------------------------------------------------------------------
 // RenderScanline
 // ----------------------------------------------------------------------------
-uint maria_RenderScanline( ) {
-  maria_cycles = 0;
-  if((memory_ram[CTRL] & 96) == 64 && maria_scanline >= maria_displayArea.top && maria_scanline <= maria_displayArea.bottom) {
-    maria_cycles += 31;
-    if(maria_scanline == maria_displayArea.top) {
-      maria_cycles += 7;
-      maria_dpp.b.l = memory_ram[DPPL];
-      maria_dpp.b.h = memory_ram[DPPH];
-      maria_h08 = memory_ram[maria_dpp.w] & 32;
-      maria_h16 = memory_ram[maria_dpp.w] & 64;
-      maria_offset = memory_ram[maria_dpp.w] & 15;
-      maria_dp.b.l = memory_ram[maria_dpp.w + 2];
-      maria_dp.b.h = memory_ram[maria_dpp.w + 1];
-      if(memory_ram[maria_dpp.w] & 128) {
-        sally_ExecuteNMI( );
+uint maria_RenderScanline(void)
+{
+   maria_cycles = 0;
+   if((memory_ram[CTRL] & 96) == 64 && maria_scanline >= maria_displayArea.top && maria_scanline <= maria_displayArea.bottom)
+   {
+      maria_cycles += 31;
+      if(maria_scanline == maria_displayArea.top)
+      {
+         maria_cycles += 7;
+         maria_dpp.b.l = memory_ram[DPPL];
+         maria_dpp.b.h = memory_ram[DPPH];
+         maria_h08 = memory_ram[maria_dpp.w] & 32;
+         maria_h16 = memory_ram[maria_dpp.w] & 64;
+         maria_offset = memory_ram[maria_dpp.w] & 15;
+         maria_dp.b.l = memory_ram[maria_dpp.w + 2];
+         maria_dp.b.h = memory_ram[maria_dpp.w + 1];
+
+         if(memory_ram[maria_dpp.w] & 128)
+            sally_ExecuteNMI( );
       }
-    }
-    else if(maria_scanline >= maria_visibleArea.top && maria_scanline <= maria_visibleArea.bottom) {
-      maria_WriteLineRAM(maria_surface + ((maria_scanline - maria_displayArea.top) * maria_displayArea.GetLength( )));
-    }
-    if(maria_scanline != maria_displayArea.bottom) {
-      maria_dp.b.l = memory_ram[maria_dpp.w + 2];
-      maria_dp.b.h = memory_ram[maria_dpp.w + 1];
-      maria_StoreLineRAM( );
-      maria_offset--;
-      if(maria_offset < 0) {
-        maria_dpp.w += 3;
-        maria_h08 = memory_ram[maria_dpp.w] & 32;
-        maria_h16 = memory_ram[maria_dpp.w] & 64;
-        maria_offset = memory_ram[maria_dpp.w] & 15;
-        if(memory_ram[maria_dpp.w] & 128) {
-          sally_ExecuteNMI( );
-        }
-      }
-    }    
-  }
-  return maria_cycles;
+      else if(maria_scanline >= maria_visibleArea.top && maria_scanline <= maria_visibleArea.bottom)
+         maria_WriteLineRAM(maria_surface + ((maria_scanline - maria_displayArea.top) * maria_displayArea.GetLength( )));
+
+      if(maria_scanline != maria_displayArea.bottom)
+      {
+         maria_dp.b.l = memory_ram[maria_dpp.w + 2];
+         maria_dp.b.h = memory_ram[maria_dpp.w + 1];
+         maria_StoreLineRAM( );
+         maria_offset--;
+         if(maria_offset < 0)
+         {
+            maria_dpp.w += 3;
+            maria_h08 = memory_ram[maria_dpp.w] & 32;
+            maria_h16 = memory_ram[maria_dpp.w] & 64;
+            maria_offset = memory_ram[maria_dpp.w] & 15;
+
+            if(memory_ram[maria_dpp.w] & 128)
+               sally_ExecuteNMI( );
+         }
+      }    
+   }
+   return maria_cycles;
 }
 
 // ----------------------------------------------------------------------------
 // Clear
 // ----------------------------------------------------------------------------
-void maria_Clear( ) {
-  for(int index = 0; index < MARIA_SURFACE_SIZE; index++) {
+void maria_Clear(void)
+{
+  for(int index = 0; index < MARIA_SURFACE_SIZE; index++)
     maria_surface[index] = 0;
-  }
 }

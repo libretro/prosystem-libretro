@@ -55,10 +55,11 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-extern void pokey_Reset( );
+extern void pokey_Reset(void);
 extern void pokey_SetRegister(word address, byte value);
 extern void pokey_Process(uint length);
-extern void pokey_Clear( );
+extern void pokey_Clear(void);
+
 extern byte pokey_buffer[POKEY_BUFFER_SIZE];
 extern uint pokey_size;
 

@@ -38,7 +38,7 @@ typedef unsigned char byte;
 typedef unsigned short word;
 typedef unsigned int uint;
 
-extern void region_Reset( );
+extern void region_Reset(void);
 extern byte region_type;
 
 #endif

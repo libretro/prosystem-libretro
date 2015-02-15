@@ -51,11 +51,11 @@ typedef unsigned short word;
 typedef unsigned int uint;
 
 extern bool cartridge_Load(std::string filename);
-extern void cartridge_Store( );
+extern void cartridge_Store(void);
 extern void cartridge_StoreBank(byte bank);
 extern void cartridge_Write(word address, byte data);
-extern bool cartridge_IsLoaded( );
-extern void cartridge_Release( );
+extern bool cartridge_IsLoaded(void);
+extern void cartridge_Release(void);
 extern std::string cartridge_digest;
 extern std::string cartridge_title;
 extern std::string cartridge_description;

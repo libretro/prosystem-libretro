@@ -28,56 +28,63 @@
 bool database_enabled = true;
 std::string database_filename;
 
-static std::string database_GetValue(std::string entry) {
-  int index = entry.rfind('=');
-  return entry.substr(index + 1);
+static std::string database_GetValue(std::string entry)
+{
+   int index = entry.rfind('=');
+   return entry.substr(index + 1);
 }
 
 // ----------------------------------------------------------------------------
 // Initialize
 // ----------------------------------------------------------------------------
-void database_Initialize( ) {
-  database_filename = common_defaultPath + "ProSystem.dat";
+void database_Initialize( )
+{
+   database_filename = common_defaultPath + "ProSystem.dat";
 }
 
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool database_Load(std::string digest) {
-  if(database_enabled) {
-	logger_LogInfo("Accessing database " + database_filename + ".", DATABASE_SOURCE);
-    
-    FILE* file = fopen(database_filename.c_str( ), "r");
-    if(file == NULL) {
-      logger_LogError("Failed to open the database for reading.", DATABASE_SOURCE);
-      return false;  
-    }
+bool database_Load(const char *digest)
+{
+   if(database_enabled)
+   {
+      logger_LogInfo("Accessing database " + database_filename + ".", DATABASE_SOURCE);
 
-    char buffer[256];
-    while(fgets(buffer, 256, file) != NULL) {
-      std::string line = buffer;
-      if(line.compare(1, 32, digest.c_str( )) == 0) {
-        std::string entry[7];
-        for(int index = 0; index < 7; index++) {
-          fgets(buffer, 256, file);
-          entry[index] = common_Remove(buffer, '\n');  
-          entry[index] = common_Remove(entry[index], '\r');
-        }
-        
-        cartridge_title = database_GetValue(entry[0]);
-        cartridge_type = common_ParseByte(database_GetValue(entry[1]));
-        cartridge_pokey = common_ParseBool(database_GetValue(entry[2]));
-        cartridge_controller[0] = common_ParseByte(database_GetValue(entry[3]));
-        cartridge_controller[1] = common_ParseByte(database_GetValue(entry[4]));
-        cartridge_region = common_ParseByte(database_GetValue(entry[5]));
-        cartridge_flags = common_ParseUint(database_GetValue(entry[6]));
-        break;
+      FILE* file = fopen(database_filename.c_str( ), "r");
+      if(file == NULL) {
+         logger_LogError("Failed to open the database for reading.", DATABASE_SOURCE);
+         return false;  
       }
-    }    
-    
-    fclose(file);  
-  }
-  return true;
+
+      char buffer[256];
+      while(fgets(buffer, 256, file) != NULL) {
+         std::string line = buffer;
+         if(line.compare(1, 32, digest) == 0)
+         {
+            int index;
+            std::string entry[7];
+
+            for(index = 0; index < 7; index++)
+            {
+               fgets(buffer, 256, file);
+               entry[index] = common_Remove(buffer, '\n');  
+               entry[index] = common_Remove(entry[index], '\r');
+            }
+
+            cartridge_title = database_GetValue(entry[0]);
+            cartridge_type = common_ParseByte(database_GetValue(entry[1]));
+            cartridge_pokey = common_ParseBool(database_GetValue(entry[2]));
+            cartridge_controller[0] = common_ParseByte(database_GetValue(entry[3]));
+            cartridge_controller[1] = common_ParseByte(database_GetValue(entry[4]));
+            cartridge_region = common_ParseByte(database_GetValue(entry[5]));
+            cartridge_flags = common_ParseUint(database_GetValue(entry[6]));
+            break;
+         }
+      }    
+
+      fclose(file);  
+   }
+
+   return true;
 }
-
-

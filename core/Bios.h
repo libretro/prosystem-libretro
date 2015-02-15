@@ -35,9 +35,9 @@ typedef unsigned short word;
 typedef unsigned int uint;
 
 extern bool bios_Load(const char *filename);
-extern bool bios_IsLoaded( );
-extern void bios_Store( );
-extern void bios_Release( );
+extern bool bios_IsLoaded(void);
+extern void bios_Store(void);
+extern void bios_Release(void);
 extern bool bios_enabled;
 
 #endif
