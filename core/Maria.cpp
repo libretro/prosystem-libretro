@@ -154,8 +154,9 @@ static void maria_WriteLineRAM(uint8_t* buffer)
 
    if(rmode == 0)
    {
-      int pixel = 0;
-      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4)
+      int pixel = 0, index;
+
+      for(index = 0; index < MARIA_LINERAM_SIZE; index += 4)
       {
          uint8_t color;
          color = maria_GetColor(maria_lineRAM[index + 0]);
@@ -174,8 +175,9 @@ static void maria_WriteLineRAM(uint8_t* buffer)
    }
    else if(rmode == 2)
    {
-      int pixel = 0;
-      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
+      int pixel = 0, index;
+      for(index = 0; index < MARIA_LINERAM_SIZE; index += 4)
+      {
          buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 16) | ((maria_lineRAM[index + 0] & 8) >> 3) | ((maria_lineRAM[index + 0] & 2)));
          buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 16) | ((maria_lineRAM[index + 0] & 4) >> 2) | ((maria_lineRAM[index + 0] & 1) << 1));
          buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 16) | ((maria_lineRAM[index + 1] & 8) >> 3) | ((maria_lineRAM[index + 1] & 2)));
@@ -188,8 +190,9 @@ static void maria_WriteLineRAM(uint8_t* buffer)
    }
    else if(rmode == 3)
    {
-      int pixel = 0;
-      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
+      int pixel = 0, index;
+      for(index = 0; index < MARIA_LINERAM_SIZE; index += 4)
+      {
          buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 30));
          buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 0] & 28) | ((maria_lineRAM[index + 0] & 1) << 1));
          buffer[pixel++] = maria_GetColor((maria_lineRAM[index + 1] & 30));
@@ -276,9 +279,10 @@ static void maria_StoreLineRAM(void)
 // ----------------------------------------------------------------------------
 void maria_Reset(void)
 {
-  maria_scanline = 1;
-  for(int index = 0; index < MARIA_SURFACE_SIZE; index++)
-    maria_surface[index] = 0;
+   int index;
+   maria_scanline = 1;
+   for(index = 0; index < MARIA_SURFACE_SIZE; index++)
+      maria_surface[index] = 0;
 }
 
 // ----------------------------------------------------------------------------

@@ -83,12 +83,12 @@ bool bios_IsLoaded(void)
 // ----------------------------------------------------------------------------
 void bios_Release(void)
 {
-   if(bios_data)
-   {
-      delete [ ] bios_data;
-      bios_size = 0;
-      bios_data = NULL;
-   }
+   if (!bios_data)
+      return;
+
+   delete [ ] bios_data;
+   bios_size = 0;
+   bios_data = NULL;
 }
 
 // ----------------------------------------------------------------------------
