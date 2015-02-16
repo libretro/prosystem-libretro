@@ -155,7 +155,8 @@ static void maria_WriteLineRAM(uint8_t* buffer)
    if(rmode == 0)
    {
       int pixel = 0;
-      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4) {
+      for(int index = 0; index < MARIA_LINERAM_SIZE; index += 4)
+      {
          uint8_t color;
          color = maria_GetColor(maria_lineRAM[index + 0]);
          buffer[pixel++] = color;
@@ -206,62 +207,68 @@ static void maria_WriteLineRAM(uint8_t* buffer)
 // ----------------------------------------------------------------------------
 static void maria_StoreLineRAM(void)
 {
-  for(int index = 0; index < MARIA_LINERAM_SIZE; index++)
-    maria_lineRAM[index] = 0;
-  
-  uint8_t mode = memory_ram[maria_dp.w + 1];
-  while(mode & 0x5f)
-  {
-     uint8_t width;
-     uint8_t indirect = 0;
+   int index;
+   for(index = 0; index < MARIA_LINERAM_SIZE; index++)
+      maria_lineRAM[index] = 0;
 
-     maria_pp.b.l = memory_ram[maria_dp.w];
-     maria_pp.b.h = memory_ram[maria_dp.w + 2];
+   uint8_t mode = memory_ram[maria_dp.w + 1];
 
-     if(mode & 31) { 
-        maria_cycles += 8;
-        maria_palette = (memory_ram[maria_dp.w + 1] & 224) >> 3;
-        maria_horizontal = memory_ram[maria_dp.w + 3];
-        width = memory_ram[maria_dp.w + 1] & 31;
-        width = ((~width) & 31) + 1;
-        maria_dp.w += 4;
-     }
-     else { 
-        maria_cycles += 10;
-        maria_palette = (memory_ram[maria_dp.w + 3] & 224) >> 3;
-        maria_horizontal = memory_ram[maria_dp.w + 4];
-        indirect = memory_ram[maria_dp.w + 1] & 32;
-        maria_wmode = memory_ram[maria_dp.w + 1] & 128;
-        width = memory_ram[maria_dp.w + 3] & 31;
-        width = (width == 0)? 32: ((~width) & 31) + 1;
-        maria_dp.w += 5;
-     }
+   while(mode & 0x5f)
+   {
+      uint8_t width;
+      uint8_t indirect = 0;
 
-     if(!indirect) {
-        maria_pp.b.h += maria_offset;
-        for(int index = 0; index < width; index++) {
-           maria_cycles += 3;
-           maria_StoreGraphic( );
-        }
-     }
-     else {
-        uint8_t cwidth = memory_ram[CTRL] & 16;
-        pair basePP = maria_pp;
-        for(int index = 0; index < width; index++) {
-           maria_cycles += 3;
-           maria_pp.b.l = memory_ram[basePP.w++];
-           maria_pp.b.h = memory_ram[CHARBASE] + maria_offset;
+      maria_pp.b.l = memory_ram[maria_dp.w];
+      maria_pp.b.h = memory_ram[maria_dp.w + 2];
 
-           maria_cycles += 6;
-           maria_StoreGraphic( );
-           if(cwidth) {
-              maria_cycles += 3;
-              maria_StoreGraphic( );
-           }
-        }
-     }
-     mode = memory_ram[maria_dp.w + 1];
-  }
+      if(mode & 31) { 
+         maria_cycles += 8;
+         maria_palette = (memory_ram[maria_dp.w + 1] & 224) >> 3;
+         maria_horizontal = memory_ram[maria_dp.w + 3];
+         width = memory_ram[maria_dp.w + 1] & 31;
+         width = ((~width) & 31) + 1;
+         maria_dp.w += 4;
+      }
+      else { 
+         maria_cycles += 10;
+         maria_palette = (memory_ram[maria_dp.w + 3] & 224) >> 3;
+         maria_horizontal = memory_ram[maria_dp.w + 4];
+         indirect = memory_ram[maria_dp.w + 1] & 32;
+         maria_wmode = memory_ram[maria_dp.w + 1] & 128;
+         width = memory_ram[maria_dp.w + 3] & 31;
+         width = (width == 0)? 32: ((~width) & 31) + 1;
+         maria_dp.w += 5;
+      }
+
+      if(!indirect)
+      {
+         maria_pp.b.h += maria_offset;
+         for(int index = 0; index < width; index++)
+         {
+            maria_cycles += 3;
+            maria_StoreGraphic( );
+         }
+      }
+      else {
+         uint8_t cwidth = memory_ram[CTRL] & 16;
+         pair basePP = maria_pp;
+         for(int index = 0; index < width; index++)
+         {
+            maria_cycles += 3;
+            maria_pp.b.l = memory_ram[basePP.w++];
+            maria_pp.b.h = memory_ram[CHARBASE] + maria_offset;
+
+            maria_cycles += 6;
+            maria_StoreGraphic( );
+            if(cwidth)
+            {
+               maria_cycles += 3;
+               maria_StoreGraphic( );
+            }
+         }
+      }
+      mode = memory_ram[maria_dp.w + 1];
+   }
 }
 
 // ----------------------------------------------------------------------------
@@ -326,6 +333,7 @@ uint32_t maria_RenderScanline(void)
 // ----------------------------------------------------------------------------
 void maria_Clear(void)
 {
-  for(int index = 0; index < MARIA_SURFACE_SIZE; index++)
-    maria_surface[index] = 0;
+   int index;
+   for(index = 0; index < MARIA_SURFACE_SIZE; index++)
+      maria_surface[index] = 0;
 }

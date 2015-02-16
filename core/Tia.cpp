@@ -99,108 +99,119 @@ static void tia_ProcessChannel(uint8_t channel) {
 // ----------------------------------------------------------------------------
 // Reset
 // ----------------------------------------------------------------------------
-void tia_Reset( ) {
-  tia_soundCntr = 0;
-  for(int index = 0; index < 2; index++) {
-    tia_volume[index] = 0;
-    tia_counterMax[index] = 0;
-    tia_counter[index] = 0;
-    tia_audc[index] = 0;
-    tia_audf[index] = 0;
-    tia_audv[index] = 0;
-    tia_poly4Cntr[index] = 0;
-    tia_poly5Cntr[index] = 0;
-    tia_poly9Cntr[index] = 0;
-  }
-  tia_Clear( );
+void tia_Reset(void)
+{
+   int index;
+
+   tia_soundCntr = 0;
+
+   for(index = 0; index < 2; index++)
+   {
+      tia_volume[index] = 0;
+      tia_counterMax[index] = 0;
+      tia_counter[index] = 0;
+      tia_audc[index] = 0;
+      tia_audf[index] = 0;
+      tia_audv[index] = 0;
+      tia_poly4Cntr[index] = 0;
+      tia_poly5Cntr[index] = 0;
+      tia_poly9Cntr[index] = 0;
+   }
+   tia_Clear();
 }
 
 // ----------------------------------------------------------------------------
 // Clear
 // ----------------------------------------------------------------------------
-void tia_Clear( ) {
-  for(int index = 0; index < TIA_BUFFER_SIZE; index++) {
-    tia_buffer[index] = 0;
-  }
+void tia_Clear(void)
+{
+   int index;
+   for(index = 0; index < TIA_BUFFER_SIZE; index++)
+      tia_buffer[index] = 0;
 }
 
 // ----------------------------------------------------------------------------
 // SetRegister
 // ----------------------------------------------------------------------------
-void tia_SetRegister(uint16_t address, uint8_t data) {
-  uint8_t channel;
-  uint8_t frequency;
-    
-  switch(address) {
-    case AUDC0:
-      tia_audc[0] = data & 15;
-      channel = 0;
-      break;
-    case AUDC1:
-      tia_audc[1] = data & 15;
-      channel = 1;
-      break;
-    case AUDF0:
-      tia_audf[0] = data & 31;
-      channel = 0;
-      break;
-    case AUDF1:
-      tia_audf[1] = data & 31;
-      channel = 1;
-      break;
-    case AUDV0:
-      tia_audv[0] = (data & 15) << 2;
-      channel = 0;
-      break;
-    case AUDV1:
-      tia_audv[1] = (data & 15) << 2;
-      channel = 1;
-      break;
-    default:
-      return;
-  }
+void tia_SetRegister(uint16_t address, uint8_t data)
+{
+   uint8_t channel;
+   uint8_t frequency;
 
-  if(tia_audc[channel] == 0) {
-    frequency = 0;
-    tia_volume[channel] = tia_audv[channel];
-  }
-  else {
-    frequency = tia_audf[channel] + 1;
-    if(tia_audc[channel] > 11) {
-      frequency *= 3;
-    }
-  }
+   switch(address)
+   {
+      case AUDC0:
+         tia_audc[0] = data & 15;
+         channel = 0;
+         break;
+      case AUDC1:
+         tia_audc[1] = data & 15;
+         channel = 1;
+         break;
+      case AUDF0:
+         tia_audf[0] = data & 31;
+         channel = 0;
+         break;
+      case AUDF1:
+         tia_audf[1] = data & 31;
+         channel = 1;
+         break;
+      case AUDV0:
+         tia_audv[0] = (data & 15) << 2;
+         channel = 0;
+         break;
+      case AUDV1:
+         tia_audv[1] = (data & 15) << 2;
+         channel = 1;
+         break;
+      default:
+         return;
+   }
 
-  if(frequency != tia_counterMax[channel]) {
-    tia_counterMax[channel] = frequency;
-    if(tia_counter[channel] == 0 || frequency == 0) {
-      tia_counter[channel] = frequency;
-    }
-  }
+   if(tia_audc[channel] == 0)
+   {
+      frequency = 0;
+      tia_volume[channel] = tia_audv[channel];
+   }
+   else
+   {
+      frequency = tia_audf[channel] + 1;
+      if(tia_audc[channel] > 11)
+         frequency *= 3;
+   }
+
+   if(frequency != tia_counterMax[channel])
+   {
+      tia_counterMax[channel] = frequency;
+      if(tia_counter[channel] == 0 || frequency == 0)
+         tia_counter[channel] = frequency;
+   }
 }
 
 // --------------------------------------------------------------------------------------
 // Process
 // --------------------------------------------------------------------------------------
-void tia_Process(uint32_t length) {
-  for(uint32_t index = 0; index < length; index++) {
-    if(tia_counter[0] > 1) {
-      tia_counter[0]--;
-    }
-    else if(tia_counter[0] == 1) {
-      tia_counter[0] = tia_counterMax[0];
-      tia_ProcessChannel(0);
-    }
-    if(tia_counter[1] > 1) {
-      tia_counter[1]--;
-    }
-    else if(tia_counter[1] == 1) {
-      tia_counter[1] = tia_counterMax[1];
-      tia_ProcessChannel(1);
-    }
-    tia_buffer[tia_soundCntr++] = tia_volume[0] + tia_volume[1];
-    if(tia_soundCntr >= tia_size) {
-      tia_soundCntr = 0;
-    }
-  }
+void tia_Process(uint32_t length)
+{
+   uint32_t index;
+   for(index = 0; index < length; index++)
+   {
+      if(tia_counter[0] > 1)
+         tia_counter[0]--;
+      else if(tia_counter[0] == 1)
+      {
+         tia_counter[0] = tia_counterMax[0];
+         tia_ProcessChannel(0);
+      }
+      if(tia_counter[1] > 1)
+         tia_counter[1]--;
+      else if(tia_counter[1] == 1)
+      {
+         tia_counter[1] = tia_counterMax[1];
+         tia_ProcessChannel(1);
+      }
+      tia_buffer[tia_soundCntr++] = tia_volume[0] + tia_volume[1];
+      if(tia_soundCntr >= tia_size)
+         tia_soundCntr = 0;
+   }
 }

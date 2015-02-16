@@ -95,7 +95,9 @@ static uint32_t pokey_baseMultiplier;
 // ----------------------------------------------------------------------------
 void pokey_Reset(void)
 {
-   for(int index = 0; index < POKEY_POLY17_SIZE; index++)
+   int index, channel;
+
+   for(index = 0; index < POKEY_POLY17_SIZE; index++)
       pokey_poly17[index] = rand( ) & 1;
 
    pokey_polyAdjust = 0;
@@ -110,7 +112,7 @@ void pokey_Reset(void)
 
    pokey_poly17Size = POKEY_POLY17_SIZE;
 
-   for(int channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
+   for(channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
    {
       pokey_outVol[channel] = 0;
       pokey_output[channel] = 0;
@@ -130,6 +132,8 @@ void pokey_Reset(void)
 void pokey_SetRegister(uint16_t address, uint8_t value)
 {
    uint8_t channelMask;
+   uint32_t newValue = 0;
+
    switch(address)
    {
       case POKEY_AUDF1:
@@ -194,8 +198,6 @@ void pokey_SetRegister(uint16_t address, uint8_t value)
          channelMask = 0;
          break;
    }
-
-   uint32_t newValue = 0;
 
    if(channelMask & (1 << POKEY_CHANNEL1))
    {
@@ -292,11 +294,11 @@ void pokey_Process(uint32_t length)
 
    while(length)
    {
+      uint8_t channel;
       uint8_t currentValue;
       uint8_t nextEvent = POKEY_SAMPLE;
       uint32_t eventMin = *sampleCntrPtr;
 
-      uint8_t channel;
       for(channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
       {
          if(pokey_divideCount[channel] <= eventMin)
@@ -359,6 +361,8 @@ void pokey_Process(uint32_t length)
 // ----------------------------------------------------------------------------
 void pokey_Clear(void)
 {
-  for(int index = 0; index < POKEY_BUFFER_SIZE; index++)
-    pokey_buffer[index] = 0;
+   int index;
+
+   for(index = 0; index < POKEY_BUFFER_SIZE; index++)
+      pokey_buffer[index] = 0;
 }
