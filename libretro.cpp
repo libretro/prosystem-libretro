@@ -102,20 +102,21 @@ static void sound_Resample(const uint8_t* source, uint8_t* target, int length)
    }
 }
 
+#define MAX_BUFFER_SIZE 8192
+
 static void sound_Store()
 {
-   //#define MAX_BUFFER_SIZE 8192
+   uint8_t sample[MAX_BUFFER_SIZE];
+   memset(sample, 0, MAX_BUFFER_SIZE);
+   uint32_t length = 48000 / prosystem_frequency;
 
-   uint8_t sample[8192];
-   memset(sample, 0, 8192);
-   uint32_t length = 48000 / prosystem_frequency; /* sound_GetSampleLength(sound_format.nSamplesPerSec, prosystem_frame, prosystem_frequency); */ /* 48000 / prosystem_frequency */
    sound_Resample(tia_buffer, sample, length);
 
    // Ballblazer, Commando, various homebrew and hacks
    if(cartridge_pokey)
    {
-      uint8_t pokeySample[8192];
-      memset(pokeySample, 0, 8192);
+      uint8_t pokeySample[MAX_BUFFER_SIZE];
+      memset(pokeySample, 0, MAX_BUFFER_SIZE);
       sound_Resample(pokey_buffer, pokeySample, length);
       for(uint32_t index = 0; index < length; index++)
       {
