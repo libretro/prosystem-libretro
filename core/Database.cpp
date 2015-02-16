@@ -49,11 +49,8 @@ bool database_Load(const char *digest)
 {
    if(database_enabled)
    {
-      logger_LogInfo("Accessing database " + database_filename + ".", DATABASE_SOURCE);
-
       FILE* file = fopen(database_filename.c_str( ), "r");
       if(file == NULL) {
-         logger_LogError("Failed to open the database for reading.", DATABASE_SOURCE);
          return false;  
       }
 

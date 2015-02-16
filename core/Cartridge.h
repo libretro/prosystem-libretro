@@ -43,7 +43,6 @@
 #include "Equates.h"
 #include "Memory.h"
 #include "Hash.h"
-#include "Logger.h"
 #include "Pokey.h"
 
 extern bool cartridge_Load(const uint8_t* data, uint32_t size);

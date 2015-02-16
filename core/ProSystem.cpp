@@ -129,12 +129,7 @@ void prosystem_ExecuteFrame(const uint8_t* input)
 bool prosystem_Save(std::string filename, bool compress)
 {
    if(filename.empty( ) || filename.length( ) == 0)
-   {
-      logger_LogError("Filename is invalid.", PRO_SYSTEM_SOURCE);
       return false;
-   }
-
-   logger_LogInfo("Saving game state to file " + filename + ".", PRO_SYSTEM_SOURCE);
 
    uint8_t buffer[32829] = {0};
    uint32_t size = 0;
@@ -175,15 +170,12 @@ bool prosystem_Save(std::string filename, bool compress)
 
    FILE* file = fopen(filename.c_str( ), "wb");
    if(file == NULL)
-   {
-      logger_LogError("Failed to open the file " + filename + " for writing.", PRO_SYSTEM_SOURCE);
       return false;
-   }
 
    if(fwrite(buffer, 1, size, file) != size)
    {
       fclose(file);
-      logger_LogError("Failed to write the save state data to the file " + filename + ".", PRO_SYSTEM_SOURCE);
+      /* Failed to write the save state data to the file */
       return false;
    }
 
@@ -198,26 +190,19 @@ bool prosystem_Save(std::string filename, bool compress)
 bool prosystem_Load(const std::string filename)
 {
    if(filename.empty( ) || filename.length( ) == 0)
-   {
-      logger_LogError("Filename is invalid.", PRO_SYSTEM_SOURCE);    
       return false;
-   }
-
-   logger_LogInfo("Loading game state from file " + filename + ".", PRO_SYSTEM_SOURCE);
 
    uint8_t buffer[32829] = {0};
    uint32_t size = 0;
    {
       FILE* file = fopen(filename.c_str( ), "rb");
-      if(file == NULL) {
-         logger_LogError("Failed to open the file " + filename + " for reading.", PRO_SYSTEM_SOURCE);
+      if(file == NULL)
          return false;
-      }
 
       if(fseek(file, 0, SEEK_END))
       {
          fclose(file);
-         logger_LogError("Failed to find the end of the file.", PRO_SYSTEM_SOURCE);
+         /* Failed to find the end of the file. */
          return false;
       }
 
@@ -225,21 +210,21 @@ bool prosystem_Load(const std::string filename)
       if(fseek(file, 0, SEEK_SET))
       {
          fclose(file);
-         logger_LogError("Failed to find the size of the file.", PRO_SYSTEM_SOURCE);
+         /* Failed to find the size of the file. */
          return false;
       }
 
       if(size != 16445 && size != 32829)
       {
          fclose(file);
-         logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
+         /* Save state file has an invalid size. */
          return false;
       }
 
       if(fread(buffer, 1, size, file) != size && ferror(file))
       {
          fclose(file);
-         logger_LogError("Failed to read the file data.", PRO_SYSTEM_SOURCE);
+         /* Failed to read the file data. */
          return false;
       }
       fclose(file);
@@ -251,7 +236,7 @@ bool prosystem_Load(const std::string filename)
    {
       if(buffer[offset + index] != PRO_SYSTEM_STATE_HEADER[index])
       {
-         logger_LogError("File is not a valid ProSystem save state.", PRO_SYSTEM_SOURCE);
+         /* File is not a valid ProSystem save state. */
          return false;
       }
    }
@@ -272,7 +257,7 @@ bool prosystem_Load(const std::string filename)
 
    if(cartridge_digest != std::string(digest))
    {
-      logger_LogError("Load state digest [" + std::string(digest) + "] does not match loaded cartridge digest [" + cartridge_digest + "].", PRO_SYSTEM_SOURCE);
+      //logger_LogError("Load state digest [" + std::string(digest) + "] does not match loaded cartridge digest [" + cartridge_digest + "].", PRO_SYSTEM_SOURCE);
       return false;
    }
 
@@ -294,7 +279,7 @@ bool prosystem_Load(const std::string filename)
    {
       if(size != 32829)
       {
-         logger_LogError("Save state file has an invalid size.", PRO_SYSTEM_SOURCE);
+         /* Save state file has an invalid size. */
          return false;
       }
 

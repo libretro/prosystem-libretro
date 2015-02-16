@@ -28,7 +28,6 @@
 #include <stdint.h>
 #include <string>
 #include "Memory.h"
-#include "Logger.h"
 
 extern bool bios_Load(const char *filename);
 extern bool bios_IsLoaded(void);

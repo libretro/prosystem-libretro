@@ -159,7 +159,7 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
 
    if(size <= 128)
    {
-      logger_LogError("Cartridge data is invalid.", CARTRIDGE_SOURCE);
+      /* Cartridge data is invalid. */
       return false;
    }
 
@@ -171,7 +171,7 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
 
    if (cartridge_CC2(header))
    {
-      logger_LogError("Prosystem doesn't support CC2 hacks.", CARTRIDGE_SOURCE);
+      /* Prosystem doesn't support CC2 hacks. */
       return false;
    }
 

@@ -29,7 +29,6 @@
 
 #include <stdint.h>
 #include <string>
-#include "Logger.h"
 
 extern bool palette_Load(std::string filename);
 extern void palette_Load(const uint8_t* data);

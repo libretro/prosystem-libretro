@@ -47,7 +47,6 @@ bool bios_Load(const char *filename)
    if(fseek(file, 0, SEEK_END))
    {
       fclose(file);
-      logger_LogError("Failed to find the end of the bios file.", BIOS_SOURCE);
       return false;
    }
 
@@ -55,7 +54,6 @@ bool bios_Load(const char *filename)
    if(fseek(file, 0, SEEK_SET))
    {
       fclose(file);
-      logger_LogError("Failed to find the size of the bios file.", BIOS_SOURCE);
       return false;
    }
 
@@ -63,7 +61,6 @@ bool bios_Load(const char *filename)
    if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file))
    {
       fclose(file);
-      logger_LogError("Failed to read the bios data.", BIOS_SOURCE);
       bios_Release();
       return false;
    }

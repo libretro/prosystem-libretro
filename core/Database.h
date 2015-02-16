@@ -27,7 +27,6 @@
 
 #include <string>
 #include "Cartridge.h"
-#include "Logger.h"
 #include "Common.h"
 
 extern void database_Initialize(void);
