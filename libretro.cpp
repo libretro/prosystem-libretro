@@ -295,11 +295,9 @@ bool retro_load_game(const struct retro_game_info *info)
     // Right difficulty switch defaults to right position, "(A)dvanced", which fixes Tower Toppler
     keyboard_data[16] = 0;
 
-    const char *full_path;
-    full_path = info->path;
     const char *system_directory_c = NULL;
 
-    if (cartridge_Load(full_path))
+    if (cartridge_Load((const uint8_t*)info->data, info->size))
     {
        environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
        if (!system_directory_c)

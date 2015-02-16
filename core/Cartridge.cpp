@@ -152,7 +152,7 @@ static void cartridge_ReadHeader(const uint8_t* header)
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-static bool cartridge_Load(const uint8_t* data, uint32_t size)
+bool cartridge_Load(const uint8_t* data, uint32_t size)
 {
    int index;
    uint8_t header[128] = {0};
@@ -193,78 +193,6 @@ static bool cartridge_Load(const uint8_t* data, uint32_t size)
 
    cartridge_digest = hash_Compute(cartridge_buffer, cartridge_size);
 
-   return true;
-}
-
-// ----------------------------------------------------------------------------
-// Load
-// ----------------------------------------------------------------------------
-bool cartridge_Load(std::string filename)
-{
-   uint8_t* data = NULL;
-   uint32_t size = 0;
-
-   if(filename.empty( ) || filename.length( ) == 0)
-   {
-      logger_LogError("Cartridge filename is invalid.", CARTRIDGE_SOURCE);
-      return false;
-   }
-
-   cartridge_Release( );
-   logger_LogInfo("Opening cartridge file " + filename + ".", CARTRIDGE_SOURCE);
-
-   if(size == 0)
-   {
-      FILE *file = fopen(filename.c_str( ), "rb");
-      if(file == NULL)
-      {
-         logger_LogError("Failed to open the cartridge file " + filename + " for reading.", CARTRIDGE_SOURCE);
-         return false;  
-      }
-
-      if(fseek(file, 0, SEEK_END))
-      {
-         fclose(file);
-         logger_LogError("Failed to find the end of the cartridge file.", CARTRIDGE_SOURCE);
-         return false;
-      }
-
-      size = ftell(file);
-
-      if(fseek(file, 0, SEEK_SET))
-      {
-         fclose(file);
-         logger_LogError("Failed to find the size of the cartridge file.", CARTRIDGE_SOURCE);
-         return false;
-      }
-
-      data = new uint8_t[size];
-
-      if(fread(data, 1, size, file) != size && ferror(file))
-      {
-         fclose(file);
-         logger_LogError("Failed to read the cartridge data.", CARTRIDGE_SOURCE);
-         cartridge_Release( );
-         delete [ ] data;
-         return false;
-      }    
-
-      fclose(file);    
-   }
-   else
-      data = new uint8_t[size];
-
-   if(!cartridge_Load(data, size))
-   {
-      logger_LogError("Failed to load the cartridge data into memory.", CARTRIDGE_SOURCE);
-      delete [ ] data;
-      return false;
-   }
-
-   if(data != NULL)
-      delete [ ] data;
-
-   cartridge_filename = filename;
    return true;
 }
 

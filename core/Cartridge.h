@@ -46,7 +46,7 @@
 #include "Logger.h"
 #include "Pokey.h"
 
-extern bool cartridge_Load(std::string filename);
+extern bool cartridge_Load(const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);
 extern void cartridge_StoreBank(uint8_t bank);
 extern void cartridge_Write(uint16_t address, uint8_t data);
