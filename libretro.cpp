@@ -127,7 +127,7 @@ static void sound_Store()
    // Convert 8u to 16s
    for(int i = 0; i != length; i ++)
    {
-      int16_t sample16 = (sample[i] << 8) - 32768;
+      int16_t sample16 = (sample[i] << 8);
       int16_t frame[2] = {sample16, sample16};
 
       audio_cb((int16_t)frame[0], (int16_t)frame[1]);
