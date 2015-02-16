@@ -126,15 +126,11 @@ void prosystem_ExecuteFrame(const uint8_t* input)
 // ----------------------------------------------------------------------------
 // Save
 // ----------------------------------------------------------------------------
-bool prosystem_Save(std::string filename, bool compress)
+bool prosystem_Save(char *buffer, bool compress)
 {
-   if(filename.empty( ) || filename.length( ) == 0)
-      return false;
-
-   uint8_t buffer[32829] = {0};
    uint32_t size = 0;
-
    uint32_t index;
+
    for(index = 0; index < 16; index++)
       buffer[size + index] = PRO_SYSTEM_STATE_HEADER[index];
    size += 16;
@@ -168,70 +164,18 @@ bool prosystem_Save(std::string filename, bool compress)
       size += 16384;
    }
 
-   FILE* file = fopen(filename.c_str( ), "wb");
-   if(file == NULL)
-      return false;
-
-   if(fwrite(buffer, 1, size, file) != size)
-   {
-      fclose(file);
-      /* Failed to write the save state data to the file */
-      return false;
-   }
-
-   fclose(file);
-
    return true;
 }
 
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool prosystem_Load(const std::string filename)
+bool prosystem_Load(const char *buffer)
 {
-   if(filename.empty( ) || filename.length( ) == 0)
-      return false;
-
-   uint8_t buffer[32829] = {0};
    uint32_t size = 0;
-   {
-      FILE* file = fopen(filename.c_str( ), "rb");
-      if(file == NULL)
-         return false;
-
-      if(fseek(file, 0, SEEK_END))
-      {
-         fclose(file);
-         /* Failed to find the end of the file. */
-         return false;
-      }
-
-      size = ftell(file);
-      if(fseek(file, 0, SEEK_SET))
-      {
-         fclose(file);
-         /* Failed to find the size of the file. */
-         return false;
-      }
-
-      if(size != 16445 && size != 32829)
-      {
-         fclose(file);
-         /* Save state file has an invalid size. */
-         return false;
-      }
-
-      if(fread(buffer, 1, size, file) != size && ferror(file))
-      {
-         fclose(file);
-         /* Failed to read the file data. */
-         return false;
-      }
-      fclose(file);
-   }  
-
    uint32_t offset = 0;
    uint32_t index;
+
    for(index = 0; index < 16; index++)
    {
       if(buffer[offset + index] != PRO_SYSTEM_STATE_HEADER[index])
@@ -246,8 +190,6 @@ bool prosystem_Load(const std::string filename)
    uint32_t date = 0;
    for(index = 0; index < 4; index++);
    offset += 4;
-
-   prosystem_Reset( );
 
    char digest[33] = {0};
    for(index = 0; index < 32; index++)
@@ -286,7 +228,7 @@ bool prosystem_Load(const std::string filename)
       for(index = 0; index < 16384; index++)
          memory_ram[16384 + index] = buffer[offset + index];
       offset += 16384; 
-   }  
+   }
 
    return true;
 }

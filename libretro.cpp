@@ -224,23 +224,17 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void) 
 { 
-   //TODO
-	//return STATE_SIZE;
-	return 0;
+   return 32829;
 }
 
 bool retro_serialize(void *data, size_t size)
 { 
-   //TODO
-	//return prosystem_Save(fileName, false) ? true : false;
-	return false;
+   return prosystem_Save((char*)data, false);
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   //TODO
-	//return prosystem_Load(fileName) ? true : false;
-    return false;
+   return prosystem_Load((const char*)data);
 }
 
 void retro_cheat_reset(void)
