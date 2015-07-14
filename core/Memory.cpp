@@ -54,17 +54,16 @@ uint8_t memory_Read(uint16_t address)
       case INTIM | 0x2:
          memory_ram[INTFLG] &= 0x7f;
          return memory_ram[INTIM];
-         break;
       case INTFLG:
       case INTFLG | 0x2:
          tmp_uint8_t = memory_ram[INTFLG];
          memory_ram[INTFLG] &= 0x7f;
          return tmp_uint8_t; 
-         break;
       default:
-         return memory_ram[address];
          break;
    }
+
+   return memory_ram[address];
 }
 
 // ----------------------------------------------------------------------------
