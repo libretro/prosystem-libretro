@@ -65,28 +65,16 @@ static uint32_t sound_GetSampleLength(uint32_t length, uint32_t unit, uint32_t u
    return sampleLength;
 }
 
+#define SAMPLES_PER_SEC 48000
+
 static void sound_Resample(const uint8_t* source, uint8_t* target, int length)
 {
-   typedef struct {
-      uint16_t  wFormatTag;
-      uint16_t  nChannels;
-      uint32_t nSamplesPerSec;
-      uint32_t nAvgBytesPerSec;
-      uint16_t  nBlockAlign;
-      uint16_t  wBitsPerSample;
-      uint16_t  cbSize;
-   } WAVEFORMATEX;
-
-   //# define WAVE_FORMAT_PCM 0
-
-   static const WAVEFORMATEX SOUND_DEFAULT_FORMAT = {0, 1, 48000, 48000, 1, 8, 0};
-   static WAVEFORMATEX sound_format = SOUND_DEFAULT_FORMAT;
-
-   int measurement = sound_format.nSamplesPerSec;
+   int measurement = SAMPLES_PER_SEC;
    int sourceIndex = 0;
    int targetIndex = 0;
 
    int max = ((prosystem_frequency * prosystem_scanlines) << 1);
+
    while(targetIndex < length)
    {
       if(measurement >= max)
@@ -97,7 +85,7 @@ static void sound_Resample(const uint8_t* source, uint8_t* target, int length)
       else
       {
          sourceIndex++;
-         measurement += sound_format.nSamplesPerSec;
+         measurement += SAMPLES_PER_SEC;
       }
    }
 }
