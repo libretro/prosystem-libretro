@@ -289,7 +289,11 @@ void pokey_SetRegister(uint16_t address, uint8_t value)
 void pokey_Process(uint32_t length)
 {
    uint8_t* buffer = pokey_buffer + pokey_soundCntr;
+#ifdef MSB_FIRST
+   uint32_t* sampleCntrPtr = (uint32_t*)((uint8_t*)(&pokey_sampleCount[0]) + 3);
+#else
    uint32_t* sampleCntrPtr = (uint32_t*)((uint8_t*)(&pokey_sampleCount[0]) + 1);
+#endif
    uint32_t size = length;
 
    while(length)
@@ -339,7 +343,11 @@ void pokey_Process(uint32_t length)
       }
       else
       {
+#ifdef MSB_FIRST
+         *(pokey_sampleCount + 1) += pokey_sampleMax;
+#else
          *pokey_sampleCount += pokey_sampleMax;
+#endif
          currentValue = 0;
 
          for(channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)

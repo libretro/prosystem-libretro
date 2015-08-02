@@ -35,12 +35,13 @@ static uint16_t bios_size = 0;
 // ----------------------------------------------------------------------------
 bool bios_Load(const char *filename)
 {
+   FILE *file;
    if(!filename || filename[0] == '\0')
       return false;
 
    bios_Release();
 
-   FILE* file = fopen(filename, "rb");
+   file = fopen(filename, "rb");
    if(file == NULL)
       return false;
 

@@ -43,6 +43,7 @@ void prosystem_Reset(void)
 
    prosystem_paused = false;
    prosystem_frame = 0;
+   sally_Reset();
    region_Reset( );
    tia_Clear( );
    tia_Reset( );

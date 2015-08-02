@@ -32,8 +32,13 @@ union Pair
    uint16_t w;
    struct Join
    {
+#ifdef MSB_FIRST
+      uint8_t h; 
+      uint8_t l;
+#else
       uint8_t l; 
       uint8_t h;
+#endif
    } b;
 };
 

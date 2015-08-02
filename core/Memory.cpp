@@ -86,15 +86,10 @@ void memory_Write(uint16_t address, uint8_t data)
                bios_Store( );
             break;
          case INPT0:
-            break;
          case INPT1:
-            break;
          case INPT2:
-            break;
          case INPT3:
-            break;
          case INPT4:
-            break;
          case INPT5:
             break;
          case AUDC0:
@@ -152,9 +147,8 @@ void memory_Write(uint16_t address, uint8_t data)
             /*TODO: gdement:  test here for debug port.  Don't put it in the switch because that will change behavior.*/
       }
    }
-   else {
+   else
       cartridge_Write(address, data);
-   }
 }
 
 // ----------------------------------------------------------------------------

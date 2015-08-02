@@ -103,10 +103,11 @@ static void sound_Store()
    // Ballblazer, Commando, various homebrew and hacks
    if(cartridge_pokey)
    {
+      uint32_t index;
       uint8_t pokeySample[MAX_BUFFER_SIZE];
       memset(pokeySample, 0, MAX_BUFFER_SIZE);
       sound_Resample(pokey_buffer, pokeySample, length);
-      for(uint32_t index = 0; index < length; index++)
+      for(index = 0; index < length; index++)
       {
          sample[index] += pokeySample[index];
          sample[index] = sample[index] / 2;

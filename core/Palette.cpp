@@ -100,16 +100,13 @@ uint8_t palette_data[PALETTE_SIZE] = {
 // ----------------------------------------------------------------------------
 bool palette_Load(std::string filename)
 {
+   FILE *file;
    if(filename.empty( ) || filename.length( ) == 0)
-   {
       return false;
-   }
 
-   FILE* file = fopen(filename.c_str( ), "rb");
+   file = fopen(filename.c_str( ), "rb");
    if(file == NULL)
-   {
       return false;
-   }  
 
    if(fread(palette_data, 1, PALETTE_SIZE, file) != PALETTE_SIZE)
    {
