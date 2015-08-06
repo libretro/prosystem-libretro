@@ -40,10 +40,15 @@
 // ----------------------------------------------------------------------------
 #ifndef TIA_H
 #define TIA_H
+
 #define TIA_BUFFER_SIZE 624
 
 #include <stdint.h>
 #include "Equates.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void tia_Reset(void);
 extern void tia_SetRegister(uint16_t address, uint8_t data);
@@ -52,5 +57,9 @@ extern void tia_Clear(void);
 extern void tia_Process(uint32_t length);
 extern uint8_t tia_buffer[TIA_BUFFER_SIZE];
 extern uint32_t tia_size;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

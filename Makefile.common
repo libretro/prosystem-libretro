@@ -12,8 +12,8 @@ SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/core/Region.cpp \
 	$(CORE_DIR)/core/Riot.cpp \
 	$(CORE_DIR)/core/Sally.cpp \
-	$(CORE_DIR)/core/Tia.cpp \
 	$(CORE_DIR)/libretro.cpp
 
 SOURCES_C := \
-	$(CORE_DIR)/core/Pokey.c
+	$(CORE_DIR)/core/Pokey.c \
+	$(CORE_DIR)/core/Tia.c
