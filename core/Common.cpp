@@ -29,62 +29,6 @@
 std::string common_defaultPath;
 
 // ----------------------------------------------------------------------------
-// Format
-// ----------------------------------------------------------------------------
-std::string common_Format(double value)
-{
-  return common_Format(value, "%f");
-}
-
-// ----------------------------------------------------------------------------
-// Format
-// ----------------------------------------------------------------------------
-std::string common_Format(double value, std::string specification)
-{
-  char buffer[17] = {0};
-  sprintf(buffer, specification.c_str( ), value);
-  return std::string(buffer);
-}
-
-// ----------------------------------------------------------------------------
-// Format
-// ----------------------------------------------------------------------------
-std::string common_Format(uint32_t value)
-{
-   char buffer[11] = {0};
-   sprintf(buffer, "%d", value);
-   return std::string(buffer);
-}
-
-// ----------------------------------------------------------------------------
-// Format
-// ----------------------------------------------------------------------------
-std::string common_Format(uint16_t value)
-{
-   char buffer[6] = {0};
-   sprintf(buffer, "%d", value);
-   return std::string(buffer);
-}
-
-// ----------------------------------------------------------------------------
-// Format
-// ----------------------------------------------------------------------------
-std::string common_Format(uint8_t value)
-{
-   char buffer[4] = {0};
-   sprintf(buffer, "%d", value);
-   return std::string(buffer);
-}
-
-// ----------------------------------------------------------------------------
-// Format
-// ----------------------------------------------------------------------------
-std::string common_Format(bool value)
-{
-   return (value)? "true": "false";
-}
-
-// ----------------------------------------------------------------------------
 // ParseUint
 // ----------------------------------------------------------------------------
 uint32_t common_ParseUint(std::string text)
@@ -121,60 +65,10 @@ bool common_ParseBool(std::string text)
 }
 
 // ----------------------------------------------------------------------------
-// Trim
-// ----------------------------------------------------------------------------
-std::string common_Trim(std::string target)
-{
-   int index;
-   for(index = target.length( ) - 1; index >= 0; index--)
-   {
-      if(target[index] != 0x20 && target[index] != '\n')
-         break;
-   }
-   return target.substr(0, index + 1);
-}
-
-// ----------------------------------------------------------------------------
 // Remove
 // ----------------------------------------------------------------------------
 std::string common_Remove(std::string target, char value)
 {
    target.erase(std::remove(target.begin(), target.end(), value), target.end());
    return target;
-}
-
-// ----------------------------------------------------------------------------
-// Replace (string, from, to)
-// ----------------------------------------------------------------------------
-std::string common_Replace(std::string target, char value1, char value2)
-{
-   int length = 0;
-   int index;
-   for(index = 0; index < target.size( ); index++)
-      length++;
-
-   char* buffer = new char[length + 1];
-   for(index = 0; index < target.size( ); index++)
-   {
-      if(target[index] != value1)
-         buffer[index] = target[index];
-      else
-         buffer[index] = value2;
-   }
-
-   buffer[length] = 0;
-   std::string source = buffer;
-   delete[ ] buffer;
-   return source;
-}
-
-// ----------------------------------------------------------------------------
-// GetExtension
-// ----------------------------------------------------------------------------
-std::string common_GetExtension(std::string filename)
-{
-   int position = filename.rfind('.');
-   if(position != -1)
-      return filename.substr(position);
-   return "";
 }

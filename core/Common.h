@@ -29,19 +29,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-extern std::string common_Format(double value);
-extern std::string common_Format(double value, std::string specification);
-extern std::string common_Format(uint32_t value);
-extern std::string common_Format(uint16_t value);
-extern std::string common_Format(uint8_t value);
-extern std::string common_Format(bool value);
-//extern std::string common_Format(HRESULT result);
-extern std::string common_Trim(std::string target);
 extern std::string common_Remove(std::string target, char value);
-extern std::string common_Replace(std::string target, char value1, char value2);
-extern std::string common_GetErrorMessage( );
-//extern std::string common_GetErrorMessage(DWORD error);
-extern std::string common_GetExtension(std::string filename);
 extern uint32_t common_ParseUint(std::string text);
 extern uint16_t common_ParseWord(std::string text);
 extern uint8_t common_ParseByte(std::string text);
