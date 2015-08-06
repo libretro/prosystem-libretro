@@ -54,6 +54,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern void pokey_Reset(void);
 extern void pokey_SetRegister(uint16_t address, uint8_t value);
 extern void pokey_Process(uint32_t length);
@@ -61,5 +65,9 @@ extern void pokey_Clear(void);
 
 extern uint8_t pokey_buffer[POKEY_BUFFER_SIZE];
 extern uint32_t pokey_size;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

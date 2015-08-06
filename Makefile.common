@@ -8,7 +8,6 @@ SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/core/Maria.cpp \
 	$(CORE_DIR)/core/Memory.cpp \
 	$(CORE_DIR)/core/Palette.cpp \
-	$(CORE_DIR)/core/Pokey.cpp \
 	$(CORE_DIR)/core/ProSystem.cpp \
 	$(CORE_DIR)/core/Region.cpp \
 	$(CORE_DIR)/core/Riot.cpp \
@@ -16,4 +15,5 @@ SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/core/Tia.cpp \
 	$(CORE_DIR)/libretro.cpp
 
-SOURCES_C :=
+SOURCES_C := \
+	$(CORE_DIR)/core/Pokey.c
