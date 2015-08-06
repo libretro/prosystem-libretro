@@ -23,6 +23,10 @@
 // Maria.c
 // ----------------------------------------------------------------------------
 #include "Maria.h"
+#include "Equates.h"
+#include "Pair.h"
+#include "Memory.h"
+#include "Sally.h"
 #define MARIA_LINERAM_SIZE 160
 
 rect maria_displayArea = {0, 16, 319, 258};

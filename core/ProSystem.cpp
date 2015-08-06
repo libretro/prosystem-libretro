@@ -23,6 +23,16 @@
 // ProSystem.cpp
 // ----------------------------------------------------------------------------
 #include "ProSystem.h"
+#include "Equates.h"
+#include "Bios.h"
+#include "Cartridge.h"
+#include "Maria.h"
+#include "Memory.h"
+#include "Region.h"
+#include "Riot.h"
+#include "Sally.h"
+#include "Tia.h"
+#include "Pokey.h"
 #define PRO_SYSTEM_STATE_HEADER "PRO-SYSTEM STATE"
 #define PRO_SYSTEM_SOURCE "ProSystem.cpp"
 

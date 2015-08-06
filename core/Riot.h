@@ -26,8 +26,6 @@
 #define RIOT_H
 
 #include <stdint.h>
-#include "Equates.h"
-#include "Memory.h"
 
 extern void riot_Reset(void);
 extern void riot_SetInput(const uint8_t* input);

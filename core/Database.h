@@ -26,8 +26,6 @@
 #define DATABASE_H
 
 #include <string>
-#include "Cartridge.h"
-#include "Common.h"
 
 extern void database_Initialize(void);
 extern bool database_Load(const char *digest);

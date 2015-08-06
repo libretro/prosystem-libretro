@@ -23,6 +23,10 @@
 // Cartridge.cpp
 // ----------------------------------------------------------------------------
 #include "Cartridge.h"
+#include "Equates.h"
+#include "Memory.h"
+#include "Hash.h"
+#include "Pokey.h"
 #define CARTRIDGE_SOURCE "Cartridge.cpp"
 
 std::string cartridge_title;

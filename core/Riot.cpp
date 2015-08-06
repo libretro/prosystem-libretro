@@ -23,6 +23,8 @@
 // Riot.cpp
 // ----------------------------------------------------------------------------
 #include "Riot.h"
+#include "Equates.h"
+#include "Memory.h"
 
 bool riot_timing = false;
 uint16_t riot_timer = TIM64T;

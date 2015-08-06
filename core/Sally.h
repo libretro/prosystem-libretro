@@ -26,7 +26,6 @@
 #define SALLY_H
 
 #include <stdint.h>
-#include "Memory.h"
 #include "Pair.h"
 
 extern void sally_Reset(void);

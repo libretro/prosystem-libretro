@@ -28,16 +28,8 @@
 #include <stdint.h>
 #include <string>
 #include <stdio.h>
-#include "Equates.h"
-#include "Bios.h"
-#include "Cartridge.h"
-#include "Maria.h"
-#include "Memory.h"
-#include "Region.h"
-#include "Riot.h"
-#include "Sally.h"
-#include "Tia.h"
-#include "Pokey.h"
+
+#include <boolean.h>
 
 extern void prosystem_Reset(void);
 extern void prosystem_ExecuteFrame(const uint8_t* input);

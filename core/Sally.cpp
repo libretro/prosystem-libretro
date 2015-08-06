@@ -23,6 +23,8 @@
 // Sally.cpp
 // ----------------------------------------------------------------------------
 #include "Sally.h"
+#include "Memory.h"
+#include "Pair.h"
 
 uint8_t sally_a = 0;
 uint8_t sally_x = 0;

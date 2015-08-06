@@ -23,6 +23,8 @@
 // Database.cpp
 // ----------------------------------------------------------------------------
 #include "Database.h"
+#include "Cartridge.h"
+#include "Common.h"
 #define DATABASE_SOURCE "Database.cpp"
 
 bool database_enabled = true;

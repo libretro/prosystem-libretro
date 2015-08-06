@@ -16,11 +16,13 @@
 
 #include "libretro.h"
 
+#include "Bios.h"
 #include "Cartridge.h"
 #include "Database.h"
 #include "Maria.h"
 #include "Palette.h"
 #include "Pokey.h"
+#include "Region.h"
 #include "ProSystem.h"
 #include "Tia.h"
 

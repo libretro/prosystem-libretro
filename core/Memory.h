@@ -24,14 +24,10 @@
 // ----------------------------------------------------------------------------
 #ifndef MEMORY_H
 #define MEMORY_H
-#define MEMORY_SIZE 65536
-//#define NULL 0
 
-#include "Equates.h"
-#include "Bios.h"
-#include "Cartridge.h"
-#include "Tia.h"
-#include "Riot.h"
+#define MEMORY_SIZE 65536
+
+#include <stdint.h>
 
 extern void memory_Reset(void);
 extern uint8_t memory_Read(uint16_t address);

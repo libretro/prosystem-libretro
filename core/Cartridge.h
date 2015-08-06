@@ -24,6 +24,7 @@
 // ----------------------------------------------------------------------------
 #ifndef CARTRIDGE_H
 #define CARTRIDGE_H
+
 #define CARTRIDGE_TYPE_NORMAL 0
 #define CARTRIDGE_TYPE_SUPERCART 1
 #define CARTRIDGE_TYPE_SUPERCART_LARGE 2
@@ -40,10 +41,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <string>
-#include "Equates.h"
-#include "Memory.h"
-#include "Hash.h"
-#include "Pokey.h"
 
 extern bool cartridge_Load(const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);

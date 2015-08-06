@@ -26,11 +26,8 @@
 #define MARIA_H
 #define MARIA_SURFACE_SIZE 93440
 
-#include "Equates.h"
-#include "Pair.h"
-#include "Memory.h"
+#include <stdint.h>
 #include "Rect.h"
-#include "Sally.h"
 
 extern void maria_Reset(void);
 extern uint32_t maria_RenderScanline(void);

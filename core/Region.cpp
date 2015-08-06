@@ -23,6 +23,7 @@
 // Region.h
 // ----------------------------------------------------------------------------
 #include "Region.h"
+#include "Pokey.h"
 
 uint8_t region_type = REGION_AUTO;
 

@@ -23,6 +23,11 @@
 // Memory.cpp
 // ----------------------------------------------------------------------------
 #include "Memory.h"
+#include "Equates.h"
+#include "Bios.h"
+#include "Cartridge.h"
+#include "Tia.h"
+#include "Riot.h"
 
 uint8_t memory_ram[MEMORY_SIZE] = {0};
 uint8_t memory_rom[MEMORY_SIZE] = {0};

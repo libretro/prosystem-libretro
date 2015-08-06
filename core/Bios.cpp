@@ -22,7 +22,9 @@
 // ----------------------------------------------------------------------------
 // Bios.cpp
 // ----------------------------------------------------------------------------
+#include <stdio.h>
 #include "Bios.h"
+#include "Memory.h"
 #define BIOS_SOURCE "Bios.cpp"
 
 bool bios_enabled = false;
