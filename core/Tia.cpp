@@ -64,35 +64,40 @@ static uint32_t tia_soundCntr = 0;
 // ----------------------------------------------------------------------------
 // ProcessChannel
 // ----------------------------------------------------------------------------
-static void tia_ProcessChannel(uint8_t channel) {
-  tia_poly5Cntr[channel]++;
-  if(tia_poly5Cntr[channel] == TIA_POLY5_SIZE) {
-    tia_poly5Cntr[channel] = 0;
-  }
-  if(((tia_audc[channel] & 2) == 0) || (((tia_audc[channel] & 1) == 0) && TIA_DIV31[tia_poly5Cntr[channel]]) || (((tia_audc[channel] & 1) == 1) && TIA_POLY5[tia_poly5Cntr[channel]])) {
-    if(tia_audc[channel] & 4) {
-      tia_volume[channel] = (!tia_volume[channel])? tia_audv[channel]: 0;
-    }
-    else if(tia_audc[channel] & 8) {
-      if(tia_audc[channel] == 8) {
-        tia_poly9Cntr[channel]++;
-        if(tia_poly9Cntr[channel] == TIA_POLY9_SIZE) {
-          tia_poly9Cntr[channel] = 0;
-        }
-        tia_volume[channel] = (TIA_POLY9[tia_poly9Cntr[channel]])? tia_audv[channel]: 0;
+static void tia_ProcessChannel(uint8_t channel)
+{
+   tia_poly5Cntr[channel]++;
+   if(tia_poly5Cntr[channel] == TIA_POLY5_SIZE)
+      tia_poly5Cntr[channel] = 0;
+
+   if(
+         ((tia_audc[channel] & 2) == 0) 
+         || (((tia_audc[channel] & 1) == 0) && TIA_DIV31[tia_poly5Cntr[channel]]) 
+         || (((tia_audc[channel] & 1) == 1) && TIA_POLY5[tia_poly5Cntr[channel]])
+     )
+   {
+      if(tia_audc[channel] & 4)
+         tia_volume[channel] = (!tia_volume[channel])? tia_audv[channel]: 0;
+      else if(tia_audc[channel] & 8)
+      {
+         if(tia_audc[channel] == 8)
+         {
+            tia_poly9Cntr[channel]++;
+            if(tia_poly9Cntr[channel] == TIA_POLY9_SIZE)
+               tia_poly9Cntr[channel] = 0;
+            tia_volume[channel] = (TIA_POLY9[tia_poly9Cntr[channel]])? tia_audv[channel]: 0;
+         }
+         else
+            tia_volume[channel] = (TIA_POLY5[tia_poly5Cntr[channel]])? tia_audv[channel]: 0;
       }
-      else {
-        tia_volume[channel] = (TIA_POLY5[tia_poly5Cntr[channel]])? tia_audv[channel]: 0;
+      else
+      {
+         tia_poly4Cntr[channel]++;
+         if(tia_poly4Cntr[channel] == TIA_POLY4_SIZE)
+            tia_poly4Cntr[channel] = 0;
+         tia_volume[channel] = (TIA_POLY4[tia_poly4Cntr[channel]])? tia_audv[channel]: 0;
       }
-    }
-    else {
-      tia_poly4Cntr[channel]++;
-      if(tia_poly4Cntr[channel] == TIA_POLY4_SIZE) {
-        tia_poly4Cntr[channel] = 0;
-      }
-      tia_volume[channel] = (TIA_POLY4[tia_poly4Cntr[channel]])? tia_audv[channel]: 0;
-    }
-  }
+   }
 }
 
 

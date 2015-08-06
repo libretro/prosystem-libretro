@@ -46,8 +46,6 @@ void memory_Reset(void)
 // ----------------------------------------------------------------------------
 uint8_t memory_Read(uint16_t address)
 {
-   uint8_t tmp_uint8_t;
-
    switch ( address )
    {
       case INTIM:
@@ -56,9 +54,8 @@ uint8_t memory_Read(uint16_t address)
          return memory_ram[INTIM];
       case INTFLG:
       case INTFLG | 0x2:
-         tmp_uint8_t = memory_ram[INTFLG];
          memory_ram[INTFLG] &= 0x7f;
-         return tmp_uint8_t; 
+         return memory_ram[INTFLG];
       default:
          break;
    }
@@ -156,9 +153,11 @@ void memory_Write(uint16_t address, uint8_t data)
 // ----------------------------------------------------------------------------
 void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data)
 {
+   uint32_t index;
+
    if((address + size) <= MEMORY_SIZE && data != NULL)
    {
-      for(uint32_t index = 0; index < size; index++)
+      for(index = 0; index < size; index++)
       {
          memory_ram[address + index] = data[index];
          memory_rom[address + index] = 1;
@@ -171,9 +170,11 @@ void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data)
 // ----------------------------------------------------------------------------
 void memory_ClearROM(uint16_t address, uint16_t size)
 {
+   uint32_t index;
+
    if((address + size) <= MEMORY_SIZE)
    {
-      for(uint32_t index = 0; index < size; index++)
+      for(index = 0; index < size; index++)
       {
          memory_ram[address + index] = 0;
          memory_rom[address + index] = 0;

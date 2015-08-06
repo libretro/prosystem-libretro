@@ -122,34 +122,25 @@ also see 7800 schematic and RIOT datasheet  */
    {
       memory_ram[INPT0] &= 0x7f;		//new style buttons are always off in this mode
       memory_ram[INPT1] &= 0x7f;
+
       if(input[0x04] || input[0x05])	//in this mode, either button triggers only the legacy button signal
-      {
          memory_ram[INPT4] &= 0x7f;	//this button signal activates by turning off the high bit
-      }
       else
-      {
          memory_ram[INPT4] |= 0x80;
-      }
    }
    else			//first player in 2 button mode
    {
       memory_ram[INPT4] |= 0x80;		//2600 button is always off in this mode
+
       if(input[0x04])					//left button (button 1)
-      {
          memory_ram[INPT1] |= 0x80;	//these buttons activate by turning on the high bit.
-      }
       else
-      {
          memory_ram[INPT1] &= 0x7f;
-      }
+
       if(input[0x05])					//right button (button 2)
-      {
          memory_ram[INPT0] |= 0x80;
-      }
       else
-      {
          memory_ram[INPT0] &= 0x7f;
-      }
    }
 
    /*now repeat for 2nd player*/
@@ -157,34 +148,25 @@ also see 7800 schematic and RIOT datasheet  */
    {
       memory_ram[INPT2] &= 0x7f;
       memory_ram[INPT3] &= 0x7f;
+
       if(input[0x0a] || input[0x0b])
-      {
          memory_ram[INPT5] &= 0x7f;
-      }
       else
-      {
          memory_ram[INPT5] |= 0x80;
-      }
    }
    else
    {
       memory_ram[INPT5] |= 0x80;
+
       if(input[0x0a])
-      {
          memory_ram[INPT3] |= 0x80;
-      }
       else
-      {
          memory_ram[INPT3] &= 0x7f;
-      }
+
       if(input[0x0b])
-      {
          memory_ram[INPT2] |= 0x80;
-      }
       else
-      {
          memory_ram[INPT2] &= 0x7f;
-      }
    }
 }
 
