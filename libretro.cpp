@@ -92,15 +92,18 @@ static void sound_Resample(const uint8_t* source, uint8_t* target, int length)
 
 #define MAX_BUFFER_SIZE 8192
 
-static void sound_Store()
+static void sound_Store(void)
 {
+   unsigned i;
+   uint32_t length;
    uint8_t sample[MAX_BUFFER_SIZE];
+
    memset(sample, 0, MAX_BUFFER_SIZE);
-   uint32_t length = 48000 / prosystem_frequency;
+   length = 48000 / prosystem_frequency;
 
    sound_Resample(tia_buffer, sample, length);
 
-   // Ballblazer, Commando, various homebrew and hacks
+   /* Ballblazer, Commando, various homebrew and hacks */
    if(cartridge_pokey)
    {
       uint32_t index;
@@ -114,8 +117,8 @@ static void sound_Store()
       }
    }
 
-   // Convert 8u to 16s
-   for(int i = 0; i != length; i ++)
+   /* Convert 8u to 16s */
+   for(i = 0; i != length; i ++)
    {
       int16_t sample16 = (sample[i] << 8);
       int16_t frame[2] = {sample16, sample16};
