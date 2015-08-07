@@ -24,6 +24,7 @@
 // ----------------------------------------------------------------------------
 #ifndef MARIA_H
 #define MARIA_H
+
 #define MARIA_SURFACE_SIZE 93440
 
 #include <stdint.h>
