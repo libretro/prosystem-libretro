@@ -45,13 +45,15 @@ static uint32_t cartridge_size = 0;
 // ----------------------------------------------------------------------------
 static bool cartridge_HasHeader(const uint8_t* header)
 {
-  const char HEADER_ID[ ] = {"ATARI7800"};
-  for(int index = 0; index < 9; index++)
-  {
-    if(HEADER_ID[index] != header[index + 1])
-      return false;
-  }
-  return true;
+   unsigned index;
+   const char HEADER_ID[ ] = {"ATARI7800"};
+
+   for(index = 0; index < 9; index++)
+   {
+      if(HEADER_ID[index] != header[index + 1])
+         return false;
+   }
+   return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -59,13 +61,15 @@ static bool cartridge_HasHeader(const uint8_t* header)
 // ----------------------------------------------------------------------------
 static bool cartridge_CC2(const uint8_t* header)
 {
-  const char HEADER_ID[ ] = {">>"};
-  for(int index = 0; index < 2; index++)
-  {
-    if(HEADER_ID[index] != header[index+1])
-      return false;
-  }
-  return true;
+   unsigned index;
+   const char HEADER_ID[ ] = {">>"};
+
+   for(index = 0; index < 2; index++)
+   {
+      if(HEADER_ID[index] != header[index+1])
+         return false;
+   }
+   return true;
 }
 
 // ----------------------------------------------------------------------------

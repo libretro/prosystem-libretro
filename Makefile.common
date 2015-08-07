@@ -1,20 +1,20 @@
-INCFLAGS += -I$(CORE_DIR) -I$(CORE_DIR)/core
+INCFLAGS += -I$(CORE_DIR)
 
 SOURCES_CXX := \
-	$(CORE_DIR)/core/Common.cpp \
-	$(CORE_DIR)/core/Database.cpp \
+	$(CORE_DIR)/Common.cpp \
+	$(CORE_DIR)/Database.cpp \
 	$(CORE_DIR)/libretro.cpp
 
 SOURCES_C := \
-	$(CORE_DIR)/core/Bios.c \
-	$(CORE_DIR)/core/Cartridge.c \
-	$(CORE_DIR)/core/Hash.c \
-	$(CORE_DIR)/core/Maria.c \
-	$(CORE_DIR)/core/Memory.c \
-	$(CORE_DIR)/core/Palette.c \
-	$(CORE_DIR)/core/Pokey.c \
-	$(CORE_DIR)/core/ProSystem.c \
-	$(CORE_DIR)/core/Region.c \
-	$(CORE_DIR)/core/Riot.c \
-	$(CORE_DIR)/core/Sally.c \
-	$(CORE_DIR)/core/Tia.c
+	$(CORE_DIR)/Bios.c \
+	$(CORE_DIR)/Cartridge.c \
+	$(CORE_DIR)/Hash.c \
+	$(CORE_DIR)/Maria.c \
+	$(CORE_DIR)/Memory.c \
+	$(CORE_DIR)/Palette.c \
+	$(CORE_DIR)/Pokey.c \
+	$(CORE_DIR)/ProSystem.c \
+	$(CORE_DIR)/Region.c \
+	$(CORE_DIR)/Riot.c \
+	$(CORE_DIR)/Sally.c \
+	$(CORE_DIR)/Tia.c

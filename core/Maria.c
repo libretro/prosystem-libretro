@@ -249,17 +249,20 @@ static void maria_StoreLineRAM(void)
 
       if(!indirect)
       {
+         int index;
          maria_pp.b.h += maria_offset;
-         for(int index = 0; index < width; index++)
+         for(index = 0; index < width; index++)
          {
             maria_cycles += 3;
             maria_StoreGraphic( );
          }
       }
-      else {
+      else
+      {
+         int index;
          uint8_t cwidth = memory_ram[CTRL] & 16;
          pair basePP = maria_pp;
-         for(int index = 0; index < width; index++)
+         for(index = 0; index < width; index++)
          {
             maria_cycles += 3;
             maria_pp.b.l = memory_ram[basePP.w++];

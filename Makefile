@@ -113,7 +113,7 @@ else
    LDFLAGS += -static-libgcc -static-libstdc++ -lwinmm
 endif
 
-CORE_DIR := .
+CORE_DIR := core
 
 include Makefile.common
 
