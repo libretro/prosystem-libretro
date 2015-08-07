@@ -39,7 +39,7 @@ static std::string database_GetValue(std::string entry)
 // ----------------------------------------------------------------------------
 // Initialize
 // ----------------------------------------------------------------------------
-void database_Initialize( )
+void database_Initialize(void)
 {
    database_filename = common_defaultPath + "ProSystem.dat";
 }
