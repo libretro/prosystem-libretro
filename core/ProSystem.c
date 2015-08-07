@@ -244,8 +244,8 @@ bool prosystem_Load(const char *buffer)
 // ----------------------------------------------------------------------------
 void prosystem_Pause(bool pause)
 {
-  if(prosystem_active)
-    prosystem_paused = pause;
+   if(prosystem_active)
+      prosystem_paused = pause;
 }
 
 // ----------------------------------------------------------------------------

@@ -47,7 +47,7 @@ void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_c
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
-static void display_ResetPalette32()
+static void display_ResetPalette32(void)
 {
    for(uint32_t index = 0; index < 256; index++)
    {
