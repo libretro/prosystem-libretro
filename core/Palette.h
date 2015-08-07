@@ -28,12 +28,20 @@
 #define PALETTE_SIZE 768
 
 #include <stdint.h>
-#include <string>
+#include <boolean.h>
 
-extern bool palette_Load(std::string filename);
-extern void palette_Load(const uint8_t* data);
-extern std::string palette_filename;
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern bool palette_Load(const char *filename);
+extern void palette_Load2(const uint8_t* data);
+extern char palette_filename[1024];
 extern uint8_t palette_data[PALETTE_SIZE];
 extern bool palette_default;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

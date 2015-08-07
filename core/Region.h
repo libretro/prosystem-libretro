@@ -31,13 +31,15 @@
 
 #include <stdint.h>
 
-#include "Cartridge.h"
-#include "ProSystem.h"
-#include "Maria.h"
-#include "Palette.h"
-#include "Tia.h"
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void region_Reset(void);
 extern uint8_t region_type;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

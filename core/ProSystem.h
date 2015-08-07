@@ -26,10 +26,13 @@
 #define PRO_SYSTEM_H
 
 #include <stdint.h>
-#include <string>
 #include <stdio.h>
 
 #include <boolean.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void prosystem_Reset(void);
 extern void prosystem_ExecuteFrame(const uint8_t* input);
@@ -44,5 +47,9 @@ extern uint16_t prosystem_frequency;
 extern uint8_t prosystem_frame;
 extern uint16_t prosystem_scanlines;
 extern uint32_t prosystem_cycles;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

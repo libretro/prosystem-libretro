@@ -23,10 +23,11 @@
 // Palette.h
 // ----------------------------------------------------------------------------
 #include <stdio.h>
+#include <string.h>
 #include "Palette.h"
-#define PALETTE_SOURCE "Palette.cpp"
+#define PALETTE_SOURCE "Palette.c"
 
-std::string palette_filename;
+char palette_filename[1024];
 bool palette_default = true;
 uint8_t palette_data[PALETTE_SIZE] = {
 0x00,0x00,0x00,0x25,0x25,0x25,0x34,0x34,0x34,0x4F,0x4F,0x4F,
@@ -98,13 +99,9 @@ uint8_t palette_data[PALETTE_SIZE] = {
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool palette_Load(std::string filename)
+bool palette_Load(const char * filename)
 {
-   FILE *file;
-   if(filename.empty( ) || filename.length( ) == 0)
-      return false;
-
-   file = fopen(filename.c_str( ), "rb");
+   FILE *file = fopen(filename, "rb");
    if(file == NULL)
       return false;
 
@@ -115,14 +112,14 @@ bool palette_Load(std::string filename)
    }
 
    fclose(file);
-   palette_filename = filename;
+   strcpy(palette_filename, filename);
    return true;
 }
 
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-void palette_Load(const uint8_t* data)
+void palette_Load2(const uint8_t* data)
 {
    int index;
    for(index = 0; index < PALETTE_SIZE; index++)

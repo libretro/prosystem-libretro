@@ -3,9 +3,6 @@ INCFLAGS += -I$(CORE_DIR) -I$(CORE_DIR)/core
 SOURCES_CXX := \
 	$(CORE_DIR)/core/Common.cpp \
 	$(CORE_DIR)/core/Database.cpp \
-	$(CORE_DIR)/core/Palette.cpp \
-	$(CORE_DIR)/core/ProSystem.cpp \
-	$(CORE_DIR)/core/Region.cpp \
 	$(CORE_DIR)/libretro.cpp
 
 SOURCES_C := \
@@ -14,7 +11,10 @@ SOURCES_C := \
 	$(CORE_DIR)/core/Hash.c \
 	$(CORE_DIR)/core/Maria.c \
 	$(CORE_DIR)/core/Memory.c \
+	$(CORE_DIR)/core/Palette.c \
 	$(CORE_DIR)/core/Pokey.c \
+	$(CORE_DIR)/core/ProSystem.c \
+	$(CORE_DIR)/core/Region.c \
 	$(CORE_DIR)/core/Riot.c \
 	$(CORE_DIR)/core/Sally.c \
 	$(CORE_DIR)/core/Tia.c
