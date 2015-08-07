@@ -29,6 +29,10 @@
 #include <stdint.h>
 #include "Rect.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern void maria_Reset(void);
 extern uint32_t maria_RenderScanline(void);
 extern void maria_Clear(void);
@@ -37,5 +41,9 @@ extern rect maria_displayArea;
 extern rect maria_visibleArea;
 extern uint8_t maria_surface[MARIA_SURFACE_SIZE];
 extern uint16_t maria_scanline;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -27,28 +27,40 @@
 
 #include <stdint.h>
 
+#include <boolean.h>
+#include <retro_inline.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct Rects
 {
    uint32_t left;
    uint32_t top;
    uint32_t right;
    uint32_t bottom;
-
-   uint32_t GetArea()
-   {
-      return GetLength( ) * GetHeight( );
-   }
-
-   uint32_t GetLength()
-   {
-      return (right - left) + 1;
-   }
-
-   uint32_t GetHeight()
-   {
-      return (bottom - top) + 1;
-   }
 };
 
-typedef Rects rect;
+static INLINE uint32_t Rect_GetLength(struct Rects *rect)
+{
+   return (rect->right - rect->left) + 1;
+}
+
+static INLINE uint32_t Rect_GetHeight(struct Rects *rect)
+{
+   return (rect->bottom - rect->top) + 1;
+}
+
+static INLINE uint32_t Rect_GetArea(struct Rects *rect)
+{
+   return Rect_GetLength(rect) * Rect_GetHeight(rect);
+}
+
+typedef struct Rects rect;
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

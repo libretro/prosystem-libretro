@@ -391,10 +391,10 @@ void retro_run(void)
 
    prosystem_ExecuteFrame(keyboard_data); // wants input
 
-   videoWidth = maria_visibleArea.GetLength();
-   videoHeight = maria_visibleArea.GetHeight();
+   videoWidth = Rect_GetLength(&maria_visibleArea);
+   videoHeight = Rect_GetHeight(&maria_visibleArea);
 
-   const uint8_t *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * maria_visibleArea.GetLength());
+   const uint8_t *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * Rect_GetLength(&maria_visibleArea));
 
    uint32_t *surface = (uint32_t*)videoBuffer;
    uint32_t pitch = 320;

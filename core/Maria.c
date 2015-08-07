@@ -47,9 +47,9 @@ static uint8_t maria_h16;
 static uint8_t maria_wmode;
 
 // ----------------------------------------------------------------------------
-// StoreCell
+// StoreCell2
 // ----------------------------------------------------------------------------
-static void maria_StoreCell(uint8_t data)
+static void maria_StoreCell2(uint8_t data)
 {
    if(maria_horizontal < MARIA_LINERAM_SIZE)
    {
@@ -133,17 +133,17 @@ static void maria_StoreGraphic(void)
    {
       if(maria_IsHolyDMA( ))
       {
-         maria_StoreCell(0);
-         maria_StoreCell(0);
-         maria_StoreCell(0);
-         maria_StoreCell(0);
+         maria_StoreCell2(0);
+         maria_StoreCell2(0);
+         maria_StoreCell2(0);
+         maria_StoreCell2(0);
       }
       else
       {
-         maria_StoreCell((data & 192) >> 6);
-         maria_StoreCell((data & 48) >> 4);
-         maria_StoreCell((data & 12) >> 2);
-         maria_StoreCell(data & 3);
+         maria_StoreCell2((data & 192) >> 6);
+         maria_StoreCell2((data & 48) >> 4);
+         maria_StoreCell2((data & 12) >> 2);
+         maria_StoreCell2(data & 3);
       }
    }
    maria_pp.w++;
@@ -313,7 +313,7 @@ uint32_t maria_RenderScanline(void)
             sally_ExecuteNMI( );
       }
       else if(maria_scanline >= maria_visibleArea.top && maria_scanline <= maria_visibleArea.bottom)
-         maria_WriteLineRAM(maria_surface + ((maria_scanline - maria_displayArea.top) * maria_displayArea.GetLength( )));
+         maria_WriteLineRAM(maria_surface + ((maria_scanline - maria_displayArea.top) * Rect_GetLength(&maria_displayArea)));
 
       if(maria_scanline != maria_displayArea.bottom)
       {
