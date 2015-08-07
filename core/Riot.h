@@ -26,6 +26,11 @@
 #define RIOT_H
 
 #include <stdint.h>
+#include <boolean.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void riot_Reset(void);
 extern void riot_SetInput(const uint8_t* input);
@@ -37,5 +42,9 @@ extern void riot_UpdateTimer(uint8_t cycles);
 extern bool riot_timing;
 extern uint16_t riot_timer;
 extern uint8_t riot_intervals;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

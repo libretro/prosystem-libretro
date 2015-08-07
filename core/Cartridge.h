@@ -40,6 +40,11 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <boolean.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern bool cartridge_Load(const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);
@@ -54,5 +59,9 @@ extern bool cartridge_pokey;
 extern uint8_t cartridge_controller[2];
 extern uint8_t cartridge_bank;
 extern uint32_t cartridge_flags;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

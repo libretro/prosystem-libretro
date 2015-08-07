@@ -27,6 +27,10 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 union Pair 
 {
    uint16_t w;
@@ -42,6 +46,10 @@ union Pair
    } b;
 };
 
-typedef Pair pair;
+typedef union Pair pair;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

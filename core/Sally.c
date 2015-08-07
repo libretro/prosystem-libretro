@@ -49,7 +49,7 @@ struct Flag
    uint8_t N;
 };
 
-static const Flag SALLY_FLAG = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+static const struct Flag SALLY_FLAG = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 
 struct Vector
 {
@@ -57,9 +57,9 @@ struct Vector
    uint16_t L;
 };
 
-static const Vector SALLY_RES = {65533, 65532};
-static const Vector SALLY_NMI = {65531, 65530};
-static const Vector SALLY_IRQ = {65535, 65534}; 
+static const struct Vector SALLY_RES = {65533, 65532};
+static const struct Vector SALLY_NMI = {65531, 65530};
+static const struct Vector SALLY_IRQ = {65535, 65534}; 
 
 static const uint8_t SALLY_CYCLES[256] = {
 	7,6,0,0,0,3,5,0,3,2,2,0,0,4,6,0,

@@ -26,6 +26,11 @@
 #define BIOS_H
 
 #include <stdint.h>
+#include <boolean.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern bool bios_Load(const char *filename);
 extern bool bios_IsLoaded(void);
@@ -33,5 +38,9 @@ extern void bios_Store(void);
 extern void bios_Release(void);
 
 extern bool bios_enabled;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
