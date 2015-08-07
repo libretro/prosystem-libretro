@@ -37,8 +37,6 @@
 #define PRO_SYSTEM_STATE_HEADER "PRO-SYSTEM STATE"
 #define PRO_SYSTEM_SOURCE "ProSystem.cpp"
 
-bool prosystem_active = false;
-bool prosystem_paused = false;
 uint16_t prosystem_frequency = 60;
 uint8_t prosystem_frame = 0;
 uint16_t prosystem_scanlines = 262;
@@ -52,7 +50,6 @@ void prosystem_Reset(void)
    if(!cartridge_IsLoaded())
       return;
 
-   prosystem_paused = false;
    prosystem_frame = 0;
    sally_Reset();
    region_Reset( );
@@ -71,7 +68,6 @@ void prosystem_Reset(void)
       cartridge_Store( );
 
    prosystem_cycles = sally_ExecuteRES( );
-   prosystem_active = true;
 }
 
 // ----------------------------------------------------------------------------
@@ -240,21 +236,10 @@ bool prosystem_Load(const char *buffer)
 }
 
 // ----------------------------------------------------------------------------
-// Pause
-// ----------------------------------------------------------------------------
-void prosystem_Pause(bool pause)
-{
-   if(prosystem_active)
-      prosystem_paused = pause;
-}
-
-// ----------------------------------------------------------------------------
 // Close
 // ----------------------------------------------------------------------------
 void prosystem_Close(void)
 {
-   prosystem_active = false;
-   prosystem_paused = false;
    cartridge_Release( );
    maria_Reset( );
    maria_Clear( );

@@ -38,11 +38,8 @@ extern void prosystem_Reset(void);
 extern void prosystem_ExecuteFrame(const uint8_t* input);
 extern bool prosystem_Save(char *buffer, bool compress);
 extern bool prosystem_Load(const char *buffer);
-extern void prosystem_Pause(bool pause);
 extern void prosystem_Close(void);
 
-extern bool prosystem_active;
-extern bool prosystem_paused;
 extern uint16_t prosystem_frequency;
 extern uint8_t prosystem_frame;
 extern uint16_t prosystem_scanlines;
