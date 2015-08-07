@@ -191,7 +191,7 @@ void region_Reset(void)
       maria_displayArea = REGION_DISPLAY_AREA_PAL;
       maria_visibleArea = REGION_VISIBLE_AREA_PAL;
       if(palette_default)
-         palette_Load2(REGION_PALETTE_PAL);  // Added check for default - bberlin
+         palette_Load(REGION_PALETTE_PAL);  // Added check for default - bberlin
       prosystem_frequency = REGION_FREQUENCY_PAL;
       prosystem_scanlines = REGION_SCANLINES_PAL;
       tia_size = 624;
@@ -202,7 +202,7 @@ void region_Reset(void)
       maria_displayArea = REGION_DISPLAY_AREA_NTSC;
       maria_visibleArea = REGION_VISIBLE_AREA_NTSC;
       if(palette_default)
-         palette_Load2(REGION_PALETTE_NTSC);  // Added check for default - bberlin
+         palette_Load(REGION_PALETTE_NTSC);  // Added check for default - bberlin
       prosystem_frequency = REGION_FREQUENCY_NTSC;
       prosystem_scanlines = REGION_SCANLINES_NTSC;
       tia_size = 524;

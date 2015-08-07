@@ -34,9 +34,7 @@
 extern "C" {
 #endif
 
-extern bool palette_Load(const char *filename);
-extern void palette_Load2(const uint8_t* data);
-extern char palette_filename[1024];
+extern void palette_Load(const uint8_t* data);
 extern uint8_t palette_data[PALETTE_SIZE];
 extern bool palette_default;
 
