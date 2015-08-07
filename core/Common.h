@@ -30,9 +30,9 @@
 #include <stdlib.h>
 
 extern std::string common_Remove(std::string target, char value);
-extern uint32_t common_ParseUint(std::string text);
-extern uint16_t common_ParseWord(std::string text);
-extern uint8_t common_ParseByte(std::string text);
+extern uint32_t common_ParseUint(const char *text);
+extern uint16_t common_ParseWord(const char *text);
+extern uint8_t common_ParseByte(const char *text);
 extern bool common_ParseBool(std::string text);
 extern std::string common_defaultPath;
 

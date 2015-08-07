@@ -72,12 +72,12 @@ bool database_Load(const char *digest)
                entry[index] = common_Remove(entry[index], '\r');
             }
 
-            cartridge_type = common_ParseByte(database_GetValue(entry[1]));
+            cartridge_type = common_ParseByte(database_GetValue(entry[1]).c_str());
             cartridge_pokey = common_ParseBool(database_GetValue(entry[2]));
-            cartridge_controller[0] = common_ParseByte(database_GetValue(entry[3]));
-            cartridge_controller[1] = common_ParseByte(database_GetValue(entry[4]));
-            cartridge_region = common_ParseByte(database_GetValue(entry[5]));
-            cartridge_flags = common_ParseUint(database_GetValue(entry[6]));
+            cartridge_controller[0] = common_ParseByte(database_GetValue(entry[3]).c_str());
+            cartridge_controller[1] = common_ParseByte(database_GetValue(entry[4]).c_str());
+            cartridge_region = common_ParseByte(database_GetValue(entry[5]).c_str());
+            cartridge_flags = common_ParseUint(database_GetValue(entry[6]).c_str());
             break;
          }
       }    

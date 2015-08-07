@@ -31,25 +31,25 @@ std::string common_defaultPath;
 // ----------------------------------------------------------------------------
 // ParseUint
 // ----------------------------------------------------------------------------
-uint32_t common_ParseUint(std::string text)
+uint32_t common_ParseUint(const char *text)
 {
-   return (uint32_t)atoi(text.c_str( ));
+   return (uint32_t)atoi(text);
 }
 
 // ----------------------------------------------------------------------------
 // ParseWord
 // ----------------------------------------------------------------------------
-uint16_t common_ParseWord(std::string text)
+uint16_t common_ParseWord(const char *text)
 {
-   return (uint16_t)atoi(text.c_str( ));
+   return (uint16_t)atoi(text);
 }
 
 // ----------------------------------------------------------------------------
 // ParseByte
 // ----------------------------------------------------------------------------
-uint8_t common_ParseByte(std::string text)
+uint8_t common_ParseByte(const char *text)
 {
-   return (uint8_t)atoi(text.c_str( ));
+   return (uint8_t)atoi(text);
 }
 
 // ----------------------------------------------------------------------------
