@@ -4,7 +4,6 @@ SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/core/Cartridge.cpp \
 	$(CORE_DIR)/core/Common.cpp \
 	$(CORE_DIR)/core/Database.cpp \
-	$(CORE_DIR)/core/Hash.cpp \
 	$(CORE_DIR)/core/Maria.cpp \
 	$(CORE_DIR)/core/Memory.cpp \
 	$(CORE_DIR)/core/Palette.cpp \
@@ -15,5 +14,6 @@ SOURCES_CXX := $(CORE_DIR)/core/Bios.cpp \
 	$(CORE_DIR)/libretro.cpp
 
 SOURCES_C := \
+	$(CORE_DIR)/core/Hash.c \
 	$(CORE_DIR)/core/Pokey.c \
 	$(CORE_DIR)/core/Tia.c

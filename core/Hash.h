@@ -27,8 +27,15 @@
 
 #include <stdint.h>
 #include <stdlib.h>
-#include <string>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void hash_Compute(char *s, const uint8_t* source, uint32_t length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

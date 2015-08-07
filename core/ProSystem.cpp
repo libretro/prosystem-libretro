@@ -190,11 +190,9 @@ bool prosystem_Load(const char *buffer)
 
    for(index = 0; index < 16; index++)
    {
+      /* File is not a valid ProSystem save state. */
       if(buffer[offset + index] != PRO_SYSTEM_STATE_HEADER[index])
-      {
-         /* File is not a valid ProSystem save state. */
          return false;
-      }
    }
    offset += 16;
    uint8_t version = buffer[offset++];
@@ -209,11 +207,9 @@ bool prosystem_Load(const char *buffer)
 
    offset += 32;
 
+   /* Does not match loaded cartridge digest? */
    if(!strcmp(cartridge_digest, digest))
-   {
-      //logger_LogError("Load state digest [" + std::string(digest) + "] does not match loaded cartridge digest [" + cartridge_digest + "].", PRO_SYSTEM_SOURCE);
       return false;
-   }
 
    sally_a = buffer[offset++];
    sally_x = buffer[offset++];
@@ -231,11 +227,9 @@ bool prosystem_Load(const char *buffer)
 
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
    {
+      /* Save state file has an invalid size. */
       if(size != 32829)
-      {
-         /* Save state file has an invalid size. */
          return false;
-      }
 
       for(index = 0; index < 16384; index++)
          memory_ram[16384 + index] = buffer[offset + index];
