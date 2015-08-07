@@ -72,7 +72,6 @@ bool database_Load(const char *digest)
                entry[index] = common_Remove(entry[index], '\r');
             }
 
-            cartridge_title = database_GetValue(entry[0]);
             cartridge_type = common_ParseByte(database_GetValue(entry[1]));
             cartridge_pokey = common_ParseBool(database_GetValue(entry[2]));
             cartridge_controller[0] = common_ParseByte(database_GetValue(entry[3]));

@@ -29,12 +29,7 @@
 #include "Pokey.h"
 #define CARTRIDGE_SOURCE "Cartridge.cpp"
 
-std::string cartridge_title;
-std::string cartridge_description;
-std::string cartridge_year;
-std::string cartridge_maker;
 char cartridge_digest[33];
-std::string cartridge_filename;
 uint8_t cartridge_type;
 uint8_t cartridge_region;
 bool cartridge_pokey;
@@ -112,12 +107,6 @@ static void cartridge_WriteBank(uint16_t address, uint8_t bank)
 // ----------------------------------------------------------------------------
 static void cartridge_ReadHeader(const uint8_t* header)
 {
-   char temp[33] = {0};
-
-   for(int index = 0; index < 32; index++)
-      temp[index] = header[index + 17];  
-   cartridge_title = temp;
-
    cartridge_size  = header[49] << 24;
    cartridge_size |= header[50] << 16;
    cartridge_size |= header[51] << 8;

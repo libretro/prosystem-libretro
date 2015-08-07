@@ -40,7 +40,6 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <string>
 
 extern bool cartridge_Load(const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);
@@ -49,11 +48,6 @@ extern void cartridge_Write(uint16_t address, uint8_t data);
 extern bool cartridge_IsLoaded(void);
 extern void cartridge_Release(void);
 extern char cartridge_digest[33];
-extern std::string cartridge_title;
-extern std::string cartridge_description;
-extern std::string cartridge_year;
-extern std::string cartridge_maker;
-extern std::string cartridge_filename;
 extern uint8_t cartridge_type;
 extern uint8_t cartridge_region;
 extern bool cartridge_pokey;
