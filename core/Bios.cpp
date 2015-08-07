@@ -23,6 +23,7 @@
 // Bios.cpp
 // ----------------------------------------------------------------------------
 #include <stdio.h>
+#include <stdlib.h>
 #include "Bios.h"
 #include "Memory.h"
 #define BIOS_SOURCE "Bios.cpp"
@@ -60,7 +61,7 @@ bool bios_Load(const char *filename)
       return false;
    }
 
-   bios_data = new uint8_t[bios_size];
+   bios_data = (uint8_t*)calloc(1, bios_size * sizeof(uint8_t));
    if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file))
    {
       fclose(file);
@@ -86,12 +87,10 @@ bool bios_IsLoaded(void)
 // ----------------------------------------------------------------------------
 void bios_Release(void)
 {
-   if (!bios_data)
-      return;
-
-   delete [ ] bios_data;
-   bios_size = 0;
+   if (bios_data)
+      free(bios_data);
    bios_data = NULL;
+   bios_size = 0;
 }
 
 // ----------------------------------------------------------------------------
