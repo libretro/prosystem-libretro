@@ -130,7 +130,7 @@ static void sound_Store(void)
    }
 }
 
-static void update_input()
+static void update_input(void)
 {
    // ----------------------------------------------------------------------------
    // SetInput
@@ -156,9 +156,6 @@ static void update_input()
    // | 16       | Console      | Right Difficulty
    // +----------+--------------+-------------------------------------------------
 
-   if (!input_poll_cb)
-      return;
-
    input_poll_cb();
 
    keyboard_data[0]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
@@ -180,7 +177,6 @@ static void update_input()
    keyboard_data[14] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START);
    keyboard_data[15] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L);
    keyboard_data[16] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R);
-
 }
 
 /************************************
@@ -411,7 +407,7 @@ void retro_run(void)
          surface[x + 3] = display_palette32[buffer[x + 3]];
       }
       surface += pitch;
-      buffer += videoWidth;
+      buffer  += videoWidth;
    }
 
    video_cb(videoBuffer, videoWidth, videoHeight, videoWidth << 2);
