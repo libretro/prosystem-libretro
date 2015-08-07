@@ -33,7 +33,7 @@ std::string cartridge_title;
 std::string cartridge_description;
 std::string cartridge_year;
 std::string cartridge_maker;
-std::string cartridge_digest;
+char cartridge_digest[33];
 std::string cartridge_filename;
 uint8_t cartridge_type;
 uint8_t cartridge_region;
@@ -159,6 +159,7 @@ static void cartridge_ReadHeader(const uint8_t* header)
 bool cartridge_Load(const uint8_t* data, uint32_t size)
 {
    int index;
+   char buffer[33]     = {0};
    uint8_t header[128] = {0};
 
    if(size <= 128)
@@ -195,7 +196,7 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
    for(index = 0; index < cartridge_size; index++)
       cartridge_buffer[index] = data[index + offset];
 
-   cartridge_digest = hash_Compute(cartridge_buffer, cartridge_size);
+   hash_Compute(buffer, cartridge_buffer, cartridge_size);
 
    return true;
 }

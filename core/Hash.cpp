@@ -154,7 +154,7 @@ static void hash_Transform(uint32_t out[4], uint32_t in[16])
 // ----------------------------------------------------------------------------
 // Compute
 // ----------------------------------------------------------------------------
-std::string hash_Compute(const uint8_t* source, uint32_t length)
+void hash_Compute(char *s, const uint8_t* source, uint32_t length)
 {
    uint32_t buffer1[4] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476};
    uint32_t buffer2[2] = {0};
@@ -230,8 +230,5 @@ std::string hash_Compute(const uint8_t* source, uint32_t length)
    for(uint32_t index = 0; index < 16; index++)
       digest[index] = bufferptr[index];
 
-   char buffer[33] = {0};
-   sprintf(buffer, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]);
-   return std::string(buffer);
+   sprintf(s, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]);
 }
-

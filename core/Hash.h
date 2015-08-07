@@ -29,6 +29,6 @@
 #include <stdlib.h>
 #include <string>
 
-extern std::string hash_Compute(const uint8_t* source, uint32_t length);
+extern void hash_Compute(char *s, const uint8_t* source, uint32_t length);
 
 #endif

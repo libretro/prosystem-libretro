@@ -48,7 +48,7 @@ extern void cartridge_StoreBank(uint8_t bank);
 extern void cartridge_Write(uint16_t address, uint8_t data);
 extern bool cartridge_IsLoaded(void);
 extern void cartridge_Release(void);
-extern std::string cartridge_digest;
+extern char cartridge_digest[33];
 extern std::string cartridge_title;
 extern std::string cartridge_description;
 extern std::string cartridge_year;
