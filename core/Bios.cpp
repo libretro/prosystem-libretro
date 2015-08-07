@@ -61,7 +61,7 @@ bool bios_Load(const char *filename)
       return false;
    }
 
-   bios_data = (uint8_t*)calloc(1, bios_size * sizeof(uint8_t));
+   bios_data = (uint8_t*)malloc(bios_size * sizeof(uint8_t));
    if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file))
    {
       fclose(file);

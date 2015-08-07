@@ -190,7 +190,7 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
    else
       cartridge_size = size;
 
-   cartridge_buffer = new uint8_t[cartridge_size];
+   cartridge_buffer = (uint8_t*)malloc(cartridge_size * sizeof(uint8_t));
 
    for(index = 0; index < cartridge_size; index++)
       cartridge_buffer[index] = data[index + offset];
@@ -356,10 +356,8 @@ bool cartridge_IsLoaded(void)
 // ----------------------------------------------------------------------------
 void cartridge_Release(void)
 {
-   if(!cartridge_buffer)
-      return;
-
-   delete [ ] cartridge_buffer;
-   cartridge_size = 0;
+   if(cartridge_buffer)
+      free(cartridge_buffer);
    cartridge_buffer = NULL;
+   cartridge_size   = 0;
 }
