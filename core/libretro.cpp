@@ -387,26 +387,28 @@ void retro_reset(void)
 
 void retro_run(void)
 {
+   uint32_t x, y;
+   const uint8_t *buffer;
+   uint32_t *surface, pitch;
+
    update_input();
 
    prosystem_ExecuteFrame(keyboard_data); // wants input
 
-   videoWidth = Rect_GetLength(&maria_visibleArea);
+   videoWidth  = Rect_GetLength(&maria_visibleArea);
    videoHeight = Rect_GetHeight(&maria_visibleArea);
+   buffer      = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * Rect_GetLength(&maria_visibleArea));
+   surface     = (uint32_t*)videoBuffer;
+   pitch       = 320;
 
-   const uint8_t *buffer = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * Rect_GetLength(&maria_visibleArea));
-
-   uint32_t *surface = (uint32_t*)videoBuffer;
-   uint32_t pitch = 320;
-
-   for(uint32_t indexY = 0; indexY < videoHeight; indexY++)
+   for(y = 0; y < videoHeight; y++)
    {
-      for(uint32_t indexX = 0; indexX < videoWidth; indexX += 4)
+      for(x = 0; x < videoWidth; x += 4)
       {
-         surface[indexX + 0] = display_palette32[buffer[indexX + 0]];
-         surface[indexX + 1] = display_palette32[buffer[indexX + 1]];
-         surface[indexX + 2] = display_palette32[buffer[indexX + 2]];
-         surface[indexX + 3] = display_palette32[buffer[indexX + 3]];
+         surface[x + 0] = display_palette32[buffer[x + 0]];
+         surface[x + 1] = display_palette32[buffer[x + 1]];
+         surface[x + 2] = display_palette32[buffer[x + 2]];
+         surface[x + 3] = display_palette32[buffer[x + 3]];
       }
       surface += pitch;
       buffer += videoWidth;
