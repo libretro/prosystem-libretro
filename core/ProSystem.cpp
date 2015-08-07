@@ -23,6 +23,7 @@
 // ProSystem.cpp
 // ----------------------------------------------------------------------------
 #include "ProSystem.h"
+#include <string.h>
 #include "Equates.h"
 #include "Bios.h"
 #include "Cartridge.h"
@@ -208,7 +209,7 @@ bool prosystem_Load(const char *buffer)
 
    offset += 32;
 
-   if(cartridge_digest != std::string(digest))
+   if(!strcmp(cartridge_digest, digest))
    {
       //logger_LogError("Load state digest [" + std::string(digest) + "] does not match loaded cartridge digest [" + cartridge_digest + "].", PRO_SYSTEM_SOURCE);
       return false;
