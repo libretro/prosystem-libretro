@@ -131,6 +131,7 @@ void pokey_Reset(void)
 // ----------------------------------------------------------------------------
 void pokey_SetRegister(uint16_t address, uint8_t value)
 {
+   uint8_t channel;
    uint8_t channelMask;
    uint32_t newValue = 0;
 
@@ -269,7 +270,7 @@ void pokey_SetRegister(uint16_t address, uint8_t value)
       }
    }
 
-   for(uint8_t channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
+   for(channel = POKEY_CHANNEL1; channel <= POKEY_CHANNEL4; channel++)
    {
       if(channelMask & (1 << channel))
       {
