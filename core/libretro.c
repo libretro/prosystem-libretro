@@ -124,7 +124,9 @@ static void sound_Store(void)
       int16_t frame[2] = {sample16, sample16};
 
       audio_cb((int16_t)frame[0], (int16_t)frame[1]);
-      //audio_batch_cb(frame, 2);
+#if 0
+      audio_batch_cb(frame, 2);
+#endif
    }
 }
 
@@ -271,22 +273,31 @@ bool retro_load_game(const struct retro_game_info *info)
 
    memset(keyboard_data, 0, sizeof(keyboard_data));
 
-   // Difficulty switches: Left position = (B)eginner, Right position = (A)dvanced
-   // Left difficulty switch defaults to left position, "(B)eginner"
+   /* Difficulty switches: 
+    * Left position = (B)eginner, Right position = (A)dvanced
+    * Left difficulty switch defaults to left position, "(B)eginner"
+    */
    keyboard_data[15] = 1;
 
-   // Right difficulty switch defaults to right position, "(A)dvanced", which fixes Tower Toppler
+   /* Right difficulty switch defaults to right position,
+    * "(A)dvanced", which fixes Tower Toppler
+    */
    keyboard_data[16] = 0;
-
-   const char *system_directory_c = NULL;
 
    if (cartridge_Load((const uint8_t*)info->data, info->size))
    {
       char biospath[512];
+      const char *system_directory_c = NULL;
+#ifdef _WIN32
+      char slash = '\\';
+#else
+      char slash = '/';
+#endif
+
       environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
 
-      // BIOS is optional
-      sprintf(biospath, "%s/%s", system_directory_c, "7800 BIOS (U).rom");
+      /* BIOS is optional */
+      sprintf(biospath, "%s%c%s", system_directory_c, slash, "7800 BIOS (U).rom");
       if (bios_Load(biospath))
          bios_enabled = true;
 
