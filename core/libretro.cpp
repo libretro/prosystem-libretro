@@ -197,7 +197,7 @@ void retro_get_system_info(struct retro_system_info *info)
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    memset(info, 0, sizeof(*info));
-   info->timing.fps            = cartridge_region == REGION_NTSC ? 60 : 50;
+   info->timing.fps            = (cartridge_region == REGION_NTSC) ? 60 : 50;
    info->timing.sample_rate    = 48000;
    info->geometry.base_width   = videoWidth;
    info->geometry.base_height  = videoHeight;
@@ -239,66 +239,66 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
-    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
-    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
-    {
-        if (log_cb)
-            log_cb(RETRO_LOG_INFO, "[ProSystem]: XRGB8888 is not supported.\n");
-        return false;
-    }
+   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   {
+      if (log_cb)
+         log_cb(RETRO_LOG_INFO, "[ProSystem]: XRGB8888 is not supported.\n");
+      return false;
+   }
 
-    struct retro_input_descriptor desc[] = {
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "1" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "2" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Console Reset" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Console Select" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Console Pause" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L, "Left Difficulty" },
-       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R, "Right Difficulty" },
+   struct retro_input_descriptor desc[] = {
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "1" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "2" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X,     "Console Reset" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Console Select" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Console Pause" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L, "Left Difficulty" },
+      { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R, "Right Difficulty" },
 
-       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
-       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
-       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
-       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "1" },
-       { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "2" },
+      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
+      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP,    "Up" },
+      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN,  "Down" },
+      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B,     "1" },
+      { 1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A,     "2" },
 
-       { 0 },
-    };
+      { 0 },
+   };
 
    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
-    memset(keyboard_data, 0, sizeof(keyboard_data));
+   memset(keyboard_data, 0, sizeof(keyboard_data));
 
-    // Difficulty switches: Left position = (B)eginner, Right position = (A)dvanced
-    // Left difficulty switch defaults to left position, "(B)eginner"
-    keyboard_data[15] = 1;
+   // Difficulty switches: Left position = (B)eginner, Right position = (A)dvanced
+   // Left difficulty switch defaults to left position, "(B)eginner"
+   keyboard_data[15] = 1;
 
-    // Right difficulty switch defaults to right position, "(A)dvanced", which fixes Tower Toppler
-    keyboard_data[16] = 0;
+   // Right difficulty switch defaults to right position, "(A)dvanced", which fixes Tower Toppler
+   keyboard_data[16] = 0;
 
-    const char *system_directory_c = NULL;
+   const char *system_directory_c = NULL;
 
-    if (cartridge_Load((const uint8_t*)info->data, info->size))
-    {
-       environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
+   if (cartridge_Load((const uint8_t*)info->data, info->size))
+   {
+      char biospath[512];
+      environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
 
-       // BIOS is optional
-       std::string system_directory(system_directory_c);
-       std::string bios_file_path = system_directory + "/7800 BIOS (U).rom";
-       if (bios_Load(bios_file_path.c_str()))
-          bios_enabled = true;
+      // BIOS is optional
+      sprintf(biospath, "%s/%s", system_directory_c, "7800 BIOS (U).rom");
+      if (bios_Load(biospath))
+         bios_enabled = true;
 
-       database_Load(cartridge_digest);
-       prosystem_Reset();
+      database_Load(cartridge_digest);
+      prosystem_Reset();
 
-       display_ResetPalette32();
+      display_ResetPalette32();
 
-       return true;
-    }
+      return true;
+   }
 
    return false;
 }
