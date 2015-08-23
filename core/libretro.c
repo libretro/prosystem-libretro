@@ -47,7 +47,9 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 static void display_ResetPalette32(void)
 {
-   for(uint32_t index = 0; index < 256; index++)
+   unsigned index;
+
+   for(index = 0; index < 256; index++)
    {
       uint32_t r = palette_data[(index * 3) + 0] << 16;
       uint32_t g = palette_data[(index * 3) + 1] << 8;
