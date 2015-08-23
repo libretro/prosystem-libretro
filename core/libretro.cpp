@@ -285,29 +285,6 @@ bool retro_load_game(const struct retro_game_info *info)
     if (cartridge_Load((const uint8_t*)info->data, info->size))
     {
        environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
-       if (!system_directory_c)
-       {
-          if (log_cb)
-             log_cb(RETRO_LOG_WARN, "[ProSystem]: no system directory defined, unable to look for ProSystem.dat\n");
-          database_enabled = false;
-       }
-       else
-       {
-          std::string system_directory(system_directory_c);
-          std::string database_file_path = system_directory + "/ProSystem.dat";
-          std::ifstream database_file(database_file_path.c_str());
-          if (!database_file.is_open())
-          {
-             if (log_cb)
-                log_cb(RETRO_LOG_WARN, "[ProSystem]: ProSystem.dat not found, cannot load internal ROM database\n");
-             database_enabled = false;
-          }
-          else
-          {
-             database_filename = database_file_path;
-             database_enabled = true;
-          }
-       }
 
        // BIOS is optional
        std::string system_directory(system_directory_c);
