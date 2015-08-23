@@ -671,6 +671,71 @@ static const cartridge_db db_list[] =
          0,
          0,
          0
+      },
+      {
+         "fd9e78e201b6baafddfd3e1fbfe6ba31",
+         "Hat Trick",
+         0,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+      {
+         "0baec96787ce17f390e204de1a136e59",
+         "Hat Trick",
+         0,
+         false,
+         1,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0
+      },
+      {
+         "c3672482ca93f70eafd9134b936c3feb",
+         "Ikari Warriors",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+      {
+         "8c2c2a1ea6e9a928a44c3151ba5c1ce3",
+         "Ikari Warriors",
+         4,
+         false,
+         1,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0
+      },
+      {
+         "baebc9246c087e893dfa489632157180",
+         "Impossible Mission",
+         3,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
       }
 };
 
