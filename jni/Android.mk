@@ -3,7 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 ifeq ($(TARGET_ARCH),arm)
-LOCAL_CFLAGS += -DANDROID_ARM
+LOCAL_CFLAGS += -DANDROID_ARM -fsigned-char
 LOCAL_ARM_MODE := arm
 endif
 
