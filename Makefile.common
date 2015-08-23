@@ -1,8 +1,7 @@
 INCFLAGS += -I$(CORE_DIR)
 
-SOURCES_CXX := $(CORE_DIR)/libretro.cpp
-
 SOURCES_C := \
+	$(CORE_DIR)/libretro.c \
 	$(CORE_DIR)/Bios.c \
 	$(CORE_DIR)/Cartridge.c \
 	$(CORE_DIR)/Database.c \
