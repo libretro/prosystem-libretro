@@ -152,7 +152,6 @@ static void cartridge_ReadHeader(const uint8_t* header)
 bool cartridge_Load(const uint8_t* data, uint32_t size)
 {
    int index;
-   char buffer[33]     = {0};
    uint8_t header[128] = {0};
 
    if(size <= 128)
@@ -189,7 +188,7 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
    for(index = 0; index < cartridge_size; index++)
       cartridge_buffer[index] = data[index + offset];
 
-   hash_Compute(buffer, cartridge_buffer, cartridge_size);
+   hash_Compute(cartridge_digest, cartridge_buffer, cartridge_size);
 
    return true;
 }
