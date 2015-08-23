@@ -24,8 +24,6 @@
 // ----------------------------------------------------------------------------
 #include "Database.h"
 #include "Cartridge.h"
-#include "Common.h"
-#include <string.h>
 #define DATABASE_SOURCE "Database.cpp"
 
 // ----------------------------------------------------------------------------
@@ -50,7 +48,7 @@ typedef struct cartridge_db
    uint8_t hblank;
 } cartridge_db_t;
 
-static const cartridge_db db_list[] = 
+static const struct cartridge_db db_list[] = 
 {
    {
       "4332c24e4f3bc72e7fe1b77adf66c2b7",  /* digest */
@@ -1487,7 +1485,6 @@ static const cartridge_db db_list[] =
          0,
          0,
          0,
-         0
       },
       {
          "c3903ab01a51222a52197dbfe6538ecf",
@@ -1660,7 +1657,7 @@ static const cartridge_db db_list[] =
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool database_Load(const char *digest)
+void database_Load(const char *digest)
 {
    unsigned i;
    size_t len = sizeof(db_list) / sizeof(db_list[0]);
@@ -1680,6 +1677,4 @@ bool database_Load(const char *digest)
          cartridge_flags         = db_list[i].flags;
       }
    }
-
-   return true;
 }

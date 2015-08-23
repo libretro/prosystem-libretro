@@ -25,11 +25,17 @@
 #ifndef DATABASE_H
 #define DATABASE_H
 
-#include <string>
+#include <string.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern void database_Initialize(void);
-extern bool database_Load(const char *digest);
-extern bool database_enabled;
-extern std::string database_filename;
+extern void database_Load(const char *digest);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
