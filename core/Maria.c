@@ -41,7 +41,7 @@ static pair maria_dp;
 static pair maria_pp;
 static uint8_t maria_horizontal;
 static uint8_t maria_palette;
-static char maria_offset;
+static int8_t maria_offset;
 static uint8_t maria_h08;
 static uint8_t maria_h16;
 static uint8_t maria_wmode;

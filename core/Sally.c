@@ -122,7 +122,7 @@ static void sally_Branch(uint8_t branch)
    if (branch)
    {
       pair temp = sally_pc;
-      sally_pc.w += (char)sally_address.b.l;
+      sally_pc.w += (int8_t)sally_address.b.l;
 
       if(temp.b.h != sally_pc.b.h)
          sally_cycles += 2;
