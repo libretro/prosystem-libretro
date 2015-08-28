@@ -1675,6 +1675,7 @@ void database_Load(const char *digest)
          cartridge_controller[1] = db_list[i].controller2;
          cartridge_region        = db_list[i].region;
          cartridge_flags         = db_list[i].flags;
+         break;
       }
    }
 }
