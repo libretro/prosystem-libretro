@@ -53,20 +53,22 @@ else ifeq ($(platform), osx)
 	fpic += -mmacosx-version-min=10.1
 
 # iOS
-else ifeq ($(platform), ios)
+else ifneq (,$(findstring ios,$(platform)))
 	TARGET := $(TARGET_NAME)_libretro_ios.dylib
 	fpic := -fPIC
 	SHARED := -dynamiclib
 	ifeq ($(IOSSDK),)
 		IOSSDK := $(shell xcodebuild -version -sdk iphoneos Path)
 	endif
-	CC = clang -arch armv7 -isysroot $(IOSSDK)
-	OSXVER = `sw_vers -productVersion | cut -d. -f 2`
-	OSX_LT_MAVERICKS = `(( $(OSXVER) <= 9)) && echo "YES"`
-	ifeq ($(OSX_LT_MAVERICKS),"YES")
-		SHARED += -miphoneos-version-min=5.0
-		CC +=  -miphoneos-version-min=5.0
-	endif
+	CC = cc -arch armv7 -isysroot $(IOSSDK)
+
+ifeq ($(platform),ios9)
+	CC     += -miphoneos-version-min=8.0
+	SHARED += -miphoneos-version-min=8.0
+else
+	CC     += -miphoneos-version-min=5.0
+	SHARED += -miphoneos-version-min=5.0
+endif
 
 # Theos
 else ifeq ($(platform), theos_ios)
