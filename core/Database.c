@@ -519,8 +519,8 @@ static const struct cartridge_db db_list[] =
          0
       },
       {
-         "cb6f27c7bcbe65b60595d6f54bd39348"
-         "Double Dragon (Sprite & Color Hack RC4)""
+         "cb6f27c7bcbe65b60595d6f54bd39348",
+         "Double Dragon (Sprite & Color Hack RC4)",
          6,
          false,
          1,
@@ -531,7 +531,6 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
-      }
       {
          "2251a6a0f3aec84cc0aff66fc9fa91e8",
          "F-18 Hornet",
@@ -871,8 +870,8 @@ static const struct cartridge_db db_list[] =
          0
       },
       {
-         "41b1dfe4174ad5434f1ef1aeeac90592"
-         "Kung Fu Master (New Sprites v5)"
+         "41b1dfe4174ad5434f1ef1aeeac90592",
+         "Kung Fu Master (New Sprites v5)",
          0,
          false,
          1,
