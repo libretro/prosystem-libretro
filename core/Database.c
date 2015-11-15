@@ -838,7 +838,7 @@ static const struct cartridge_db db_list[] =
          1,
          1,
          0,
-         0,
+         2,
          0,
          0,
          0
