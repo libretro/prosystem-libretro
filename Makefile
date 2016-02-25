@@ -130,6 +130,16 @@ else ifeq ($(platform), ctr)
 	FLAGS += -DARM11 -D_3DS
 	STATIC_LINKING = 1
 
+# Raspberry Pi 2
+else ifeq ($(platform), rpi2)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS+=-fsigned-char
+	FLAGS += -DARM 
+	FLAGS += -marm -mcpu=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -funsafe-math-optimizations
+	FLAGS += -fomit-frame-pointer -ffast-math
+
 # Windows
 else
 	TARGET := $(TARGET_NAME)_libretro.dll
