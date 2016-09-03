@@ -67,15 +67,44 @@ static uint32_t hash_Step4(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint3
   return w;
 }    
 
+static uint32_t read32le(uint32_t* data)
+{
+	uint32_t ret = *data;
+	return ret;
+}
+
+#ifdef MSB_FIRST
+uint32_t end_swap(uint32_t n)
+{
+#if defined(__GNUC__)
+	return __builtin_bswap32(n);
+#elif defined(_MSC_VER)
+	return _byteswap_ulong(n);
+#else
+	n = n>>16 | n<<16;
+	n = (n&0x00FF00FF)<<8 | (n&0xFF00FF00)>>8;
+	return n;
+#endif
+}
+#endif
+
 // ----------------------------------------------------------------------------
 // Transform
 // ----------------------------------------------------------------------------
-static void hash_Transform(uint32_t out[4], uint32_t in[16])
+static void hash_Transform(uint32_t out[4], uint32_t in_[16])
 {
    uint32_t a = out[0];
    uint32_t b = out[1];
    uint32_t c = out[2];
    uint32_t d = out[3];
+
+#ifdef MSB_FIRST
+   uint32_t in[16];
+   int i;
+   for (i=0;i<16;i++) in[i] = end_swap32(in_[i]);
+#else
+   uint32_t* in = in_;
+#endif
 
    a = hash_Step1(a, b, c, d, in[0] + 0xd76aa478, 7);
    d = hash_Step1(d, a, b, c, in[1] + 0xe8c7b756, 12);
