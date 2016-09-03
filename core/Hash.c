@@ -74,17 +74,11 @@ static uint32_t read32le(uint32_t* data)
 }
 
 #ifdef MSB_FIRST
-uint32_t end_swap(uint32_t n)
+static uint32_t end_swap32(uint32_t n)
 {
-#if defined(__GNUC__)
-	return __builtin_bswap32(n);
-#elif defined(_MSC_VER)
-	return _byteswap_ulong(n);
-#else
 	n = n>>16 | n<<16;
 	n = (n&0x00FF00FF)<<8 | (n&0xFF00FF00)>>8;
 	return n;
-#endif
 }
 #endif
 
