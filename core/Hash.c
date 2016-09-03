@@ -67,14 +67,14 @@ static uint32_t hash_Step4(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint3
   return w;
 }    
 
-#ifdef MSB_FIRST
-static uint32_t end_swap32(uint32_t n)
+static uint32_t end_to_le32(uint32_t n)
 {
+#ifdef MSB_FIRST
 	n = n>>16 | n<<16;
 	n = (n&0x00FF00FF)<<8 | (n&0xFF00FF00)>>8;
+#endif
 	return n;
 }
-#endif
 
 // ----------------------------------------------------------------------------
 // Transform
@@ -89,7 +89,7 @@ static void hash_Transform(uint32_t out[4], uint32_t in_[16])
 #ifdef MSB_FIRST
    uint32_t in[16];
    int i;
-   for (i=0;i<16;i++) in[i] = end_swap32(in_[i]);
+   for (i=0;i<16;i++) in[i] = end_to_le32(in_[i]);
 #else
    uint32_t* in = in_;
 #endif
@@ -246,15 +246,19 @@ void hash_Compute(char *s, const uint8_t* source, uint32_t length)
          ptr[index] = 0;
    }
 
-   ((uint32_t*)buffer3)[14] = buffer2[0];
-   ((uint32_t*)buffer3)[15] = buffer2[1];
+   ((uint32_t*)buffer3)[14] = end_to_le32(buffer2[0]);
+   ((uint32_t*)buffer3)[15] = end_to_le32(buffer2[1]);
 
    hash_Transform(buffer1, (uint32_t*)buffer3);
 
    uint8_t digest[16];
    uint8_t* bufferptr = (uint8_t*)buffer1;
    for(index = 0; index < 16; index++)
+#ifdef MSB_FIRST
+      digest[index] = bufferptr[index^3];
+#else
       digest[index] = bufferptr[index];
+#endif
 
    sprintf(s, "%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x", digest[0], digest[1], digest[2], digest[3], digest[4], digest[5], digest[6], digest[7], digest[8], digest[9], digest[10], digest[11], digest[12], digest[13], digest[14], digest[15]);
 }
