@@ -67,12 +67,6 @@ static uint32_t hash_Step4(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint3
   return w;
 }    
 
-static uint32_t read32le(uint32_t* data)
-{
-	uint32_t ret = *data;
-	return ret;
-}
-
 #ifdef MSB_FIRST
 static uint32_t end_swap32(uint32_t n)
 {
@@ -214,14 +208,22 @@ void hash_Compute(char *s, const uint8_t* source, uint32_t length)
    while(length >= 64)
    {
       for(index = 0; index < 64; index++)
+#ifdef MSB_FIRST
+         buffer3[index] = source[index] << 24;
+#else
          buffer3[index] = source[index];
+#endif
       hash_Transform(buffer1, (uint32_t*)buffer3);
       source += 64;
       length -= 64;
    }
 
    for(index = 0; index < length; index++)
+#ifdef MSB_FIRST
+      buffer3[index] = source[index] << 24;
+#else
       buffer3[index] = source[index];
+#endif
 
    uint32_t count = (buffer2[0] >> 3) & 0x3f;
    uint8_t* ptr = buffer3 + count;
