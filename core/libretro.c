@@ -191,7 +191,10 @@ void retro_get_system_info(struct retro_system_info *info)
 {
    memset(info, 0, sizeof(*info));
 	info->library_name = "ProSystem";
-	info->library_version = "1.3e";
+#ifndef GIT_VERSION
+#define GIT_VERSION ""
+#endif
+	info->library_version = "1.3e" GIT_VERSION;
 	info->need_fullpath = false;
 	info->valid_extensions = "a78|bin";
 }
