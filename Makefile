@@ -119,6 +119,26 @@ else ifeq ($(platform), sncps3)
 	FLAGS += -DMSB_FIRST
 	NO_GCC = 1
 
+# Nintendo Game Cube
+else ifeq ($(platform), ngc)
+	EXT=a
+	TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+	CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+	CFLAGS += -DGEKKO -DHW_DOL -mrvl -mcpu=750 -meabi -mhard-float -D__ppc__ -DMSB_FIRST
+	STATIC_LINKING=1
+	FLAGS += -DMSB_FIRST
+
+# Nintendo Wii
+else ifeq ($(platform), wii)
+	EXT=a
+	TARGET := $(TARGET_NAME)_libretro_$(platform).$(EXT)
+	CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
+	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
+	CFLAGS += -DGEKKO -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -D__ppc__ -DMSB_FIRST
+	STATIC_LINKING=1
+	FLAGS += -DMSB_FIRST
+
 # PSP
 else ifeq ($(platform), psp1)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
