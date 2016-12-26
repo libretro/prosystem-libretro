@@ -77,6 +77,19 @@ static const struct cartridge_db db_list[] =
       0,                                   /* hblank */
    },
    {
+      "35a881a4d3d90120a95573b77c50f9ed",  /* digest */
+      "Ace Of Aces",                       /* title */
+      4,                                   /* type */
+      false,                               /* pokey */
+      1,                                   /* controller 1 */
+      1,                                   /* controller 2 */
+      0,                                   /* region */
+      0,                                   /* flags */
+      0,                                   /* crossx */
+      0,                                   /* crossy */
+      0,                                   /* hblank */
+   },
+   {
       "aadde920b3aaba03bc10b40bd0619c94",  /* digest */
       "Ace Of Aces",                       /* title */
       4,                                   /* type */
@@ -195,6 +208,19 @@ static const struct cartridge_db db_list[] =
    },
    {
       "f5f6b69c5eb4b55fc163158d1a6b423e",
+      "Basketbrawl",
+      4,
+      false,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+   },
+   {
+      "8791dfa8e7f2494a45a696c52d83ee59",
       "Basketbrawl",
       4,
       false,
@@ -518,6 +544,19 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
+	  {
+         "2995d5cb75ec2b939269dcd98aa3a3c2",
+         "Double Dragon",
+         6,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
       {
          "cb6f27c7bcbe65b60595d6f54bd39348",
          "Double Dragon (Sprite & Color Hack RC4)",
@@ -557,6 +596,19 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
+	  {
+         "18399a98e74ed6fc57259c22cfd18535",
+         "F-18 Hornet",
+         5,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
       {
          "e7709da8e49d3767301947a0a0b9d2e6",
          "F-18 Hornet",
@@ -583,6 +635,19 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
+	  {
+         "f44299eb1f3bde16c3d688c770e63432",
+         "Fatal Run",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
       {
          "23505651ac2e47f3637152066c3aa62f",
          "Fatal Run",
@@ -598,6 +663,19 @@ static const struct cartridge_db db_list[] =
       },
       {
          "07dbbfe612a0a28e283c01545e59f25e",
+         "Fight Night",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+      {
+         "57b5e213987cd769d51211cf165c1d2b",
          "Fight Night",
          4,
          false,
@@ -715,6 +793,19 @@ static const struct cartridge_db db_list[] =
       },
       {
          "c3672482ca93f70eafd9134b936c3feb",
+         "Ikari Warriors",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+	  {
+         "24283ee460abdb369150f75b5bc406c3",
          "Ikari Warriors",
          4,
          false,
@@ -882,6 +973,19 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
+	  {
+         "fc5e7877ee0af4e061691e8613eea5b3",
+         "Kung Fu Master",
+         0,
+         false,
+         1,
+         1,
+         0,
+         2,
+         0,
+         0,
+         0
+      },
       {
          "41b1dfe4174ad5434f1ef1aeeac90592",
          "Kung Fu Master (New Sprites v5)",
@@ -973,6 +1077,19 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
+	  {
+         "dae03a762c23ce643446eb540405c7e3",
+         "Mean 18 Ultimate Golf",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
       {
          "2e9dbad6c0fa381a6cd1bb9abf98a104",
          "Mean 18 Ultimate Golf",
@@ -999,6 +1116,19 @@ static const struct cartridge_db db_list[] =
          20,
          0
       },
+	  {
+         "7898b06c7101c4127016438bf9f51d40",
+         "Meltdown",
+         4,
+         false,
+         2,
+         2,
+         0,
+         0,
+         0,
+         20,
+         0
+      },
       {
          "c80155d7eec9e3dcb79aa6b83c9ccd1e",
          "Meltdown",
@@ -1014,6 +1144,19 @@ static const struct cartridge_db db_list[] =
       },
       {
          "bc1e905db1008493a9632aa83ab4682b",
+         "Midnight Mutants",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+	  {
+         "b0da4d681f67d23e12e71a19bfc26c0a",
          "Midnight Mutants",
          4,
          false,
@@ -1053,6 +1196,19 @@ static const struct cartridge_db db_list[] =
       },
       {
          "3bc8f554cf86f8132a623cc2201a564b",
+         "Motor Psycho",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+	  {
+         "7111e6f5e18ae1209be28a0efdfa8172",
          "Motor Psycho",
          4,
          false,
@@ -1110,6 +1266,19 @@ static const struct cartridge_db db_list[] =
          false,
          1,
          1,
+         0,
+         0
+      },
+	        {
+         "441c36f5dee42dbe839eed986cfb24e6",
+         "Ninja Golf",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
          0,
          0
       },
@@ -1214,6 +1383,19 @@ static const struct cartridge_db db_list[] =
          0,
          0
       },
+	  {
+         "f1b6c6145d9e98069169caa94a9dc146",
+         "Planet Smashers",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
       {
          "2837a8fd49b7fc7ccd70fd45b69c5099",
          "Planet Smashers",
@@ -1293,6 +1475,19 @@ static const struct cartridge_db db_list[] =
          0
       },
       {
+         "564480c05b5407fe6e29a650256cf1d0",
+         "Rampage",
+         6,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+      {
          "442761655bb25ddfe5f7ab16bf591c6f",
          "Rampart",
          1,
@@ -1359,6 +1554,19 @@ static const struct cartridge_db db_list[] =
       },
       {
          "980c35ae9625773a450aa7ef51751c04",
+         "Scrapyard Dog",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+	  {
+         "7bd97f7b4eb6c2c618b978ce6f7b102d",
          "Scrapyard Dog",
          4,
          false,
@@ -1657,6 +1865,19 @@ static const struct cartridge_db db_list[] =
       },
       {
          "05fb699db9eef564e2fe45c568746dbc",
+         "Xenophobe",
+         4,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+	  {
+         "040b05266407a9f3c973beeb853e1533",
          "Xenophobe",
          4,
          false,
