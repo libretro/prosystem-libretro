@@ -174,6 +174,10 @@ static void hash_Transform(uint32_t out[4], uint32_t in_[16])
 void hash_Compute(char *s, const uint8_t* source, uint32_t length)
 {
    uint32_t index;
+   uint32_t count;
+   uint8_t digest[16];
+   uint8_t* bufferptr  = NULL;
+   uint8_t* ptr        = NULL;
    uint32_t buffer1[4] = {0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476};
    uint32_t buffer2[2] = {0};
    uint8_t buffer3[64] = {0};
@@ -218,11 +222,10 @@ void hash_Compute(char *s, const uint8_t* source, uint32_t length)
    for(index = 0; index < length; index++)
       buffer3[index] = source[index];
 
-   uint32_t count = (buffer2[0] >> 3) & 0x3f;
-   uint8_t* ptr = buffer3 + count;
+   count  = (buffer2[0] >> 3) & 0x3f;
+   ptr    = buffer3 + count;
    *ptr++ = 0x80;
-
-   count = 63 - count;
+   count  = 63 - count;
 
    if(count < 8)
    {
@@ -244,8 +247,8 @@ void hash_Compute(char *s, const uint8_t* source, uint32_t length)
 
    hash_Transform(buffer1, (uint32_t*)buffer3);
 
-   uint8_t digest[16];
-   uint8_t* bufferptr = (uint8_t*)buffer1;
+   bufferptr = (uint8_t*)buffer1;
+
    for(index = 0; index < 16; index++)
 #ifdef MSB_FIRST
       digest[index] = bufferptr[index^3];
