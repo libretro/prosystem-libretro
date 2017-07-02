@@ -180,9 +180,12 @@ bool prosystem_Save(char *buffer, bool compress)
 // ----------------------------------------------------------------------------
 bool prosystem_Load(const char *buffer)
 {
-   uint32_t size = 0;
-   uint32_t offset = 0;
    uint32_t index;
+   uint8_t version;
+   char digest[33] = {0};
+   uint32_t date   = 0;
+   uint32_t size   = 0;
+   uint32_t offset = 0;
 
    for(index = 0; index < 16; index++)
    {
@@ -191,13 +194,11 @@ bool prosystem_Load(const char *buffer)
          return false;
    }
    offset += 16;
-   uint8_t version = buffer[offset++];
+   version = buffer[offset++];
 
-   uint32_t date = 0;
    for(index = 0; index < 4; index++);
    offset += 4;
 
-   char digest[33] = {0};
    for(index = 0; index < 32; index++)
       digest[index] = buffer[offset + index];
 
