@@ -152,37 +152,30 @@ static void cartridge_ReadHeader(const uint8_t* header)
 bool cartridge_Load(const uint8_t* data, uint32_t size)
 {
    int index;
+   uint32_t offset     = 0;
    uint8_t header[128] = {0};
 
+   /* Cartridge data is invalid. */
    if(size <= 128)
-   {
-      /* Cartridge data is invalid. */
       return false;
-   }
 
    cartridge_Release( );
-
 
    for(index = 0; index < 128; index++)
       header[index] = data[index];
 
+   /* Prosystem doesn't support CC2 hacks. */
    if (cartridge_CC2(header))
-   {
-      /* Prosystem doesn't support CC2 hacks. */
       return false;
-   }
 
-   uint32_t offset = 0;
    if(cartridge_HasHeader(header))
    {
       cartridge_ReadHeader(header);
       size -= 128;
       offset = 128;
-      cartridge_size = size;
    }
-   else
-      cartridge_size = size;
 
+   cartridge_size   = size;
    cartridge_buffer = (uint8_t*)malloc(cartridge_size * sizeof(uint8_t));
 
    for(index = 0; index < cartridge_size; index++)
