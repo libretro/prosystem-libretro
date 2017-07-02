@@ -215,10 +215,12 @@ static void maria_WriteLineRAM(uint8_t* buffer)
 static void maria_StoreLineRAM(void)
 {
    int index;
+   uint8_t mode;
+
    for(index = 0; index < MARIA_LINERAM_SIZE; index++)
       maria_lineRAM[index] = 0;
 
-   uint8_t mode = memory_ram[maria_dp.w + 1];
+   mode = memory_ram[maria_dp.w + 1];
 
    while(mode & 0x5f)
    {
