@@ -201,7 +201,7 @@ static const struct cartridge_db db_list[] =
       1,
       1,
       0,
-      0,
+      1,
       0,
       0,
       0
@@ -214,7 +214,7 @@ static const struct cartridge_db db_list[] =
       1,
       1,
       1,
-      0,
+      1,
       0,
       0,
       0
@@ -532,8 +532,21 @@ static const struct cartridge_db db_list[] =
          0
       },
       {
-         "59ca19c4b024fdfcd25b75ac836c7749"
+         "12626E21E9EF33CE42E7BAEB68B0D4D9"
          "Double Dragon (Sprite & Color Hack RC7)",
+         6,
+         false,
+         1,
+         1,
+         0,
+         0,
+         0,
+         0,
+         0
+      },
+      {
+         "558D5BEA768096703DA4D49316FD989D"
+         "Double Dragon (Sprite & Color Hack RC7b)",
          6,
          false,
          1,
@@ -1111,6 +1124,9 @@ static const struct cartridge_db db_list[] =
          1,
          1,
          0,
+         0,
+         0,
+         0,
          0
       },
       {
@@ -1134,7 +1150,7 @@ static const struct cartridge_db db_list[] =
          1,
          1,
          0,
-         0,
+         1,
          0,
          0,
          0
@@ -1147,7 +1163,7 @@ static const struct cartridge_db db_list[] =
          1,
          1,
          1,
-         0,
+         1,
          0,
          0,
          0
