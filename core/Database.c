@@ -220,13 +220,13 @@ static const struct cartridge_db db_list[] =
       0
    },
    {
-      "3e63be18e480fa63fce5e4c823286e53",
+      "aefb78276913e8a166e460222e378fec",
       "Beef Drop",
       0,
       true,
       1,
       1,
-      1,
+      0,
       0,
       0,
       0,
