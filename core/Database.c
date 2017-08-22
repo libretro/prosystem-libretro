@@ -74,7 +74,7 @@ static const struct cartridge_db db_list[] =
       0,                                   /* flags */
       0,                                   /* crossx */
       0,                                   /* crossy */
-      0,                                   /* hblank */
+      37,                                  /* hblank */
    },
    {
       "aadde920b3aaba03bc10b40bd0619c94",  /* digest */
@@ -87,7 +87,7 @@ static const struct cartridge_db db_list[] =
       0,                                   /* flags */
       0,                                   /* crossx */
       0,                                   /* crossy */
-      0                                    /* hblank */
+      37,                                  /* hblank */
    },
    {
       "877dcc97a775ed55081864b2dbf5f1e2",  /* digest */
@@ -100,7 +100,7 @@ static const struct cartridge_db db_list[] =
       0,                                   /* flags */
       15,                                  /* crossx */
       15,                                  /* crossy */
-      0                                    /* hblank */
+      37                                    /* hblank */
    },
    {
       "de3e9496cb7341f865f27e5a72c7f2f5",  /* digest */
@@ -113,7 +113,7 @@ static const struct cartridge_db db_list[] =
       0,                                   /* flags */
       15,                                  /* crossx */
       -20,                                 /* crossy */
-      0                                    /* hblank */
+      37                                    /* hblank */
    },
    {
       "404f95103b70975a42cb09946dc3adca",
@@ -295,7 +295,7 @@ static const struct cartridge_db db_list[] =
       0,
       0,
       0,
-      0
+      8
    },
    {
       "55da6c6c3974d013f517e725aa60f48e",
@@ -308,7 +308,7 @@ static const struct cartridge_db db_list[] =
       0,
       0,
       0,
-      0
+      8
    },
    {
       "db691469128d9a4217ec7e315930b646",
@@ -1036,7 +1036,7 @@ static const struct cartridge_db db_list[] =
          0,
          0,
          0,
-         0
+         20
       },
       {
          "6794ea31570eba0b88a0bf1ead3f3f1b",
@@ -1049,7 +1049,7 @@ static const struct cartridge_db db_list[] =
          0,
          0,
          0,
-         0
+         20
       },
       {
          "017066f522908081ec3ee624f5e4a8aa",
@@ -1254,7 +1254,7 @@ static const struct cartridge_db db_list[] =
          0,
          0,
          0,
-         0
+         50
       },
       {
          "584582bb09ee8122e7fc09dc7d1ed813",
