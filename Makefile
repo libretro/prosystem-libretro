@@ -222,6 +222,7 @@ LD   = "$(MSVCBINDIRPREFIX)/lib.exe"
 
 export INCLUDE := $(XEDK)/include/xbox
 export LIB := $(XEDK)/lib/xbox
+FLAGS += -DMSB_FIRST
 PSS_STYLE :=2
 CFLAGS   += -D_XBOX -D_XBOX360
 CXXFLAGS += -D_XBOX -D_XBOX360
