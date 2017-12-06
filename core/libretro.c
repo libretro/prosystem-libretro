@@ -224,14 +224,12 @@ size_t retro_serialize_size(void)
 
 bool retro_serialize(void *data, size_t size)
 { 
-   return false;
-   /*return prosystem_Save((char*)data, false);*/
+   return prosystem_Save((char*)data, false);
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   return false;
-   /*return prosystem_Load((const char*)data);*/
+   return prosystem_Load((const char*)data);
 }
 
 void retro_cheat_reset(void)
