@@ -205,7 +205,7 @@ bool prosystem_Load(const char *buffer)
    offset += 32;
 
    /* Does not match loaded cartridge digest? */
-   if(!strcmp(cartridge_digest, digest))
+   if(strcmp(cartridge_digest, digest) != 0)
       return false;
 
    sally_a = buffer[offset++];
