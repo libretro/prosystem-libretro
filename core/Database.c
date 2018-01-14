@@ -532,7 +532,7 @@ static const struct cartridge_db db_list[] =
          0
       },
       {
-         "59ca19c4b024fdfcd25b75ac836c7749"
+         "59ca19c4b024fdfcd25b75ac836c7749",
          "Double Dragon (Sprite & Color Hack RC7)",
          6,
          false,
@@ -545,7 +545,7 @@ static const struct cartridge_db db_list[] =
          0
       },
       {
-         "098b209aac126f2c2edbc982df09cd1b"
+         "098b209aac126f2c2edbc982df09cd1b",
          "Double Dragon (Sprite & Color Hack RC7b)",
          6,
          false,
