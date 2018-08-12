@@ -23,6 +23,7 @@
 #include "Region.h"
 #include "ProSystem.h"
 #include "Tia.h"
+#include "Memory.h"
 
 static uint32_t videoBuffer[320*292*4];
 static int videoWidth  = 320;
@@ -348,11 +349,15 @@ unsigned retro_api_version(void)
 
 void *retro_get_memory_data(unsigned id)
 {
+    if ( id == RETRO_MEMORY_SYSTEM_RAM )
+        return memory_ram;
     return NULL;
 }
 
 size_t retro_get_memory_size(unsigned id)
 {
+    if ( id == RETRO_MEMORY_SYSTEM_RAM )
+        return MEMORY_SIZE;
     return 0;
 }
 
