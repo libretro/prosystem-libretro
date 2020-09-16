@@ -39,6 +39,8 @@ static retro_environment_t environ_cb;
 static retro_audio_sample_t audio_cb;
 static retro_audio_sample_batch_t audio_batch_cb;
 
+static bool libretro_supports_bitmasks = false;
+
 void retro_set_environment(retro_environment_t cb) { environ_cb = cb; }
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
 void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
@@ -135,6 +137,9 @@ static void sound_Store(void)
 
 static void update_input(void)
 {
+   unsigned i,j;
+   unsigned joypad_bits[2];
+
    // ----------------------------------------------------------------------------
    // SetInput
    // +----------+--------------+-------------------------------------------------
@@ -161,25 +166,37 @@ static void update_input(void)
 
    input_poll_cb();
 
-   keyboard_data[0]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
-   keyboard_data[1]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
-   keyboard_data[2]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
-   keyboard_data[3]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
-   keyboard_data[4]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
-   keyboard_data[5]  = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
+   for (j = 0; j < 2; j++)
+   {
+      if (libretro_supports_bitmasks)
+         joypad_bits[j] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+      else
+      {
+         joypad_bits[j] = 0;
+         for (i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R3+1); i++)
+            joypad_bits[j] |= input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, i) ? (1 << i) : 0;
+      }
+   }
 
-   keyboard_data[6]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT);
-   keyboard_data[7]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT);
-   keyboard_data[8]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN);
-   keyboard_data[9]  = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP);
-   keyboard_data[10] = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B);
-   keyboard_data[11] = input_state_cb(1, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A);
+   keyboard_data[0]  = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT) ? 1 : 0;
+   keyboard_data[1]  = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT) ? 1 : 0;
+   keyboard_data[2]  = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN) ? 1 : 0;
+   keyboard_data[3]  = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_UP) ? 1 : 0;
+   keyboard_data[4]  = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_B) ? 1 : 0;
+   keyboard_data[5]  = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_A) ? 1 : 0;
 
-   keyboard_data[12] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X);
-   keyboard_data[13] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT);
-   keyboard_data[14] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START);
-   keyboard_data[15] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L);
-   keyboard_data[16] = input_state_cb(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R);
+   keyboard_data[6]  = joypad_bits[1] & (1 << RETRO_DEVICE_ID_JOYPAD_RIGHT) ? 1 : 0;
+   keyboard_data[7]  = joypad_bits[1] & (1 << RETRO_DEVICE_ID_JOYPAD_LEFT) ? 1 : 0;
+   keyboard_data[8]  = joypad_bits[1] & (1 << RETRO_DEVICE_ID_JOYPAD_DOWN) ? 1 : 0;
+   keyboard_data[9]  = joypad_bits[1] & (1 << RETRO_DEVICE_ID_JOYPAD_UP) ? 1 : 0;
+   keyboard_data[10] = joypad_bits[1] & (1 << RETRO_DEVICE_ID_JOYPAD_B) ? 1 : 0;
+   keyboard_data[11] = joypad_bits[1] & (1 << RETRO_DEVICE_ID_JOYPAD_A) ? 1 : 0;
+
+   keyboard_data[12] = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_X) ? 1 : 0;
+   keyboard_data[13] = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_SELECT) ? 1 : 0;
+   keyboard_data[14] = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_START) ? 1 : 0;
+   keyboard_data[15] = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_L) ? 1 : 0;
+   keyboard_data[16] = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_R) ? 1 : 0;
 }
 
 /************************************
@@ -372,10 +389,14 @@ void retro_init(void)
       log_cb = NULL;
 
    environ_cb(RETRO_ENVIRONMENT_SET_PERFORMANCE_LEVEL, &level);
+
+   if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
+      libretro_supports_bitmasks = true;
 }
 
 void retro_deinit(void)
 {
+   libretro_supports_bitmasks = false;
 }
 
 void retro_reset(void)
