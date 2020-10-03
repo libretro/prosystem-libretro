@@ -22,6 +22,7 @@
 // ----------------------------------------------------------------------------
 // Database.cpp
 // ----------------------------------------------------------------------------
+#include <stdio.h>
 #include "Database.h"
 #include "Cartridge.h"
 #define DATABASE_SOURCE "Database.cpp"

@@ -38,7 +38,6 @@
 #define CARTRIDGE_WSYNC_MASK 2
 #define CARTRIDGE_CYCLE_STEALING_MASK 1
 
-#include <stdio.h>
 #include <stdint.h>
 #include <boolean.h>
 

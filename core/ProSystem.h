@@ -26,7 +26,6 @@
 #define PRO_SYSTEM_H
 
 #include <stdint.h>
-#include <stdio.h>
 
 #include <boolean.h>
 
