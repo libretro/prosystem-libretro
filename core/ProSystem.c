@@ -193,6 +193,7 @@ bool prosystem_Load(const char *buffer)
          return false;
    }
    offset += 16;
+   buffer[offset++];
 
    for(index = 0; index < 4; index++);
    offset += 4;
