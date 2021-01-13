@@ -216,6 +216,27 @@ else ifeq ($(platform), classic_armv7_a7)
 	endif
 #######################################
 
+# (armv8 a35, hard point, neon based) ###
+# PlayStation Classic 
+else ifeq ($(platform), classic_armv8_a35)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS += -Ofast \
+	-fuse-linker-plugin \
+	-fno-stack-protector -fno-ident -fomit-frame-pointer \
+	-fmerge-all-constants -ffast-math -funroll-all-loops \
+	-marm -mcpu=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+	CXXFLAGS += $(CFLAGS)
+	CPPFLAGS += $(CFLAGS)
+	ASFLAGS += $(CFLAGS)
+	HAVE_NEON = 1
+	ARCH = arm
+   DESMUME_JIT_ARM = 1
+   CXXFLAGS += -DARM
+   LDFLAGS += -marm -mcpu=cortex-a35 -mfpu=neon-fp-armv8 -mfloat-abi=hard -Ofast -flto -fuse-linker-plugin
+#######################################
+
 # PSP
 else ifeq ($(platform), psp1)
 	TARGET := $(TARGET_NAME)_libretro_$(platform).a
@@ -271,6 +292,16 @@ else ifeq ($(platform), rpi3)
 	CFLAGS+=-fsigned-char
 	FLAGS += -DARM 
 	FLAGS += -marm -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
+	FLAGS += -fomit-frame-pointer -ffast-math
+
+# Raspberry Pi 4
+else ifeq ($(platform), rpi4)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS+=-fsigned-char
+	FLAGS += -DARM 
+	FLAGS += -mcpu=cortex-a72 -mtune=cortex-a72
 	FLAGS += -fomit-frame-pointer -ffast-math
 
 else ifeq ($(platform), emscripten)
@@ -629,4 +660,3 @@ uninstall:
 
 .PHONY: clean install uninstall
 endif
-
