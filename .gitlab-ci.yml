@@ -45,7 +45,11 @@ include:
   # Nintendo 3DS
   - project: 'libretro-infrastructure/ci-templates'
     file: '/ctr-static.yml'
-    
+
+  # Nintendo GameCube
+  - project: 'libretro-infrastructure/ci-templates'
+    file: '/ngc-static.yml'
+
   # Nintendo Wii
   - project: 'libretro-infrastructure/ci-templates'
     file: '/wii-static.yml'
@@ -140,7 +144,13 @@ libretro-build-ctr:
   extends:
     - .libretro-ctr-static-retroarch-master
     - .core-defs
-    
+
+# Nintendo GameCube
+libretro-build-ngc:
+  extends:
+    - .libretro-ngc-static-retroarch-master
+    - .core-defs
+
 # Nintendo Wii
 libretro-build-wii:
   extends:
