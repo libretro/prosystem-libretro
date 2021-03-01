@@ -13,6 +13,7 @@
 #endif
 
 #include "libretro.h"
+#include "libretro_core_options.h"
 
 #include "Bios.h"
 #include "Cartridge.h"
@@ -25,10 +26,18 @@
 #include "Tia.h"
 #include "Memory.h"
 
-static uint32_t videoBuffer[320*292*4];
+#ifdef _3DS
+extern void* linearMemAlign(size_t size, size_t alignment);
+extern void linearFree(void* mem);
+#endif
+
+#define VIDEO_BUFFER_SIZE (320 * 292 * 4)
+static uint8_t *videoBuffer = NULL;
+static uint8_t videoPixelBytes = 2;
 static int videoWidth  = 320;
 static int videoHeight = 240;
 static uint32_t display_palette32[256] = {0};
+static uint16_t display_palette16[256] = {0};
 static uint8_t keyboard_data[17] = {0};
 
 static retro_log_printf_t log_cb;
@@ -41,14 +50,37 @@ static retro_audio_sample_batch_t audio_batch_cb;
 
 static bool libretro_supports_bitmasks = false;
 
-void retro_set_environment(retro_environment_t cb) { environ_cb = cb; }
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
 void retro_set_audio_sample(retro_audio_sample_t cb) { audio_cb = cb; }
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
-static void display_ResetPalette32(void)
+void retro_set_environment(retro_environment_t cb)
+{
+   environ_cb = cb;
+   libretro_set_core_options(environ_cb);
+}
+
+#define BLIT_VIDEO_BUFFER(typename_t, src, palette, width, height, pitch, dst) \
+   {                                                                           \
+      typename_t *surface = (typename_t*)dst;                                  \
+      uint32_t x, y;                                                           \
+                                                                               \
+      for(y = 0; y < height; y++)                                              \
+      {                                                                        \
+         typename_t *surface_ptr = surface;                                    \
+         const uint8_t *src_ptr  = src;                                        \
+                                                                               \
+         for(x = 0; x < width; x++)                                            \
+            *(surface_ptr++) = *(palette + *(src_ptr++));                      \
+                                                                               \
+         surface += pitch;                                                     \
+         src     += width;                                                     \
+      }                                                                        \
+   }
+
+static void display_ResetPalette(void)
 {
    unsigned index;
 
@@ -58,6 +90,9 @@ static void display_ResetPalette32(void)
       uint32_t g = palette_data[(index * 3) + 1] << 8;
       uint32_t b = palette_data[(index * 3) + 2];
       display_palette32[index] = r | g | b;
+      display_palette16[index] = ((r & 0xF80000) >> 8) |
+                                 ((g & 0x00F800) >> 5) |
+                                 ((b & 0x0000F8) >> 3);
    }
 }
 
@@ -199,6 +234,25 @@ static void update_input(void)
    keyboard_data[16] = joypad_bits[0] & (1 << RETRO_DEVICE_ID_JOYPAD_R) ? 1 : 0;
 }
 
+void check_variables(bool first_run)
+{
+   struct retro_variable var = {0};
+
+   /* Only read colour depth option on first run */
+   if (first_run)
+   {
+      var.key   = "prosystem_color_depth";
+      var.value = NULL;
+
+      /* Set 16bpp by default */
+      videoPixelBytes = 2;
+
+      if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+         if (strcmp(var.value, "24bit") == 0)
+            videoPixelBytes = 4;
+   }
+}
+
 /************************************
  * libretro implementation
  ************************************/
@@ -262,7 +316,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 
 bool retro_load_game(const struct retro_game_info *info)
 {
-   enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+   enum retro_pixel_format fmt;
 
    struct retro_input_descriptor desc[] = {
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,  "Left" },
@@ -292,13 +346,32 @@ bool retro_load_game(const struct retro_game_info *info)
 
    environ_cb(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, desc);
 
-   if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+   /* Set color depth */
+   check_variables(true);
+
+   if (videoPixelBytes == 4)
    {
-      if (log_cb)
-         log_cb(RETRO_LOG_INFO, "[ProSystem]: XRGB8888 is not supported.\n");
-      return false;
+      fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+      if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+      {
+         if (log_cb)
+            log_cb(RETRO_LOG_INFO, "[ProSystem]: XRGB8888 is not supported - trying RGB565...\n");
+
+         /* Fallback to RETRO_PIXEL_FORMAT_RGB565 */
+         videoPixelBytes = 2;
+      }
    }
 
+   if (videoPixelBytes == 2)
+   {
+      fmt = RETRO_PIXEL_FORMAT_RGB565;
+      if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
+      {
+         if (log_cb)
+            log_cb(RETRO_LOG_INFO, "[ProSystem]: RGB565 is not supported.\n");
+         return false;
+      }
+   }
 
    memset(keyboard_data, 0, sizeof(keyboard_data));
 
@@ -333,7 +406,7 @@ bool retro_load_game(const struct retro_game_info *info)
       database_Load(cartridge_digest);
       prosystem_Reset();
 
-      display_ResetPalette32();
+      display_ResetPalette();
 
       return true;
    }
@@ -352,6 +425,7 @@ bool retro_load_game_special(unsigned game_type, const struct retro_game_info *i
 void retro_unload_game(void) 
 {
    prosystem_Close();
+   bios_Release();
 }
 
 unsigned retro_get_region(void)
@@ -392,11 +466,27 @@ void retro_init(void)
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
       libretro_supports_bitmasks = true;
+
+#ifdef _3DS
+   videoBuffer = (uint8_t*)linearMemAlign(VIDEO_BUFFER_SIZE, 128);
+#else
+   videoBuffer = (uint8_t*)malloc(VIDEO_BUFFER_SIZE);
+#endif
 }
 
 void retro_deinit(void)
 {
    libretro_supports_bitmasks = false;
+
+   if (videoBuffer)
+   {
+#ifdef _3DS
+      linearFree(videoBuffer);
+#else
+      free(videoBuffer);
+#endif
+      videoBuffer = NULL;
+   }
 }
 
 void retro_reset(void)
@@ -406,9 +496,8 @@ void retro_reset(void)
 
 void retro_run(void)
 {
-   uint32_t x, y;
    const uint8_t *buffer;
-   uint32_t *surface, pitch;
+   uint32_t video_pitch;
 
    update_input();
 
@@ -417,23 +506,18 @@ void retro_run(void)
    videoWidth  = Rect_GetLength(&maria_visibleArea);
    videoHeight = Rect_GetHeight(&maria_visibleArea);
    buffer      = maria_surface + ((maria_visibleArea.top - maria_displayArea.top) * Rect_GetLength(&maria_visibleArea));
-   surface     = (uint32_t*)videoBuffer;
-   pitch       = 320;
+   video_pitch = 320;
 
-   for(y = 0; y < videoHeight; y++)
+   if (videoPixelBytes == 2)
    {
-      for(x = 0; x < videoWidth; x += 4)
-      {
-         surface[x + 0] = display_palette32[buffer[x + 0]];
-         surface[x + 1] = display_palette32[buffer[x + 1]];
-         surface[x + 2] = display_palette32[buffer[x + 2]];
-         surface[x + 3] = display_palette32[buffer[x + 3]];
-      }
-      surface += pitch;
-      buffer  += videoWidth;
+      BLIT_VIDEO_BUFFER(uint16_t, buffer, display_palette16, videoWidth, videoHeight, video_pitch, videoBuffer);
+   }
+   else
+   {
+      BLIT_VIDEO_BUFFER(uint32_t, buffer, display_palette32, videoWidth, videoHeight, video_pitch, videoBuffer);
    }
 
-   video_cb(videoBuffer, videoWidth, videoHeight, videoWidth << 2);
+   video_cb(videoBuffer, videoWidth, videoHeight, videoWidth * videoPixelBytes);
 
    sound_Store();
 }
