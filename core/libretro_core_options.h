@@ -60,6 +60,17 @@ struct retro_core_option_definition option_defs_us[] = {
       },
       "16bit"
    },
+   {
+      "prosystem_gamepad_dual_stick_hack",
+      "Dual Stick Controller",
+      "Maps Player 2's joystick to the right analog stick of Player 1's RetroPad. Enables dual stick control in supported games (e.g. Robotron: 2084, T:ME Salvo).",
+      {
+         { "disabled", NULL},
+         { "enabled",  NULL},
+         { NULL, NULL },
+      },
+      "disabled"
+   },
    { NULL, NULL, NULL, {{0}}, NULL },
 };
 
