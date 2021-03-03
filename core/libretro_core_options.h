@@ -61,6 +61,45 @@ struct retro_core_option_definition option_defs_us[] = {
       "16bit"
    },
    {
+      "prosystem_low_pass_filter",
+      "Audio Filter",
+      "Enables a low pass audio filter to soften the 'harsh' sound produced by the Atari 7800's TIA chip.",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "prosystem_low_pass_range",
+      "Audio Filter Level",
+      "Specifies the cut-off frequency of the low pass audio filter. A higher value increases the perceived 'strength' of the filter, since a wider range of the high frequency spectrum is attenuated.",
+      {
+         { "5",  "5%" },
+         { "10", "10%" },
+         { "15", "15%" },
+         { "20", "20%" },
+         { "25", "25%" },
+         { "30", "30%" },
+         { "35", "35%" },
+         { "40", "40%" },
+         { "45", "45%" },
+         { "50", "50%" },
+         { "55", "55%" },
+         { "60", "60%" },
+         { "65", "65%" },
+         { "70", "70%" },
+         { "75", "75%" },
+         { "80", "80%" },
+         { "85", "85%" },
+         { "90", "90%" },
+         { "95", "95%" },
+         { NULL, NULL },
+      },
+      "60"
+   },
+   {
       "prosystem_gamepad_dual_stick_hack",
       "Dual Stick Controller",
       "Maps Player 2's joystick to the right analog stick of Player 1's RetroPad. Enables dual stick control in supported games (e.g. Robotron: 2084, T:ME Salvo).",
