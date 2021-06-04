@@ -12,7 +12,7 @@
 #pragma pack(1)
 #endif
 
-#include "libretro.h"
+#include <libretro.h>
 #include "libretro_core_options.h"
 
 #include "Bios.h"
@@ -32,28 +32,30 @@ extern void linearFree(void* mem);
 #endif
 
 #define VIDEO_BUFFER_SIZE (320 * 292 * 4)
-static uint8_t *videoBuffer = NULL;
-static uint8_t videoPixelBytes = 2;
-static int videoWidth  = 320;
-static int videoHeight = 240;
+static uint8_t *videoBuffer            = NULL;
+static uint8_t videoPixelBytes         = 2;
+static int videoWidth                  = 320;
+static int videoHeight                 = 240;
 static uint32_t display_palette32[256] = {0};
 static uint16_t display_palette16[256] = {0};
-static uint8_t keyboard_data[17] = {0};
+static uint8_t keyboard_data[17]       = {0};
+
+static bool persistent_data            = false;
 
 #define GAMEPAD_ANALOG_THRESHOLD 0x4000
-static bool gamepad_dual_stick_hack = false;
+static bool gamepad_dual_stick_hack    = false;
 
 /* Required buffer size is exactly TIA_BUFFER_SIZE,
  * but round up to nearest multiple of 128 for
  * peace of mind... */
 #define AUDIO_SAMPLE_BUFFER_SIZE ((TIA_BUFFER_SIZE + 0x7F) & ~0x7F)
-static uint8_t *pokeyMixBuffer = NULL;
-static int16_t *audioOutBuffer = NULL;
+static uint8_t *pokeyMixBuffer         = NULL;
+static int16_t *audioOutBuffer         = NULL;
 
 /* Low pass audio filter */
-static bool low_pass_enabled  = false;
-static int32_t low_pass_range = 0;
-static int32_t low_pass_prev  = 0; /* Previous sample */
+static bool low_pass_enabled           = false;
+static int32_t low_pass_range          = 0;
+static int32_t low_pass_prev           = 0; /* Previous sample */
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -73,8 +75,20 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void retro_set_environment(retro_environment_t cb)
 {
+   static const struct retro_system_content_info_override content_overrides[] = {
+      {
+         "a78|bin",/* extensions */
+         false,    /* need_fullpath */
+         true      /* persistent_data */
+      },
+      { NULL, false, false }
+   };
+
    environ_cb = cb;
    libretro_set_core_options(environ_cb);
+   /* Request a persistent content data buffer */
+   environ_cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE,
+         (void*)content_overrides);
 }
 
 #define BLIT_VIDEO_BUFFER(typename_t, src, palette, width, height, pitch, dst) \
@@ -375,6 +389,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 bool retro_load_game(const struct retro_game_info *info)
 {
    enum retro_pixel_format fmt;
+   const struct retro_game_info_ext *info_ext = NULL;
 
    struct retro_input_descriptor desc[] = {
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
@@ -440,13 +455,17 @@ bool retro_load_game(const struct retro_game_info *info)
     * Left difficulty switch defaults to left position, "(B)eginner"
     */
    keyboard_data[15] = 1;
-
    /* Right difficulty switch defaults to right position,
     * "(A)dvanced", which fixes Tower Toppler
     */
    keyboard_data[16] = 0;
 
-   if (cartridge_Load((const uint8_t*)info->data, info->size))
+   if (environ_cb(RETRO_ENVIRONMENT_GET_GAME_INFO_EXT, &info_ext) &&
+       info_ext->persistent_data)
+      persistent_data = true;
+
+   if (cartridge_Load(persistent_data,
+            (const uint8_t*)info->data, info->size))
    {
       char biospath[512];
       const char *system_directory_c = NULL;
@@ -484,8 +503,9 @@ bool retro_load_game_special(unsigned game_type, const struct retro_game_info *i
 
 void retro_unload_game(void) 
 {
-   prosystem_Close();
+   prosystem_Close(persistent_data);
    bios_Release();
+   persistent_data = false;
 }
 
 unsigned retro_get_region(void)

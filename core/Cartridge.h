@@ -45,12 +45,12 @@
 extern "C" {
 #endif
 
-extern bool cartridge_Load(const uint8_t* data, uint32_t size);
+extern bool cartridge_Load(bool persistent_data, const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);
 extern void cartridge_StoreBank(uint8_t bank);
 extern void cartridge_Write(uint16_t address, uint8_t data);
 extern bool cartridge_IsLoaded(void);
-extern void cartridge_Release(void);
+extern void cartridge_Release(bool persistent_data);
 extern char cartridge_digest[33];
 extern uint8_t cartridge_type;
 extern uint8_t cartridge_region;

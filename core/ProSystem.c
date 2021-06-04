@@ -238,9 +238,9 @@ bool prosystem_Load(const char *buffer)
 // ----------------------------------------------------------------------------
 // Close
 // ----------------------------------------------------------------------------
-void prosystem_Close(void)
+void prosystem_Close(bool persistent_data)
 {
-   cartridge_Release( );
+   cartridge_Release(persistent_data);
    maria_Reset( );
    maria_Clear( );
    memory_Reset( );

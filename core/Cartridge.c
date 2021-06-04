@@ -149,7 +149,7 @@ static void cartridge_ReadHeader(const uint8_t* header)
 // ----------------------------------------------------------------------------
 // Load
 // ----------------------------------------------------------------------------
-bool cartridge_Load(const uint8_t* data, uint32_t size)
+bool cartridge_Load(bool persistent_data, const uint8_t* data, uint32_t size)
 {
    int index;
    uint32_t offset     = 0;
@@ -158,8 +158,6 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
    /* Cartridge data is invalid. */
    if(size <= 128)
       return false;
-
-   cartridge_Release( );
 
    for(index = 0; index < 128; index++)
       header[index] = data[index];
@@ -171,15 +169,20 @@ bool cartridge_Load(const uint8_t* data, uint32_t size)
    if(cartridge_HasHeader(header))
    {
       cartridge_ReadHeader(header);
-      size -= 128;
-      offset = 128;
+      size   -= 128;
+      offset  = 128;
    }
 
-   cartridge_size   = size;
-   cartridge_buffer = (uint8_t*)malloc(cartridge_size * sizeof(uint8_t));
+   cartridge_size      = size;
+   if (persistent_data)
+      cartridge_buffer = (uint8_t*)data + offset;
+   else
+   {
+      cartridge_buffer = (uint8_t*)malloc(cartridge_size * sizeof(uint8_t));
 
-   for(index = 0; index < cartridge_size; index++)
-      cartridge_buffer[index] = data[index + offset];
+      for(index = 0; index < cartridge_size; index++)
+         cartridge_buffer[index] = data[index + offset];
+   }
 
    hash_Compute(cartridge_digest, cartridge_buffer, cartridge_size);
 
@@ -340,10 +343,13 @@ bool cartridge_IsLoaded(void)
 // ----------------------------------------------------------------------------
 // Release
 // ----------------------------------------------------------------------------
-void cartridge_Release(void)
+void cartridge_Release(bool persistent_data)
 {
-   if(cartridge_buffer)
-      free(cartridge_buffer);
+   if (!persistent_data)
+   {
+      if (cartridge_buffer)
+         free(cartridge_buffer);
+   }
    cartridge_buffer = NULL;
    cartridge_size   = 0;
 }
