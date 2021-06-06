@@ -224,11 +224,14 @@ static void update_input(void)
 
    input_poll_cb();
 
-   for (j = 0; j < 2; j++)
+   if (libretro_supports_bitmasks)
    {
-      if (libretro_supports_bitmasks)
+      for (j = 0; j < 2; j++)
          joypad_bits[j] = input_state_cb(j, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
-      else
+   }
+   else
+   {
+      for (j = 0; j < 2; j++)
       {
          joypad_bits[j] = 0;
          for (i = 0; i < (RETRO_DEVICE_ID_JOYPAD_R3+1); i++)
