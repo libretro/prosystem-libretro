@@ -280,6 +280,16 @@ else ifeq ($(platform), ctr)
 	FLAGS += -DARM11 -D_3DS
 	STATIC_LINKING = 1
 
+# RS90
+else ifeq ($(platform), rs90)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/rs90-toolchain/usr/bin/mipsel-linux-gcc
+	AR = /opt/rs90-toolchain/usr/bin/mipsel-linux-ar
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS += -fsigned-char
+	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+	fpic := -fPIC
+
 # GCW0
 else ifeq ($(platform), gcw0)
 	TARGET := $(TARGET_NAME)_libretro.so
