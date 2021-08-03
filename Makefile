@@ -299,7 +299,17 @@ else ifeq ($(platform), gcw0)
 	CFLAGS += -fsigned-char
 	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32r2 -mhard-float
 	fpic := -fPIC
-
+	
+# RETROFW
+else ifeq ($(platform), retrofw)
+	TARGET := $(TARGET_NAME)_libretro.so
+	CC = /opt/retrofw-toolchain/usr/bin/mipsel-linux-gcc
+	AR = /opt/retrofw-toolchain/usr/bin/mipsel-linux-ar
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS += -fsigned-char
+	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
+	fpic := -fPIC
+	
 # Raspberry Pi 1
 else ifeq ($(platform), rpi1)
 	TARGET := $(TARGET_NAME)_libretro.so
