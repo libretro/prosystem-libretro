@@ -340,6 +340,16 @@ else ifeq ($(platform), rpi3)
 	FLAGS += -marm -marm -mcpu=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard
 	FLAGS += -fomit-frame-pointer -ffast-math
 
+# Raspberry Pi 3 (64-bit)
+else ifeq ($(platform), rpi3_64)
+	TARGET := $(TARGET_NAME)_libretro.so
+	fpic := -fPIC
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS+=-fsigned-char
+	FLAGS += -DARM 
+	FLAGS += -mcpu=cortex-a53 -mtune=cortex-a53
+	FLAGS += -fomit-frame-pointer -ffast-math
+
 # Raspberry Pi 4
 else ifeq ($(platform), rpi4)
 	TARGET := $(TARGET_NAME)_libretro.so
