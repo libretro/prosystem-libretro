@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <streams/file_stream.h>
+
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #pragma pack(1)
@@ -75,6 +77,7 @@ void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
 void retro_set_environment(retro_environment_t cb)
 {
+   struct retro_vfs_interface_info vfs_iface_info;
    static const struct retro_system_content_info_override content_overrides[] = {
       {
          "a78|bin",/* extensions */
@@ -89,6 +92,11 @@ void retro_set_environment(retro_environment_t cb)
    /* Request a persistent content data buffer */
    environ_cb(RETRO_ENVIRONMENT_SET_CONTENT_INFO_OVERRIDE,
          (void*)content_overrides);
+
+   vfs_iface_info.required_interface_version = 1;
+   vfs_iface_info.iface                      = NULL;
+   if (environ_cb(RETRO_ENVIRONMENT_GET_VFS_INTERFACE, &vfs_iface_info))
+      filestream_vfs_init(&vfs_iface_info);
 }
 
 #define BLIT_VIDEO_BUFFER(typename_t, src, palette, width, height, pitch, dst) \

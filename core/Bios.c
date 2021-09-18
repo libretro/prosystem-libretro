@@ -24,8 +24,16 @@
 // ----------------------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <streams/file_stream.h>
 #include "Bios.h"
 #include "Memory.h"
+
+/* Forward declaration */
+int64_t rfread(void* buffer,
+   size_t elem_size, size_t elem_count, RFILE* stream);
+
+
 #define BIOS_SOURCE "Bios.cpp"
 
 bool bios_enabled = false;
@@ -38,38 +46,28 @@ static uint16_t bios_size = 0;
 // ----------------------------------------------------------------------------
 bool bios_Load(const char *filename)
 {
-   FILE *file;
+   RFILE *file;
    if(!filename || filename[0] == '\0')
       return false;
 
    bios_Release();
 
-   file = fopen(filename, "rb");
-   if(file == NULL)
+   file = filestream_open(filename,
+		   RETRO_VFS_FILE_ACCESS_READ,
+		   RETRO_VFS_FILE_ACCESS_HINT_NONE);
+   if (!file)
       return false;
 
-   if(fseek(file, 0, SEEK_END))
-   {
-      fclose(file);
-      return false;
-   }
-
-   bios_size = ftell(file);
-   if(fseek(file, 0, SEEK_SET))
-   {
-      fclose(file);
-      return false;
-   }
-
+   bios_size = filestream_get_size(file);
    bios_data = (uint8_t*)malloc(bios_size * sizeof(uint8_t));
-   if(fread(bios_data, 1, bios_size, file) != bios_size && ferror(file))
+   if(rfread(bios_data, 1, bios_size, file) != bios_size && filestream_error(file))
    {
-      fclose(file);
+      filestream_close(file);
       bios_Release();
       return false;
    }
 
-   fclose(file);
+   filestream_close(file);
 
    return true; 
 }

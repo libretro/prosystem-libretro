@@ -1,7 +1,7 @@
 LIBRETRO_COMM_DIR := $(CORE_DIR)/../libretro-common
 
 INCFLAGS := -I$(CORE_DIR) \
-				-I$(LIBRETRO_COMM_DIR)/include
+	    -I$(LIBRETRO_COMM_DIR)/include
 
 ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
@@ -22,3 +22,17 @@ SOURCES_C := \
 	$(CORE_DIR)/Riot.c \
 	$(CORE_DIR)/Sally.c \
 	$(CORE_DIR)/Tia.c
+
+SOURCES_C += \
+	$(LIBRETRO_COMM_DIR)/compat/compat_posix_string.c \
+	$(LIBRETRO_COMM_DIR)/compat/compat_strcasestr.c \
+	$(LIBRETRO_COMM_DIR)/compat/compat_strl.c \
+	$(LIBRETRO_COMM_DIR)/compat/fopen_utf8.c \
+	$(LIBRETRO_COMM_DIR)/encodings/encoding_utf.c \
+	$(LIBRETRO_COMM_DIR)/file/file_path.c \
+	$(LIBRETRO_COMM_DIR)/file/file_path_io.c \
+	$(LIBRETRO_COMM_DIR)/streams/file_stream.c \
+	$(LIBRETRO_COMM_DIR)/streams/file_stream_transforms.c \
+	$(LIBRETRO_COMM_DIR)/string/stdstring.c \
+	$(LIBRETRO_COMM_DIR)/time/rtime.c \
+	$(LIBRETRO_COMM_DIR)/vfs/vfs_implementation.c
