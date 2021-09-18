@@ -260,6 +260,7 @@ else ifeq ($(platform), psp1)
 	AR = psp-ar$(EXE_EXT)
 	STATIC_LINKING = 1
 	FLAGS += -G0
+	EXTRA_INCLUDES := -I$(shell psp-config --pspsdk-path)/include
 
 # Vita
 else ifeq ($(platform), vita)
@@ -654,6 +655,7 @@ endif
 LDFLAGS += $(fpic) $(SHARED)
 FLAGS += $(fpic) 
 FLAGS += $(INCFLAGS)
+FLAGS += $(EXTRA_INCLUDES) 
 
 ifeq ($(OLD_GCC), 1)
 WARNINGS := -Wall
