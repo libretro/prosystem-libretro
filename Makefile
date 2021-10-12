@@ -311,6 +311,16 @@ else ifeq ($(platform), retrofw)
 	FLAGS += -fomit-frame-pointer -ffast-math -march=mips32 -mtune=mips32
 	fpic := -fPIC
 	
+# MIYOO
+else ifeq ($(platform), miyoo)
+	TARGET := $(TARGET_NAME)_libretro.so
+   CC = /opt/miyoo/usr/bin/arm-linux-gcc
+   AR = /opt/miyoo/usr/bin/arm-linux-ar
+	SHARED := -shared -Wl,--no-undefined -Wl,--version-script=link.T
+	CFLAGS += -fsigned-char
+	FLAGS += -fomit-frame-pointer -ffast-math -march=armv5te -mtune=arm926ej-s 
+	fpic := -fPIC
+
 # Raspberry Pi 1
 else ifeq ($(platform), rpi1)
 	TARGET := $(TARGET_NAME)_libretro.so
