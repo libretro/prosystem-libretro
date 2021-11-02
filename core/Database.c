@@ -22,7 +22,6 @@
 // ----------------------------------------------------------------------------
 // Database.cpp
 // ----------------------------------------------------------------------------
-#include <stdio.h>
 #include "Database.h"
 #include "Cartridge.h"
 #define DATABASE_SOURCE "Database.cpp"
@@ -1755,9 +1754,6 @@ void database_Load(const char *digest)
    {
       if (!strcmp(db_list[i].digest, digest))
       {
-         printf("Found entry in internal database: %s [%s]\n",
-            db_list[i].title, db_list[i].digest);
-
          cartridge_type          = db_list[i].type;
          cartridge_pokey         = db_list[i].pokey;
          cartridge_controller[0] = db_list[i].controller1;
@@ -1767,5 +1763,4 @@ void database_Load(const char *digest)
          return;
       }
    }
-   printf("Did not find entry in internal database: [%s]\n", digest);
 }
