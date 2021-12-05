@@ -359,7 +359,7 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
    info->timing.fps            = (cartridge_region == REGION_NTSC) ? 60 : 50;
    info->timing.sample_rate    = (prosystem_frequency * prosystem_scanlines) << 1; /* 2 samples per scanline */
    info->geometry.base_width   = videoWidth;
-   info->geometry.base_height  = videoHeight;
+   info->geometry.base_height  = (cartridge_region == REGION_NTSC) ? 223 : 272;
    info->geometry.max_width    = 320;
    info->geometry.max_height   = 292;
    info->geometry.aspect_ratio = 4.0 / 3.0;
