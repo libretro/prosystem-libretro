@@ -171,6 +171,17 @@ bool prosystem_Save(char *buffer, bool compress)
          buffer[size + index] = memory_ram[16384 + index];
       size += 16384;
    }
+   else if(cartridge_type == CARTRIDGE_TYPE_SOUPER)
+   {
+      buffer[size++] = cartridge_souper_chr_bank[0];
+      buffer[size++] = cartridge_souper_chr_bank[1];
+      buffer[size++] = cartridge_souper_mode;
+      buffer[size++] = cartridge_souper_ram_page_bank[0];
+      buffer[size++] = cartridge_souper_ram_page_bank[1];
+      for(index = 0; index < sizeof(memory_souper_ram); index++)
+         buffer[size + index] = memory_souper_ram[index];
+      size += sizeof(memory_souper_ram);
+   }
 
    return true;
 }
@@ -230,6 +241,20 @@ bool prosystem_Load(const char *buffer)
       for(index = 0; index < 16384; index++)
          memory_ram[16384 + index] = buffer[offset + index];
       offset += 16384; 
+   }
+   else if(cartridge_type == CARTRIDGE_TYPE_SOUPER)
+   {
+      /* Save state file has an invalid size. */
+      if(size != 49218)
+         return false;
+
+      cartridge_souper_chr_bank[0] = buffer[offset++];
+      cartridge_souper_chr_bank[1] = buffer[offset++];
+      cartridge_souper_mode = buffer[offset++];
+      cartridge_souper_ram_page_bank[0] = buffer[offset++];
+      cartridge_souper_ram_page_bank[1] = buffer[offset++];
+      for(index = 0; index < sizeof(memory_souper_ram); index++)
+         memory_souper_ram[index] = buffer[offset++];
    }
 
    return true;

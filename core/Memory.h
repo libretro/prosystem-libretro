@@ -26,6 +26,7 @@
 #define MEMORY_H
 
 #define MEMORY_SIZE 65536
+#define MEMORY_SOUPER_EXRAM_SIZE 32768
 
 #include <stdint.h>
 
@@ -38,8 +39,10 @@ extern uint8_t memory_Read(uint16_t address);
 extern void memory_Write(uint16_t address, uint8_t data);
 extern void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data);
 extern void memory_ClearROM(uint16_t address, uint16_t size);
+extern uint16_t memory_souper_GetRamAddress(uint16_t address);
 extern uint8_t memory_ram[MEMORY_SIZE];
 extern uint8_t memory_rom[MEMORY_SIZE];
+extern uint8_t memory_souper_ram[MEMORY_SOUPER_EXRAM_SIZE];
 
 #ifdef __cplusplus
 }

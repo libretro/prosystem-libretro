@@ -32,11 +32,22 @@
 #define CARTRIDGE_TYPE_SUPERCART_ROM 4
 #define CARTRIDGE_TYPE_ABSOLUTE 5
 #define CARTRIDGE_TYPE_ACTIVISION 6
+#define CARTRIDGE_TYPE_SOUPER 7             // Used by "Rikki & Vikki"
 #define CARTRIDGE_CONTROLLER_NONE 0
 #define CARTRIDGE_CONTROLLER_JOYSTICK 1
 #define CARTRIDGE_CONTROLLER_LIGHTGUN 2
 #define CARTRIDGE_WSYNC_MASK 2
 #define CARTRIDGE_CYCLE_STEALING_MASK 1
+#define CARTRIDGE_SOUPER_BANK_SEL 0x8000
+#define CARTRIDGE_SOUPER_CHR_A_SEL 0x8001
+#define CARTRIDGE_SOUPER_CHR_B_SEL 0x8002
+#define CARTRIDGE_SOUPER_MODE_SEL 0x8003
+#define CARTRIDGE_SOUPER_EXRAM_V_SEL 0x8004
+#define CARTRIDGE_SOUPER_EXRAM_D_SEL 0x8005
+#define CARTRIDGE_SOUPER_AUDIO_CMD 0x8007
+#define CARTRIDGE_SOUPER_MODE_MFT 0x1
+#define CARTRIDGE_SOUPER_MODE_CHR 0x2
+#define CARTRIDGE_SOUPER_MODE_EXS 0x4
 
 #include <stdint.h>
 #include <boolean.h>
@@ -45,6 +56,7 @@
 extern "C" {
 #endif
 
+extern uint8_t cartridge_LoadROM(uint32_t address);
 extern bool cartridge_Load(bool persistent_data, const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);
 extern void cartridge_StoreBank(uint8_t bank);
@@ -58,6 +70,9 @@ extern bool cartridge_pokey;
 extern uint8_t cartridge_controller[2];
 extern uint8_t cartridge_bank;
 extern uint32_t cartridge_flags;
+extern uint8_t cartridge_souper_chr_bank[2];
+extern uint8_t cartridge_souper_mode;
+extern uint8_t cartridge_souper_ram_page_bank[2];
 
 #ifdef __cplusplus
 }
