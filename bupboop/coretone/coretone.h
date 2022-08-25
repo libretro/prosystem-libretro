@@ -39,7 +39,7 @@
 	#define CORETONE_REQUEST_DEPTH		32
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__LIBRETRO__)
 	#ifdef CORETONE_EXPORTS
 		#define CORETONE_API __declspec(dllexport)
 	#else
