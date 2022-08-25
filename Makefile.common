@@ -8,9 +8,14 @@ ifneq (,$(findstring msvc2003,$(platform)))
 INCFLAGS += -I$(LIBRETRO_COMM_DIR)/include/compat/msvc
 endif
 
+ifeq ($(platform),unix)
+LIBS += -lm
+endif
+
 SOURCES_C := \
 	$(CORE_DIR)/libretro.c \
 	$(CORE_DIR)/Bios.c \
+	$(CORE_DIR)/BupChip.c \
 	$(CORE_DIR)/Cartridge.c \
 	$(CORE_DIR)/Database.c \
 	$(CORE_DIR)/Hash.c \

@@ -27,6 +27,10 @@
 #include "Memory.h"
 #include "Hash.h"
 #include "Pokey.h"
+#include "BupChip.h"
+#include <streams/file_stream.h>
+#include <stdlib.h>
+#include <string.h>
 #define CARTRIDGE_SOURCE "Cartridge.cpp"
 
 char cartridge_digest[33];
@@ -36,6 +40,7 @@ bool cartridge_pokey;
 uint8_t cartridge_controller[2];
 uint8_t cartridge_bank;
 uint32_t cartridge_flags;
+bool cartridge_bupchip;
 
 // SOUPER-specific stuff, used for "Rikki & Vikki"
 uint8_t cartridge_souper_chr_bank[2];
@@ -339,6 +344,7 @@ void cartridge_Write(uint16_t address, uint8_t data)
                cartridge_souper_SetRamPageBank(1, data);
                break;
             case CARTRIDGE_SOUPER_AUDIO_CMD:
+               bupchip_ProcessAudioCommand(data);
                break;
          }
          break;

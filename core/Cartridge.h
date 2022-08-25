@@ -70,6 +70,7 @@ extern bool cartridge_pokey;
 extern uint8_t cartridge_controller[2];
 extern uint8_t cartridge_bank;
 extern uint32_t cartridge_flags;
+extern bool cartridge_bupchip;
 extern uint8_t cartridge_souper_chr_bank[2];
 extern uint8_t cartridge_souper_mode;
 extern uint8_t cartridge_souper_ram_page_bank[2];
