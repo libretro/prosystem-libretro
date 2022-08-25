@@ -213,7 +213,6 @@ bool prosystem_Load(const char *buffer)
    uint32_t index;
    char digest[33] = {0};
    uint32_t date   = 0;
-   uint32_t size   = 0;
    uint32_t offset = 0;
 
    for(index = 0; index < 16; index++)
@@ -253,20 +252,12 @@ bool prosystem_Load(const char *buffer)
 
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
    {
-      /* Save state file has an invalid size. */
-      if(size != 32829)
-         return false;
-
       for(index = 0; index < 16384; index++)
          memory_ram[16384 + index] = buffer[offset + index];
       offset += 16384; 
    }
    else if(cartridge_type == CARTRIDGE_TYPE_SOUPER)
    {
-      /* Save state file has an invalid size. */
-      if(size != 49221)
-         return false;
-
       cartridge_souper_chr_bank[0] = buffer[offset++];
       cartridge_souper_chr_bank[1] = buffer[offset++];
       cartridge_souper_mode = buffer[offset++];
