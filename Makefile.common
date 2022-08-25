@@ -1,4 +1,5 @@
 LIBRETRO_COMM_DIR := $(CORE_DIR)/../libretro-common
+BUPBOOP_DIR := $(CORE_DIR)/../bupboop
 
 INCFLAGS := -I$(CORE_DIR) \
 	    -I$(LIBRETRO_COMM_DIR)/include
@@ -22,6 +23,12 @@ SOURCES_C := \
 	$(CORE_DIR)/Riot.c \
 	$(CORE_DIR)/Sally.c \
 	$(CORE_DIR)/Tia.c
+
+SOURCES_C += \
+	$(BUPBOOP_DIR)/coretone/channel.c \
+	$(BUPBOOP_DIR)/coretone/coretone.c \
+	$(BUPBOOP_DIR)/coretone/music.c \
+	$(BUPBOOP_DIR)/coretone/sample.c
 
 SOURCES_C += \
 	$(LIBRETRO_COMM_DIR)/compat/compat_posix_string.c \
