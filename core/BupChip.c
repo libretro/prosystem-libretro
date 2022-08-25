@@ -50,16 +50,26 @@ uint8_t bupchip_current_song;
 short bupchip_buffer[CORETONE_BUFFER_LEN * 4];
 
 // ----------------------------------------------------------------------------
-// Init
+// InitFromCDF
 // ----------------------------------------------------------------------------
-bool bupchip_Init( )
+bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDir)
 {
    size_t songIndex = 0;
    char* line;
    BupchipFileContents fileData[34];
    uint32_t fileDataCount = 0;
 
-   // TODO: Load from CDF.
+   while(fileDataCount < sizeof(fileData) / sizeof(fileData[0]) &&
+      (line = cartridge_GetNextNonemptyLine(cdf, cdfSize)) != NULL)
+   {
+      if(!cartridge_ReadFile(&fileData[fileDataCount].data, &fileData[fileDataCount].size, line, workingDir))
+      {
+         free(line);
+         goto err;
+      }
+      free(line);
+      fileDataCount++;
+   }
 
    if(fileDataCount < 2)
       goto err;

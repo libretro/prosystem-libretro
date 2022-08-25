@@ -51,11 +51,15 @@
 
 #include <stdint.h>
 #include <boolean.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+extern char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size);
+extern bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath, const char* relativeTo);
+extern bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir);
 extern uint8_t cartridge_LoadROM(uint32_t address);
 extern bool cartridge_Load(bool persistent_data, const uint8_t* data, uint32_t size);
 extern void cartridge_Store(void);

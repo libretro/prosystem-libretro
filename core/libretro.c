@@ -81,9 +81,9 @@ void retro_set_environment(retro_environment_t cb)
    struct retro_vfs_interface_info vfs_iface_info;
    static const struct retro_system_content_info_override content_overrides[] = {
       {
-         "a78|bin",/* extensions */
-         false,    /* need_fullpath */
-         true      /* persistent_data */
+         "a78|bin|cdf", /* extensions */
+         false,         /* need_fullpath */
+         true           /* persistent_data */
       },
       { NULL, false, false }
    };
@@ -386,7 +386,7 @@ void retro_get_system_info(struct retro_system_info *info)
 #endif
 	info->library_version = "1.3e" GIT_VERSION;
 	info->need_fullpath = false;
-	info->valid_extensions = "a78|bin";
+	info->valid_extensions = "a78|bin|cdf";
 }
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
@@ -510,33 +510,50 @@ bool retro_load_game(const struct retro_game_info *info)
        info_ext->persistent_data)
       persistent_data = true;
 
-   if (cartridge_Load(persistent_data,
-            (const uint8_t*)info->data, info->size))
-   {
-      char biospath[512];
-      const char *system_directory_c = NULL;
 #ifdef _WIN32
-      char slash = '\\';
+   char slash = '\\';
 #else
-      char slash = '/';
+   char slash = '/';
 #endif
 
-      environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
+   if (info->size >= 10 && memcmp(info->data, "ProSystem", 9) == 0)
+   {
+      /* CDF file. */
+      char* lastSlash = strrchr(info->path, slash);
+      size_t baseSize = lastSlash == NULL ? strlen(info->path) : lastSlash - info->path;
+      char* workingDir = malloc(baseSize + 1);
+      memcpy(workingDir, info->path, baseSize);
+      workingDir[baseSize] = '\0';
 
-      /* BIOS is optional */
-      sprintf(biospath, "%s%c%s", system_directory_c, slash, "7800 BIOS (U).rom");
-      if (bios_Load(biospath))
-         bios_enabled = true;
+      bool ok = cartridge_LoadFromCDF(info->data, info->size, workingDir);
 
-      database_Load(cartridge_digest);
-      prosystem_Reset();
+      free(workingDir);
 
-      display_ResetPalette();
-
-      return true;
+      if (!ok)
+         return false;
+   }
+   else if (!cartridge_Load(persistent_data,
+            (const uint8_t*)info->data, info->size))
+   {
+      return false;
    }
 
-   return false;
+   char biospath[512];
+   const char *system_directory_c = NULL;
+
+   environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
+
+   /* BIOS is optional */
+   sprintf(biospath, "%s%c%s", system_directory_c, slash, "7800 BIOS (U).rom");
+   if (bios_Load(biospath))
+      bios_enabled = true;
+
+   database_Load(cartridge_digest);
+   prosystem_Reset();
+
+   display_ResetPalette();
+
+   return true;
 }
 
 bool retro_load_game_special(unsigned game_type, const struct retro_game_info *info, size_t num_info)

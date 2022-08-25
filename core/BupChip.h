@@ -27,6 +27,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include "../bupboop/types.h"
 #include "../bupboop/coretone/coretone.h"
 
@@ -35,7 +36,7 @@ extern unsigned char bupchip_volume;
 extern unsigned char bupchip_current_song;
 extern short bupchip_buffer[CORETONE_BUFFER_LEN * 4];
 
-bool bupchip_Init( );
+bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDir);
 void bupchip_ProcessAudioCommand(unsigned char data);
 void bupchip_Process(unsigned tick);
 void bupchip_Release( );

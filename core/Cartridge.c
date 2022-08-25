@@ -51,6 +51,61 @@ uint8_t* cartridge_buffer = NULL;
 static uint32_t cartridge_size = 0;
 
 // ----------------------------------------------------------------------------
+// GetNextNonemptyLine
+// ----------------------------------------------------------------------------
+char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
+{
+   while(*size != 0)
+   {
+      const char* line = *stream;
+      while(*size > 0 && **stream != '\r' && **stream != '\n')
+      {
+         (*stream)++;
+         (*size)--;
+      }
+
+      /* Skip CR/LF. */
+      const char *end = *stream;
+      while(*size > 0 && (**stream == '\r' || **stream == '\n'))
+      {
+         (*stream)++;
+         (*size)--;
+      }
+
+      if(line == end || line[0] == '\n' || line[0] == '\r')
+         continue;
+
+      char* lineBuffer = (char*)malloc(end - line + 1);
+      memcpy(lineBuffer, line, end - line);
+      lineBuffer[end - line] = '\0';
+      return lineBuffer;
+   }
+
+   return NULL;
+}
+
+// ----------------------------------------------------------------------------
+// ReadFile
+// ----------------------------------------------------------------------------
+bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath, const char* relativeTo)
+{
+   size_t pathLen = strlen(subpath) + strlen(relativeTo) + 1;
+   char* path = (char*)malloc(pathLen + 1);
+   char pathSeparator;
+#ifdef _WIN32
+   pathSeparator = '\\';
+#else
+   pathSeparator = '/';
+#endif
+   snprintf(path, pathLen + 1, "%s%c%s", relativeTo, pathSeparator, subpath);
+
+   int64_t len = 0;
+   filestream_read_file(path, (void**)outData, &len);
+   *outSize = (size_t)len;
+   return len > 0;
+}
+
+// ----------------------------------------------------------------------------
 // HasHeader
 // ----------------------------------------------------------------------------
 static bool cartridge_HasHeader(const uint8_t* header)
@@ -189,6 +244,75 @@ uint8_t cartridge_LoadROM(uint32_t address) {
    if(address >= cartridge_size)
       return 0;
    return cartridge_buffer[address];
+}
+
+// ----------------------------------------------------------------------------
+// LoadFromCDF
+// ----------------------------------------------------------------------------
+bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir)
+{
+   static const char *cartridgeTypes[ ] = {
+      "EMPTY",
+      "SUPER",
+      NULL,
+      NULL,
+      NULL,
+      "ABSOLUTE",
+      "ACTIVISION",
+      "SOUPER",
+   };
+
+   char* line;
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   if(strcmp(line, "ProSystem") != 0)
+      return false;
+   free(line);
+
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   for(int i = 0; i < sizeof(cartridgeTypes) / sizeof(cartridgeTypes[0]); i++)
+   {
+      if(cartridgeTypes[i] != NULL && strcmp(line, cartridgeTypes[i]) == 0)
+      {
+         cartridge_type = i;
+         break;
+      }
+   }
+   free(line);
+
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   /* Just ignore the cartridge title in `libretro`. */
+   free(line);
+
+   // Read binary file.
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   size_t cartSize;
+   if(!cartridge_ReadFile(&cartridge_buffer, &cartSize, line, workingDir))
+      return false;
+   free(line);
+
+   cartridge_size = (uint32_t)cartSize;
+   hash_Compute(cartridge_digest, cartridge_buffer, cartridge_size);
+
+   cartridge_bupchip = false;
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) != NULL)
+   {
+      cartridge_bupchip = strcmp(line, "CORETONE") == 0;
+      free(line);
+   }
+
+   if(cartridge_bupchip) {
+      if(!bupchip_InitFromCDF(&data, &size, workingDir))
+      {
+         free(cartridge_buffer);
+         return false;
+      }
+   }
+
+   return true;
 }
 
 // ----------------------------------------------------------------------------
