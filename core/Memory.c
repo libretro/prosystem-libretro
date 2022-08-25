@@ -32,6 +32,7 @@
 
 uint8_t memory_ram[MEMORY_SIZE] = {0};
 uint8_t memory_rom[MEMORY_SIZE] = {0};
+uint8_t memory_souper_ram[MEMORY_SOUPER_EXRAM_SIZE] = {0};
 
 // ----------------------------------------------------------------------------
 // Reset
@@ -47,6 +48,21 @@ void memory_Reset(void)
    for(index = 0; index < 16384; index++)
       memory_rom[index] = 0;
 }
+
+// ----------------------------------------------------------------------------
+// SOUPER GetRamAddress
+// ----------------------------------------------------------------------------
+uint16_t memory_souper_GetRamAddress(uint16_t address) {
+  uint8_t page = (address - 0x4000) >> 12;
+  if((cartridge_souper_mode & CARTRIDGE_SOUPER_MODE_EXS) != 0) {
+    if(address >= 0x6000 && address < 0x7000)
+      page = cartridge_souper_ram_page_bank[0];
+    else if(address >= 0x7000 && address < 0x8000)
+      page = cartridge_souper_ram_page_bank[1];
+  }
+  return (address & 0x0fff) | ((uint16_t)page << 12);
+}
+
 // ----------------------------------------------------------------------------
 // Read
 // ----------------------------------------------------------------------------
@@ -63,6 +79,11 @@ uint8_t memory_Read(uint16_t address)
          memory_ram[INTFLG] &= 0x7f;
          return memory_ram[INTFLG];
       default:
+         if(cartridge_type == CARTRIDGE_TYPE_SOUPER && address >= 0x4000 && address < 0x8000)
+         {
+            return memory_souper_ram[memory_souper_GetRamAddress(address)];
+            break;
+         }
          break;
    }
 
@@ -137,6 +158,11 @@ void memory_Write(uint16_t address, uint8_t data)
             riot_SetTimer(T1024T, data);
             break;
          default:
+            if(cartridge_type == CARTRIDGE_TYPE_SOUPER && address >= 0x4000 && address < 0x8000)
+            {
+               memory_souper_ram[memory_souper_GetRamAddress(address)] = data;
+               break;
+            }
             memory_ram[address] = data;
             if(address >= 8256 && address <= 8447)
                memory_ram[address - 8192] = data;

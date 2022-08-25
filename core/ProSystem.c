@@ -34,6 +34,7 @@
 #include "Sally.h"
 #include "Tia.h"
 #include "Pokey.h"
+#include "BupChip.h"
 #define PRO_SYSTEM_STATE_HEADER "PRO-SYSTEM STATE"
 #define PRO_SYSTEM_SOURCE "ProSystem.cpp"
 
@@ -76,6 +77,10 @@ void prosystem_Reset(void)
 void prosystem_ExecuteFrame(const uint8_t* input)
 {
    riot_SetInput(input);
+
+   uint32_t scanlinesPerBupchipTick = (prosystem_scanlines - 1) / 4;
+   uint32_t bupchipTickScanlines = 0;
+   uint32_t currentBupchipTick = 0;
 
    for(maria_scanline = 1; maria_scanline <= prosystem_scanlines; maria_scanline++)
    {
@@ -123,6 +128,17 @@ void prosystem_ExecuteFrame(const uint8_t* input)
       tia_Process(2);
       if(cartridge_pokey)
          pokey_Process(2);
+
+      if(cartridge_bupchip)
+      {
+         bupchipTickScanlines++;
+         if(bupchipTickScanlines == scanlinesPerBupchipTick)
+         {
+            bupchipTickScanlines = 0;
+            bupchip_Process(currentBupchipTick);
+            currentBupchipTick++;
+         }
+      }
    }
 
    prosystem_frame++;
@@ -170,6 +186,20 @@ bool prosystem_Save(char *buffer, bool compress)
       for(index = 0; index < 16384; index++)
          buffer[size + index] = memory_ram[16384 + index];
       size += 16384;
+   }
+   else if(cartridge_type == CARTRIDGE_TYPE_SOUPER)
+   {
+      buffer[size++] = cartridge_souper_chr_bank[0];
+      buffer[size++] = cartridge_souper_chr_bank[1];
+      buffer[size++] = cartridge_souper_mode;
+      buffer[size++] = cartridge_souper_ram_page_bank[0];
+      buffer[size++] = cartridge_souper_ram_page_bank[1];
+      for(index = 0; index < sizeof(memory_souper_ram); index++)
+         buffer[size + index] = memory_souper_ram[index];
+      size += sizeof(memory_souper_ram);
+      buffer[size++] = bupchip_flags;
+      buffer[size++] = bupchip_volume;
+      buffer[size++] = bupchip_current_song;
    }
 
    return true;
@@ -231,6 +261,24 @@ bool prosystem_Load(const char *buffer)
          memory_ram[16384 + index] = buffer[offset + index];
       offset += 16384; 
    }
+   else if(cartridge_type == CARTRIDGE_TYPE_SOUPER)
+   {
+      /* Save state file has an invalid size. */
+      if(size != 49221)
+         return false;
+
+      cartridge_souper_chr_bank[0] = buffer[offset++];
+      cartridge_souper_chr_bank[1] = buffer[offset++];
+      cartridge_souper_mode = buffer[offset++];
+      cartridge_souper_ram_page_bank[0] = buffer[offset++];
+      cartridge_souper_ram_page_bank[1] = buffer[offset++];
+      for(index = 0; index < sizeof(memory_souper_ram); index++)
+         memory_souper_ram[index] = buffer[offset++];
+      bupchip_flags = buffer[offset++];
+      bupchip_volume = buffer[offset++];
+      bupchip_current_song = buffer[offset++];
+      bupchip_StateLoaded( );
+   }
 
    return true;
 }
@@ -240,6 +288,7 @@ bool prosystem_Load(const char *buffer)
 // ----------------------------------------------------------------------------
 void prosystem_Close(bool persistent_data)
 {
+   bupchip_Release( );
    cartridge_Release(persistent_data);
    maria_Reset( );
    maria_Clear( );

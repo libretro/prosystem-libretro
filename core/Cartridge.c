@@ -27,6 +27,10 @@
 #include "Memory.h"
 #include "Hash.h"
 #include "Pokey.h"
+#include "BupChip.h"
+#include <streams/file_stream.h>
+#include <stdlib.h>
+#include <string.h>
 #define CARTRIDGE_SOURCE "Cartridge.cpp"
 
 char cartridge_digest[33];
@@ -36,9 +40,70 @@ bool cartridge_pokey;
 uint8_t cartridge_controller[2];
 uint8_t cartridge_bank;
 uint32_t cartridge_flags;
+bool cartridge_bupchip;
 
-static uint8_t* cartridge_buffer = NULL;
+// SOUPER-specific stuff, used for "Rikki & Vikki"
+uint8_t cartridge_souper_chr_bank[2];
+uint8_t cartridge_souper_mode;
+uint8_t cartridge_souper_ram_page_bank[2];
+
+uint8_t* cartridge_buffer = NULL;
 static uint32_t cartridge_size = 0;
+
+// ----------------------------------------------------------------------------
+// GetNextNonemptyLine
+// ----------------------------------------------------------------------------
+char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
+{
+   while(*size != 0)
+   {
+      const char* line = *stream;
+      while(*size > 0 && **stream != '\r' && **stream != '\n')
+      {
+         (*stream)++;
+         (*size)--;
+      }
+
+      /* Skip CR/LF. */
+      const char *end = *stream;
+      while(*size > 0 && (**stream == '\r' || **stream == '\n'))
+      {
+         (*stream)++;
+         (*size)--;
+      }
+
+      if(line == end || line[0] == '\n' || line[0] == '\r')
+         continue;
+
+      char* lineBuffer = (char*)malloc(end - line + 1);
+      memcpy(lineBuffer, line, end - line);
+      lineBuffer[end - line] = '\0';
+      return lineBuffer;
+   }
+
+   return NULL;
+}
+
+// ----------------------------------------------------------------------------
+// ReadFile
+// ----------------------------------------------------------------------------
+bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath, const char* relativeTo)
+{
+   size_t pathLen = strlen(subpath) + strlen(relativeTo) + 1;
+   char* path = (char*)malloc(pathLen + 1);
+   char pathSeparator;
+#ifdef _WIN32
+   pathSeparator = '\\';
+#else
+   pathSeparator = '/';
+#endif
+   snprintf(path, pathLen + 1, "%s%c%s", relativeTo, pathSeparator, subpath);
+
+   int64_t len = 0;
+   filestream_read_file(path, (void**)outData, &len);
+   *outSize = (size_t)len;
+   return len > 0;
+}
 
 // ----------------------------------------------------------------------------
 // HasHeader
@@ -105,6 +170,29 @@ static void cartridge_WriteBank(uint16_t address, uint8_t bank)
     cartridge_bank = bank;
   }
 }
+// ----------------------------------------------------------------------------
+// SOUPER StoreChrBank
+// ----------------------------------------------------------------------------
+static void cartridge_souper_StoreChrBank(uint8_t page, uint8_t bank) {
+  if(page < 2)
+    cartridge_souper_chr_bank[page] = bank;
+}
+
+// ----------------------------------------------------------------------------
+// SOUPER SetMode
+// ----------------------------------------------------------------------------
+static void cartridge_souper_SetMode(uint8_t data) {
+  cartridge_souper_mode = data;
+}
+
+// ----------------------------------------------------------------------------
+// SOUPER SetVideoPageBank
+// ----------------------------------------------------------------------------
+static void cartridge_souper_SetRamPageBank(uint8_t which, uint8_t data) {
+  if(which < 2)
+    cartridge_souper_ram_page_bank[which] = data & 7;
+}
+
 
 // ----------------------------------------------------------------------------
 // ReadHeader
@@ -135,6 +223,8 @@ static void cartridge_ReadHeader(const uint8_t* header)
          cartridge_type = CARTRIDGE_TYPE_ABSOLUTE;
       else if(header[53] == 2)
          cartridge_type = CARTRIDGE_TYPE_ACTIVISION;
+      else if(header[53] == 16)
+         cartridge_type = CARTRIDGE_TYPE_SOUPER;
       else
          cartridge_type = CARTRIDGE_TYPE_NORMAL;
    }
@@ -144,6 +234,85 @@ static void cartridge_ReadHeader(const uint8_t* header)
    cartridge_controller[1] = header[56];
    cartridge_region = header[57];
    cartridge_flags = 0;
+   cartridge_bupchip = false;
+}
+
+// ----------------------------------------------------------------------------
+// LoadROM
+// ----------------------------------------------------------------------------
+uint8_t cartridge_LoadROM(uint32_t address) {
+   if(address >= cartridge_size)
+      return 0;
+   return cartridge_buffer[address];
+}
+
+// ----------------------------------------------------------------------------
+// LoadFromCDF
+// ----------------------------------------------------------------------------
+bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir)
+{
+   static const char *cartridgeTypes[ ] = {
+      "EMPTY",
+      "SUPER",
+      NULL,
+      NULL,
+      NULL,
+      "ABSOLUTE",
+      "ACTIVISION",
+      "SOUPER",
+   };
+
+   char* line;
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   if(strcmp(line, "ProSystem") != 0)
+      return false;
+   free(line);
+
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   for(int i = 0; i < sizeof(cartridgeTypes) / sizeof(cartridgeTypes[0]); i++)
+   {
+      if(cartridgeTypes[i] != NULL && strcmp(line, cartridgeTypes[i]) == 0)
+      {
+         cartridge_type = i;
+         break;
+      }
+   }
+   free(line);
+
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   /* Just ignore the cartridge title in `libretro`. */
+   free(line);
+
+   // Read binary file.
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
+      return false;
+   size_t cartSize;
+   if(!cartridge_ReadFile(&cartridge_buffer, &cartSize, line, workingDir))
+      return false;
+   free(line);
+
+   cartridge_size = (uint32_t)cartSize;
+   hash_Compute(cartridge_digest, cartridge_buffer, cartridge_size);
+
+   cartridge_bupchip = false;
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)) != NULL)
+   {
+      cartridge_bupchip = strcmp(line, "CORETONE") == 0;
+      free(line);
+   }
+
+   if(cartridge_bupchip) {
+      if(!bupchip_InitFromCDF(&data, &size, workingDir))
+      {
+         free(cartridge_buffer);
+         return false;
+      }
+   }
+
+   return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -239,6 +408,11 @@ void cartridge_Store(void)
             memory_WriteROM(57344, 8192, cartridge_buffer + 114688);
          }
          break;
+      case CARTRIDGE_TYPE_SOUPER:
+         memory_WriteROM(0xc000, 0x4000, cartridge_buffer + cartridge_GetBankOffset(31));
+         memory_WriteROM(0x8000, 0x4000, cartridge_buffer + cartridge_GetBankOffset(0));
+         memory_ClearROM(0x4000, 0x4000);
+         break;
    }
 }
 
@@ -266,6 +440,37 @@ void cartridge_Write(uint16_t address, uint8_t data)
       case CARTRIDGE_TYPE_ACTIVISION:
          if(address >= 65408)
             cartridge_StoreBank(address & 7);
+         break;
+    case CARTRIDGE_TYPE_SOUPER:
+         if(address >= 0x4000 && address < 0x8000) {
+            memory_souper_ram[memory_souper_GetRamAddress(address)] = data;
+            break;
+         }
+
+         switch(address)
+         {
+            case CARTRIDGE_SOUPER_BANK_SEL:
+               cartridge_StoreBank(data & 31);
+               break;
+            case CARTRIDGE_SOUPER_CHR_A_SEL:
+               cartridge_souper_StoreChrBank(0, data);
+               break;
+            case CARTRIDGE_SOUPER_CHR_B_SEL:
+               cartridge_souper_StoreChrBank(1, data);
+               break;
+            case CARTRIDGE_SOUPER_MODE_SEL:
+               cartridge_souper_SetMode(data);
+               break;
+            case CARTRIDGE_SOUPER_EXRAM_V_SEL:
+               cartridge_souper_SetRamPageBank(0, data);
+               break;
+            case CARTRIDGE_SOUPER_EXRAM_D_SEL:
+               cartridge_souper_SetRamPageBank(1, data);
+               break;
+            case CARTRIDGE_SOUPER_AUDIO_CMD:
+               bupchip_ProcessAudioCommand(data);
+               break;
+         }
          break;
    }
 
@@ -328,6 +533,9 @@ void cartridge_StoreBank(uint8_t bank)
          break;
       case CARTRIDGE_TYPE_ACTIVISION:
          cartridge_WriteBank(40960, bank);
+         break;
+      case CARTRIDGE_TYPE_SOUPER:
+         cartridge_WriteBank(32768, bank);
          break;
    }  
 }
