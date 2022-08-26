@@ -36,12 +36,11 @@
 #include "Pokey.h"
 #include "BupChip.h"
 #define PRO_SYSTEM_STATE_HEADER "PRO-SYSTEM STATE"
-#define PRO_SYSTEM_SOURCE "ProSystem.cpp"
 
-uint16_t prosystem_frequency = 60;
-uint8_t prosystem_frame = 0;
-uint16_t prosystem_scanlines = 262;
-uint32_t prosystem_cycles = 0;
+static uint8_t prosystem_frame   = 0;
+static uint32_t prosystem_cycles = 0;
+uint16_t prosystem_frequency     = 60;
+uint16_t prosystem_scanlines     = 262;
 
 // ----------------------------------------------------------------------------
 // Reset

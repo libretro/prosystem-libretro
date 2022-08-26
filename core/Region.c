@@ -30,7 +30,7 @@
 #include "Tia.h"
 #include "Pokey.h"
 
-uint8_t region_type = REGION_AUTO;
+static uint8_t region_type = REGION_AUTO;
 
 static const rect REGION_VISIBLE_AREA_NTSC = {0, 26, 319, 248};
 static const rect REGION_VISIBLE_AREA_PAL = {0, 26, 319, 297};

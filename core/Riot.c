@@ -26,15 +26,15 @@
 #include "Equates.h"
 #include "Memory.h"
 
-bool riot_timing = false;
-uint16_t riot_timer = TIM64T;
-uint8_t riot_intervals;
+bool riot_timing              = false;
+static uint16_t riot_timer    = TIM64T;
+static uint8_t riot_intervals = 0;
 
-static uint8_t riot_dra = 0;
-static uint8_t riot_drb = 0;
-static bool riot_elapsed;
-static int riot_currentTime;
-static uint16_t riot_clocks;
+static uint8_t riot_dra       = 0;
+static uint8_t riot_drb       = 0;
+static bool riot_elapsed      = false;
+static int riot_currentTime   = 0;
+static uint16_t riot_clocks   = 0;
 
 void riot_Reset(void)
 {

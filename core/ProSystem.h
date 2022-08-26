@@ -40,9 +40,7 @@ extern bool prosystem_Load(const char *buffer);
 extern void prosystem_Close(bool persistent_data);
 
 extern uint16_t prosystem_frequency;
-extern uint8_t prosystem_frame;
 extern uint16_t prosystem_scanlines;
-extern uint32_t prosystem_cycles;
 
 #ifdef __cplusplus
 }

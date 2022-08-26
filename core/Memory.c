@@ -80,10 +80,7 @@ uint8_t memory_Read(uint16_t address)
          return memory_ram[INTFLG];
       default:
          if(cartridge_type == CARTRIDGE_TYPE_SOUPER && address >= 0x4000 && address < 0x8000)
-         {
             return memory_souper_ram[memory_souper_GetRamAddress(address)];
-            break;
-         }
          break;
    }
 
