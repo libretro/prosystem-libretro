@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Sally.cpp
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Sally.c
+ * ----------------------------------------------------------------------------
+ */
 #include "Sally.h"
 #include "Memory.h"
 #include "Pair.h"
@@ -80,27 +81,18 @@ static const uint8_t SALLY_CYCLES[256] = {
 	2,5,0,0,0,4,6,0,2,4,0,0,0,4,7,0,
 };
 
-// ----------------------------------------------------------------------------
-// Push
-// ----------------------------------------------------------------------------
 static void sally_Push(uint8_t data)
 {
    memory_Write(sally_s + 256, data);
    sally_s--;
 }
 
-// ----------------------------------------------------------------------------
-// Pop
-// ----------------------------------------------------------------------------
 static uint8_t sally_Pop(void)
 {
    sally_s++;
    return memory_Read(sally_s + 256);
 }
 
-// ----------------------------------------------------------------------------
-// Flags
-// ----------------------------------------------------------------------------
 static void sally_Flags(uint8_t data)
 {
    if(!data)
@@ -114,9 +106,6 @@ static void sally_Flags(uint8_t data)
       sally_p &= ~SALLY_FLAG.N;
 }
 
-// ----------------------------------------------------------------------------
-// Branch
-// ----------------------------------------------------------------------------
 static void sally_Branch(uint8_t branch)
 {
    if (branch)
@@ -131,9 +120,6 @@ static void sally_Branch(uint8_t branch)
    }
 }
 
-// ----------------------------------------------------------------------------
-// Delay
-// ----------------------------------------------------------------------------
 static void sally_Delay(uint8_t delta)
 {
    pair address1 = sally_address;
@@ -143,18 +129,12 @@ static void sally_Delay(uint8_t delta)
       sally_cycles++;
 }
 
-// ----------------------------------------------------------------------------
-// Absolute
-// ----------------------------------------------------------------------------
 static void sally_Absolute(void)
 {
    sally_address.b.l = memory_Read(sally_pc.w++);
    sally_address.b.h = memory_Read(sally_pc.w++);
 }
 
-// ----------------------------------------------------------------------------
-// AbsoluteX
-// ----------------------------------------------------------------------------
 static void sally_AbsoluteX(void)
 {
    sally_address.b.l = memory_Read(sally_pc.w++);
@@ -162,9 +142,6 @@ static void sally_AbsoluteX(void)
    sally_address.w += sally_x;
 }
 
-// ----------------------------------------------------------------------------
-// AbsoluteY
-// ----------------------------------------------------------------------------
 static void sally_AbsoluteY(void)
 {
    sally_address.b.l = memory_Read(sally_pc.w++);
@@ -172,17 +149,11 @@ static void sally_AbsoluteY(void)
    sally_address.w += sally_y;
 }
 
-// ----------------------------------------------------------------------------
-// Immediate
-// ----------------------------------------------------------------------------
 static void sally_Immediate(void)
 {
    sally_address.w = sally_pc.w++;
 }
 
-// ----------------------------------------------------------------------------
-// Indirect
-// ----------------------------------------------------------------------------
 static void sally_Indirect(void)
 {
    pair base;
@@ -192,9 +163,6 @@ static void sally_Indirect(void)
    sally_address.b.h = memory_Read(base.w + 1);
 }
 
-// ----------------------------------------------------------------------------
-// IndirectX
-// ----------------------------------------------------------------------------
 static void sally_IndirectX(void)
 {
    sally_address.b.l = memory_Read(sally_pc.w++) + sally_x;
@@ -202,9 +170,6 @@ static void sally_IndirectX(void)
    sally_address.b.l = memory_Read(sally_address.b.l);
 }
 
-// ----------------------------------------------------------------------------
-// IndirectY
-// ----------------------------------------------------------------------------
 static void sally_IndirectY(void)
 {
    sally_address.b.l = memory_Read(sally_pc.w++);
@@ -213,43 +178,28 @@ static void sally_IndirectY(void)
    sally_address.w += sally_y;
 }
 
-// ----------------------------------------------------------------------------
-// Relative
-// ----------------------------------------------------------------------------
 static void sally_Relative(void)
 {
    sally_address.w = memory_Read(sally_pc.w++);
 }
 
-// ----------------------------------------------------------------------------
-// Zero Page
-// ----------------------------------------------------------------------------
 static void sally_ZeroPage(void)
 {
    sally_address.w = memory_Read(sally_pc.w++);
 }
 
-// ----------------------------------------------------------------------------
-// ZeroPageX
-// ----------------------------------------------------------------------------
 static void sally_ZeroPageX(void)
 {
    sally_address.w = memory_Read(sally_pc.w++);
    sally_address.b.l += sally_x;
 }
 
-// ----------------------------------------------------------------------------
-// ZeroPageY
-// ----------------------------------------------------------------------------
 static void sally_ZeroPageY(void)
 {
    sally_address.w = memory_Read(sally_pc.w++);
    sally_address.b.l += sally_y;
 }
 
-// ----------------------------------------------------------------------------
-// ADC
-// ----------------------------------------------------------------------------
 static void sally_ADC(void)
 {
    uint8_t data = memory_Read(sally_address.w);
@@ -310,18 +260,12 @@ static void sally_ADC(void)
    }
 }
 
-// ----------------------------------------------------------------------------
-// AND
-// ----------------------------------------------------------------------------
 static void sally_AND(void)
 {
    sally_a &= memory_Read(sally_address.w);
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// ASLA
-// ----------------------------------------------------------------------------
 static void sally_ASLA(void)
 {
    if(sally_a & 128)
@@ -333,9 +277,6 @@ static void sally_ASLA(void)
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// ASL
-// ----------------------------------------------------------------------------
 static void sally_ASL(void)
 {
    uint8_t data = memory_Read(sally_address.w);
@@ -350,33 +291,21 @@ static void sally_ASL(void)
    sally_Flags(data);
 }
 
-// ----------------------------------------------------------------------------
-// BCC
-// ----------------------------------------------------------------------------
 static void sally_BCC(void)
 {
    sally_Branch(!(sally_p & SALLY_FLAG.C));
 }
 
-// ----------------------------------------------------------------------------
-// BCS
-// ----------------------------------------------------------------------------
 static void sally_BCS(void)
 {
    sally_Branch(sally_p & SALLY_FLAG.C);
 }
 
-// ----------------------------------------------------------------------------
-// BEQ
-// ----------------------------------------------------------------------------
 static void sally_BEQ(void)
 {
    sally_Branch(sally_p & SALLY_FLAG.Z);
 }
 
-// ----------------------------------------------------------------------------
-// BIT
-// ----------------------------------------------------------------------------
 static void sally_BIT(void)
 {
    uint8_t data = memory_Read(sally_address.w);
@@ -394,31 +323,23 @@ static void sally_BIT(void)
    sally_p |= data & 128;
 }
 
-// ----------------------------------------------------------------------------
-// BMI
-// ----------------------------------------------------------------------------
-static void sally_BMI(void) {
+static void sally_BMI(void)
+{
    sally_Branch(sally_p & SALLY_FLAG.N);
 }
 
-// ----------------------------------------------------------------------------
-// BNE
-// ----------------------------------------------------------------------------
-static void sally_BNE(void) {
+static void sally_BNE(void)
+{
    sally_Branch(!(sally_p & SALLY_FLAG.Z));
 }
 
-// ----------------------------------------------------------------------------
-// BPL
-// ----------------------------------------------------------------------------
-static void sally_BPL(void) {
+static void sally_BPL(void)
+{
    sally_Branch(!(sally_p & SALLY_FLAG.N));
 }
 
-// ----------------------------------------------------------------------------
-// BRK
-// ----------------------------------------------------------------------------
-static void sally_BRK(void) {
+static void sally_BRK(void)
+{
    sally_pc.w++;
    sally_p |= SALLY_FLAG.B;
 
@@ -431,51 +352,33 @@ static void sally_BRK(void) {
    sally_pc.b.h = memory_ram[SALLY_IRQ.H];
 }
 
-// ----------------------------------------------------------------------------
-// BVC
-// ----------------------------------------------------------------------------
-static void sally_BVC(void) {
+static void sally_BVC(void)
+{
    sally_Branch(!(sally_p & SALLY_FLAG.V));
 }
 
-// ----------------------------------------------------------------------------
-// BVS
-// ----------------------------------------------------------------------------
-static void sally_BVS(void) {
+static void sally_BVS(void)
+{
    sally_Branch(sally_p & SALLY_FLAG.V);
 }
 
-// ----------------------------------------------------------------------------
-// CLC
-// ----------------------------------------------------------------------------
-static void sally_CLC(void) {
+static void sally_CLC(void)
+{
    sally_p &= ~SALLY_FLAG.C;
 }
 
-// ----------------------------------------------------------------------------
-// CLD
-// ----------------------------------------------------------------------------
 static void sally_CLD(void) {
    sally_p &= ~SALLY_FLAG.D;
 }
 
-// ----------------------------------------------------------------------------
-// CLI
-// ----------------------------------------------------------------------------
 static void sally_CLI(void) {
    sally_p &= ~SALLY_FLAG.I;
 }
 
-// ----------------------------------------------------------------------------
-// CLV
-// ----------------------------------------------------------------------------
 static void sally_CLV(void) {
    sally_p &= ~SALLY_FLAG.V;
 }
 
-// ----------------------------------------------------------------------------
-// CMP
-// ----------------------------------------------------------------------------
 static void sally_CMP(void) {
    uint8_t data = memory_Read(sally_address.w);
 
@@ -489,103 +392,77 @@ static void sally_CMP(void) {
    sally_Flags(sally_a - data);
 }
 
-// ----------------------------------------------------------------------------
-// CPX
-// ----------------------------------------------------------------------------
-static void sally_CPX(void) {
+static void sally_CPX(void)
+{
    uint8_t data = memory_Read(sally_address.w);
 
-   if(sally_x >= data) {
+   if(sally_x >= data)
       sally_p |= SALLY_FLAG.C;  
-   }
-   else {
+   else
       sally_p &= ~SALLY_FLAG.C;
-   }
 
    sally_Flags(sally_x - data);
 }
 
-// ----------------------------------------------------------------------------
-// CPY
-// ----------------------------------------------------------------------------
-static void sally_CPY(void) {
+static void sally_CPY(void)
+{
    uint8_t data = memory_Read(sally_address.w);
 
-   if(sally_y >= data) {
+   if(sally_y >= data)
       sally_p |= SALLY_FLAG.C;
-   }
-   else {
+   else
       sally_p &= ~SALLY_FLAG.C;
-   }
 
    sally_Flags(sally_y - data);
 }
 
-// ----------------------------------------------------------------------------
-// DEC
-// ----------------------------------------------------------------------------
-static void sally_DEC(void) {
+static void sally_DEC(void)
+{
    uint8_t data = memory_Read(sally_address.w);
    memory_Write(sally_address.w, --data);
    sally_Flags(data);
 }
 
-// ----------------------------------------------------------------------------
-// DEX
-// ----------------------------------------------------------------------------
-static void sally_DEX(void) {
+static void sally_DEX(void)
+{
    sally_Flags(--sally_x);
 }
 
-// ----------------------------------------------------------------------------
-// DEY
-// ----------------------------------------------------------------------------
-static void sally_DEY(void) {
+static void sally_DEY(void)
+{
    sally_Flags(--sally_y);
 }
 
-// ----------------------------------------------------------------------------
-// EOR
-// ----------------------------------------------------------------------------
-static void sally_EOR(void) {
+static void sally_EOR(void)
+{
    sally_a ^= memory_Read(sally_address.w);
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// INC
-// ----------------------------------------------------------------------------
-static void sally_INC(void) {
+static void sally_INC(void)
+{
    uint8_t data = memory_Read(sally_address.w);
    memory_Write(sally_address.w, ++data);
    sally_Flags(data);
 }
 
-// ----------------------------------------------------------------------------
-// INX
-// ----------------------------------------------------------------------------
-static void sally_INX(void) {
+static void sally_INX(void)
+{
    sally_Flags(++sally_x);
 }
 
-// ----------------------------------------------------------------------------
-// INY
-// ----------------------------------------------------------------------------
-static void sally_INY(void) {
+static void sally_INY(void)
+{
    sally_Flags(++sally_y);
 }
 
-// ----------------------------------------------------------------------------
-// JMP
-// ----------------------------------------------------------------------------
-static void sally_JMP(void) {
+static void sally_JMP(void)
+{
    sally_pc = sally_address;
 }
 
-// ----------------------------------------------------------------------------
-// JSR
-// ----------------------------------------------------------------------------
-static void sally_JSR(void) {
+static void sally_JSR(void)
+{
    sally_pc.w--;
    sally_Push(sally_pc.b.h);
    sally_Push(sally_pc.b.l);
@@ -593,34 +470,26 @@ static void sally_JSR(void) {
    sally_pc = sally_address;
 }
 
-// ----------------------------------------------------------------------------
-// LDA
-// ----------------------------------------------------------------------------
-static void sally_LDA(void) {
+static void sally_LDA(void)
+{
    sally_a = memory_Read(sally_address.w);
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// LDX
-// ----------------------------------------------------------------------------
-static void sally_LDX(void) {
+static void sally_LDX(void)
+{
    sally_x = memory_Read(sally_address.w);
    sally_Flags(sally_x);
 }
 
-// ----------------------------------------------------------------------------
-// LDY
-// ----------------------------------------------------------------------------
-static void sally_LDY(void) {
+static void sally_LDY(void)
+{
    sally_y = memory_Read(sally_address.w);
    sally_Flags(sally_y);
 }
 
-// ----------------------------------------------------------------------------
-// LSRA
-// ----------------------------------------------------------------------------
-static void sally_LSRA(void) {
+static void sally_LSRA(void)
+{
    sally_p &= ~SALLY_FLAG.C;
    sally_p |= sally_a & 1;
 
@@ -628,10 +497,8 @@ static void sally_LSRA(void) {
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// LSR
-// ----------------------------------------------------------------------------
-static void sally_LSR(void) {
+static void sally_LSR(void)
+{
    uint8_t data = memory_Read(sally_address.w);
 
    sally_p &= ~SALLY_FLAG.C;
@@ -642,80 +509,60 @@ static void sally_LSR(void) {
    sally_Flags(data);
 }
 
-// ----------------------------------------------------------------------------
-// NOP
-// ----------------------------------------------------------------------------
-static void sally_NOP(void) {
+static void sally_NOP(void)
+{
 }
 
-// ----------------------------------------------------------------------------
-// ORA
-// ----------------------------------------------------------------------------
-static void sally_ORA(void) {
+static void sally_ORA(void)
+{
    sally_a |= memory_Read(sally_address.w);
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// PHA
-// ----------------------------------------------------------------------------
-static void sally_PHA(void) {
+static void sally_PHA(void)
+{
    sally_Push(sally_a);    
 }
 
-// ----------------------------------------------------------------------------
-// PHP
-// ----------------------------------------------------------------------------
-static void sally_PHP(void) {
+static void sally_PHP(void)
+{
    sally_Push(sally_p);
 }
 
-// ----------------------------------------------------------------------------
-// PLA
-// ----------------------------------------------------------------------------
-static void sally_PLA(void) {
+static void sally_PLA(void)
+{
    sally_a = sally_Pop( );
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// PLP
-// ----------------------------------------------------------------------------
-static void sally_PLP(void) {
+static void sally_PLP(void)
+{
    sally_p = sally_Pop( );
 }
 
-// ----------------------------------------------------------------------------
-// ROLA
-// ----------------------------------------------------------------------------
-static void sally_ROLA(void) {
+static void sally_ROLA(void)
+{
    uint8_t temp = sally_p;
 
-   if(sally_a & 128) {
+   if(sally_a & 128)
       sally_p |= SALLY_FLAG.C;  
-   }
-   else {
+   else
       sally_p &= ~SALLY_FLAG.C;
-   }
 
    sally_a <<= 1;
    sally_a |= temp & SALLY_FLAG.C;
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// ROL
-// ----------------------------------------------------------------------------
-static void sally_ROL(void) {
+static void sally_ROL(void)
+{
    uint8_t data = memory_Read(sally_address.w);
    uint8_t temp = sally_p;
 
-   if(data & 128) {
+   if(data & 128)
       sally_p |= SALLY_FLAG.C;
-   }
-   else {
+   else
       sally_p &= ~SALLY_FLAG.C;
-   }
 
    data <<= 1;
    data |= temp & 1;
@@ -723,27 +570,22 @@ static void sally_ROL(void) {
    sally_Flags(data);
 }
 
-// ----------------------------------------------------------------------------
-// RORA
-// ----------------------------------------------------------------------------
-static void sally_RORA(void) {
+static void sally_RORA(void)
+{
    uint8_t temp = sally_p;
 
    sally_p &= ~SALLY_FLAG.C;
    sally_p |= sally_a & 1;
 
    sally_a >>= 1;
-   if(temp & SALLY_FLAG.C) {
+   if(temp & SALLY_FLAG.C)
       sally_a |= 128;
-   }
 
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// ROR
-// ----------------------------------------------------------------------------
-static void sally_ROR(void) {
+static void sally_ROR(void)
+{
    uint8_t data = memory_Read(sally_address.w);
    uint8_t temp = sally_p;
 
@@ -759,27 +601,20 @@ static void sally_ROR(void) {
    sally_Flags(data);
 }
 
-// ----------------------------------------------------------------------------
-// RTI
-// ----------------------------------------------------------------------------
-static void sally_RTI(void) {
+static void sally_RTI(void)
+{
    sally_p = sally_Pop( );
    sally_pc.b.l = sally_Pop( );
    sally_pc.b.h = sally_Pop( );
 }
 
-// ----------------------------------------------------------------------------
-// RTS
-// ----------------------------------------------------------------------------
-static void sally_RTS(void) {
+static void sally_RTS(void)
+{
    sally_pc.b.l = sally_Pop( );
    sally_pc.b.h = sally_Pop( );
    sally_pc.w++;
 }
 
-// ----------------------------------------------------------------------------
-// SBC
-// ----------------------------------------------------------------------------
 static void sally_SBC(void)
 {
    uint8_t data = memory_Read(sally_address.w);
@@ -842,107 +677,73 @@ static void sally_SBC(void)
    }
 }
 
-// ----------------------------------------------------------------------------
-// SEC
-// ----------------------------------------------------------------------------
 static void sally_SEC(void)
 {
    sally_p |= SALLY_FLAG.C;  
 }
 
-// ----------------------------------------------------------------------------
-// SED
-// ----------------------------------------------------------------------------
 static void sally_SED(void)
 {
    sally_p |= SALLY_FLAG.D;
 }
 
-// ----------------------------------------------------------------------------
-// SEI
-// ----------------------------------------------------------------------------
 static void sally_SEI(void)
 {
    sally_p |= SALLY_FLAG.I;
 }
 
-// ----------------------------------------------------------------------------
-// STA
-// ----------------------------------------------------------------------------
 static void sally_STA(void)
 {
    memory_Write(sally_address.w, sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// STX
-// ----------------------------------------------------------------------------
 static void sally_stx(void)
 {
    memory_Write(sally_address.w, sally_x);
 }
 
-// ----------------------------------------------------------------------------
-// STY
-// ----------------------------------------------------------------------------
 static void sally_STY(void)
 {
    memory_Write(sally_address.w, sally_y);
 }
 
-// ----------------------------------------------------------------------------
-// TAX
-// ----------------------------------------------------------------------------
 static void sally_TAX(void)
 {
    sally_x = sally_a;
    sally_Flags(sally_x);
 }
 
-// ----------------------------------------------------------------------------
-// TAY
-// ----------------------------------------------------------------------------
 static void sally_TAY(void)
 {
    sally_y = sally_a;
    sally_Flags(sally_y);
 }
 
-// ----------------------------------------------------------------------------
-// TSX
-// ----------------------------------------------------------------------------
-static void sally_TSX(void) {
+static void sally_TSX(void)
+{
    sally_x = sally_s;
    sally_Flags(sally_x);
 }
 
-// ----------------------------------------------------------------------------
-// TXA
-// ----------------------------------------------------------------------------
-static void sally_TXA(void) {
+static void sally_TXA(void)
+{
    sally_a = sally_x;
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// TXS
-// ----------------------------------------------------------------------------
-static void sally_TXS(void) {
+static void sally_TXS(void)
+{
    sally_s = sally_x;
 }
 
-// ----------------------------------------------------------------------------
-// TYA
-// ----------------------------------------------------------------------------
-static void sally_TYA(void) {
+static void sally_TYA(void)
+{
    sally_a = sally_y;
    sally_Flags(sally_a);
 }
 
-// ----------------------------------------------------------------------------
-// Reset
-// ----------------------------------------------------------------------------
-void sally_Reset(void) {
+void sally_Reset(void)
+{
    sally_a = 0;
    sally_x = 0;
    sally_y = 0;
@@ -951,9 +752,6 @@ void sally_Reset(void) {
    sally_pc.w = 0;
 }
 
-// ----------------------------------------------------------------------------
-// ExecuteInstruction
-// ----------------------------------------------------------------------------
 uint32_t sally_ExecuteInstruction(void)
 {
    sally_opcode = memory_Read(sally_pc.w++);
@@ -1717,9 +1515,6 @@ uint32_t sally_ExecuteInstruction(void)
    return sally_cycles;
 }
 
-// ----------------------------------------------------------------------------
-// ExecuteRES
-// ----------------------------------------------------------------------------
 uint32_t sally_ExecuteRES(void)
 {
    sally_p = SALLY_FLAG.I | SALLY_FLAG.R | SALLY_FLAG.Z;
@@ -1728,9 +1523,6 @@ uint32_t sally_ExecuteRES(void)
    return 6;
 }
 
-// ----------------------------------------------------------------------------
-// ExecuteNMI
-// ----------------------------------------------------------------------------
 uint32_t sally_ExecuteNMI(void)
 {
    sally_Push(sally_pc.b.h);
@@ -1743,9 +1535,6 @@ uint32_t sally_ExecuteNMI(void)
    return 7;
 }
 
-// ----------------------------------------------------------------------------
-// Execute IRQ
-// ----------------------------------------------------------------------------
 uint32_t sally_ExecuteIRQ(void)
 {
    if(!(sally_p & SALLY_FLAG.I))

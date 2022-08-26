@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// BupChip.c
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * BupChip.c
+ * ----------------------------------------------------------------------------
+ */
 #include "BupChip.h"
 #include "Cartridge.h"
 #include <stdint.h>
@@ -63,11 +64,9 @@ static void bupchip_ReplaceChar(char *string, char character, char replacement)
    }
 }
 
-// ----------------------------------------------------------------------------
-// InitFromCDF
-// ----------------------------------------------------------------------------
 bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDir)
 {
+   size_t fileIndex;
    size_t songIndex = 0;
    char* line;
    BupchipFileContents fileData[34];
@@ -103,28 +102,23 @@ bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingD
    return true;
 
 err:
-   for(size_t fileIndex = 0; fileIndex < fileDataCount; fileIndex++)
+   for(fileIndex = 0; fileIndex < fileDataCount; fileIndex++)
    {
       free(fileData[fileIndex].data);
       fileData[fileIndex].data = NULL;
    }
-   bupchip_song_count = 0;
+   bupchip_song_count      = 0;
    bupchip_instrument_data = NULL;
-   bupchip_sample_data = NULL;
+   bupchip_sample_data     = NULL;
    return false;
 }
 
-// ----------------------------------------------------------------------------
-// Stop
-// ----------------------------------------------------------------------------
-void bupchip_Stop( ) {
+void bupchip_Stop(void)
+{
    bupchip_flags &= ~BUPCHIP_FLAGS_PLAYING;
    ct_stopMusic( );
 }
 
-// ----------------------------------------------------------------------------
-// Play
-// ----------------------------------------------------------------------------
 void bupchip_Play(unsigned char song)
 {
    if(song >= bupchip_song_count)
@@ -137,40 +131,28 @@ void bupchip_Play(unsigned char song)
    ct_playMusic(bupchip_songs[bupchip_current_song].data);
 }
 
-// ----------------------------------------------------------------------------
-// Pause
-// ----------------------------------------------------------------------------
-void bupchip_Pause( )
+void bupchip_Pause(void)
 {
    bupchip_flags |= BUPCHIP_FLAGS_PAUSED;
    ct_pause( );
 }
 
-// ----------------------------------------------------------------------------
-// Resume
-// ----------------------------------------------------------------------------
-void bupchip_Resume( )
+void bupchip_Resume(void)
 {
    bupchip_flags &= ~BUPCHIP_FLAGS_PAUSED;
    ct_resume( );
 }
 
-// ----------------------------------------------------------------------------
-// SetVolume
-// ----------------------------------------------------------------------------
 void bupchip_SetVolume(uint8_t volume)
 {
    bupchip_volume = volume & 0x1f;
-   // This matches BupSystem.
+   /* This matches BupSystem. */
    int attenuation = volume << 2;
    if((volume & 1) != 0)
       attenuation += 0x3;
    ct_attenMusic(attenuation);
 }
 
-// ----------------------------------------------------------------------------
-// ProcessAudioCommand
-// ----------------------------------------------------------------------------
 void bupchip_ProcessAudioCommand(unsigned char data)
 {
    switch(data & 0xc0)
@@ -205,20 +187,15 @@ void bupchip_ProcessAudioCommand(unsigned char data)
    }
 }
 
-// ----------------------------------------------------------------------------
-// Process
-// ----------------------------------------------------------------------------
 void bupchip_Process(unsigned tick)
 {
    ct_update(&bupchip_buffer[tick * CORETONE_BUFFER_LEN]);
 }
 
-// ----------------------------------------------------------------------------
-// Release
-// ----------------------------------------------------------------------------
-void bupchip_Release( )
+void bupchip_Release(void)
 {
-   for(int i = 0; i < bupchip_song_count; i++)
+   int i;
+   for(i = 0; i < bupchip_song_count; i++)
    {
       free(bupchip_songs[i].data);
       bupchip_songs[i].data = NULL;
@@ -226,13 +203,10 @@ void bupchip_Release( )
    free(bupchip_instrument_data);
    bupchip_instrument_data = NULL;
    free(bupchip_sample_data);
-   bupchip_sample_data = NULL;
+   bupchip_sample_data     = NULL;
 }
 
-// ----------------------------------------------------------------------------
-// StateLoaded
-// ----------------------------------------------------------------------------
-void bupchip_StateLoaded( )
+void bupchip_StateLoaded(void)
 {
    ct_stopAll( );
    if((bupchip_flags & BUPCHIP_FLAGS_PLAYING) == 0)

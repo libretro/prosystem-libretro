@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Cartridge.cpp
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Cartridge.c
+ * ----------------------------------------------------------------------------
+ */
 #include "Cartridge.h"
 #include "Equates.h"
 #include "Memory.h"
@@ -42,7 +43,7 @@ uint8_t cartridge_bank;
 uint32_t cartridge_flags;
 bool cartridge_bupchip;
 
-// SOUPER-specific stuff, used for "Rikki & Vikki"
+/* SOUPER-specific stuff, used for "Rikki & Vikki" */
 uint8_t cartridge_souper_chr_bank[2];
 uint8_t cartridge_souper_mode;
 uint8_t cartridge_souper_ram_page_bank[2];
@@ -50,9 +51,6 @@ uint8_t cartridge_souper_ram_page_bank[2];
 uint8_t* cartridge_buffer = NULL;
 static uint32_t cartridge_size = 0;
 
-// ----------------------------------------------------------------------------
-// GetNextNonemptyLine
-// ----------------------------------------------------------------------------
 char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
 {
    while(*size != 0)
@@ -84,9 +82,6 @@ char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
    return NULL;
 }
 
-// ----------------------------------------------------------------------------
-// ReadFile
-// ----------------------------------------------------------------------------
 bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath, const char* relativeTo)
 {
    size_t pathLen = strlen(subpath) + strlen(relativeTo) + 1;
@@ -105,9 +100,6 @@ bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath,
    return len > 0;
 }
 
-// ----------------------------------------------------------------------------
-// HasHeader
-// ----------------------------------------------------------------------------
 static bool cartridge_HasHeader(const uint8_t* header)
 {
    unsigned index;
@@ -121,9 +113,10 @@ static bool cartridge_HasHeader(const uint8_t* header)
    return true;
 }
 
-// ----------------------------------------------------------------------------
-// Header for CC2 hack
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ * Header for CC2 hack
+ * ----------------------------------------------------------------------------
+ */
 static bool cartridge_CC2(const uint8_t* header)
 {
    unsigned index;
@@ -137,9 +130,6 @@ static bool cartridge_CC2(const uint8_t* header)
    return true;
 }
 
-// ----------------------------------------------------------------------------
-// GetBankOffset
-// ----------------------------------------------------------------------------
 static uint32_t cartridge_GetBankOffset(uint8_t bank)
 {
    if (
@@ -149,17 +139,14 @@ static uint32_t cartridge_GetBankOffset(uint8_t bank)
           cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM) && cartridge_size <= 65536
       )
    {
-      // for some of these carts, there are only 4 banks. in this case we ignore bit 3
-      // previously, games of this type had to be doubled. The first 4 banks needed to be duplicated at the end of the ROM
+      /* for some of these carts, there are only 4 banks. in this case we ignore bit 3
+       * previously, games of this type had to be doubled. The first 4 banks needed to be duplicated at the end of the ROM */
       return (bank & 3) * 16384;
    }
 
    return bank * 16384;
 }
 
-// ----------------------------------------------------------------------------
-// WriteBank
-// ----------------------------------------------------------------------------
 static void cartridge_WriteBank(uint16_t address, uint8_t bank)
 {
   uint32_t offset = cartridge_GetBankOffset(bank);
@@ -170,33 +157,24 @@ static void cartridge_WriteBank(uint16_t address, uint8_t bank)
     cartridge_bank = bank;
   }
 }
-// ----------------------------------------------------------------------------
-// SOUPER StoreChrBank
-// ----------------------------------------------------------------------------
-static void cartridge_souper_StoreChrBank(uint8_t page, uint8_t bank) {
+
+static void cartridge_souper_StoreChrBank(uint8_t page, uint8_t bank)
+{
   if(page < 2)
     cartridge_souper_chr_bank[page] = bank;
 }
 
-// ----------------------------------------------------------------------------
-// SOUPER SetMode
-// ----------------------------------------------------------------------------
-static void cartridge_souper_SetMode(uint8_t data) {
+static void cartridge_souper_SetMode(uint8_t data)
+{
   cartridge_souper_mode = data;
 }
 
-// ----------------------------------------------------------------------------
-// SOUPER SetVideoPageBank
-// ----------------------------------------------------------------------------
-static void cartridge_souper_SetRamPageBank(uint8_t which, uint8_t data) {
+static void cartridge_souper_SetRamPageBank(uint8_t which, uint8_t data)
+{
   if(which < 2)
     cartridge_souper_ram_page_bank[which] = data & 7;
 }
 
-
-// ----------------------------------------------------------------------------
-// ReadHeader
-// ----------------------------------------------------------------------------
 static void cartridge_ReadHeader(const uint8_t* header)
 {
    cartridge_size  = header[49] << 24;
@@ -237,18 +215,13 @@ static void cartridge_ReadHeader(const uint8_t* header)
    cartridge_bupchip = false;
 }
 
-// ----------------------------------------------------------------------------
-// LoadROM
-// ----------------------------------------------------------------------------
-uint8_t cartridge_LoadROM(uint32_t address) {
+uint8_t cartridge_LoadROM(uint32_t address)
+{
    if(address >= cartridge_size)
       return 0;
    return cartridge_buffer[address];
 }
 
-// ----------------------------------------------------------------------------
-// LoadFromCDF
-// ----------------------------------------------------------------------------
 bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir)
 {
    static const char *cartridgeTypes[ ] = {
@@ -261,7 +234,7 @@ bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir
       "ACTIVISION",
       "SOUPER",
    };
-
+   int i;
    char* line;
    if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
       return false;
@@ -271,7 +244,7 @@ bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir
 
    if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
       return false;
-   for(int i = 0; i < sizeof(cartridgeTypes) / sizeof(cartridgeTypes[0]); i++)
+   for(i = 0; i < sizeof(cartridgeTypes) / sizeof(cartridgeTypes[0]); i++)
    {
       if(cartridgeTypes[i] != NULL && strcmp(line, cartridgeTypes[i]) == 0)
       {
@@ -286,7 +259,7 @@ bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir
    /* Just ignore the cartridge title in `libretro`. */
    free(line);
 
-   // Read binary file.
+   /* Read binary file. */
    if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
       return false;
    size_t cartSize;
@@ -315,9 +288,6 @@ bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir
    return true;
 }
 
-// ----------------------------------------------------------------------------
-// Load
-// ----------------------------------------------------------------------------
 bool cartridge_Load(bool persistent_data, const uint8_t* data, uint32_t size)
 {
    int index;
@@ -358,9 +328,6 @@ bool cartridge_Load(bool persistent_data, const uint8_t* data, uint32_t size)
    return true;
 }
 
-// ----------------------------------------------------------------------------
-// Store
-// ----------------------------------------------------------------------------
 void cartridge_Store(void)
 {
    switch(cartridge_type)
@@ -416,9 +383,6 @@ void cartridge_Store(void)
    }
 }
 
-// ----------------------------------------------------------------------------
-// Write
-// ----------------------------------------------------------------------------
 void cartridge_Write(uint16_t address, uint8_t data)
 {
    switch(cartridge_type)
@@ -509,9 +473,6 @@ void cartridge_Write(uint16_t address, uint8_t data)
    }
 }
 
-// ----------------------------------------------------------------------------
-// StoreBank
-// ----------------------------------------------------------------------------
 void cartridge_StoreBank(uint8_t bank)
 {
    switch(cartridge_type)
@@ -540,17 +501,11 @@ void cartridge_StoreBank(uint8_t bank)
    }  
 }
 
-// ----------------------------------------------------------------------------
-// IsLoaded
-// ----------------------------------------------------------------------------
 bool cartridge_IsLoaded(void)
 {
   return (cartridge_buffer != NULL)? true: false;
 }
 
-// ----------------------------------------------------------------------------
-// Release
-// ----------------------------------------------------------------------------
 void cartridge_Release(bool persistent_data)
 {
    if (!persistent_data)

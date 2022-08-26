@@ -1,30 +1,30 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Palette.h
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Palette.c
+ * ----------------------------------------------------------------------------
+ */
 #include <string.h>
 #include "Palette.h"
-#define PALETTE_SOURCE "Palette.c"
 
 bool palette_default = true;
 uint8_t palette_data[PALETTE_SIZE] = {
@@ -94,9 +94,6 @@ uint8_t palette_data[PALETTE_SIZE] = {
 0xFF,0xF5,0x74,0xFF,0xFF,0x88,0xFF,0xFF,0x9D,0xFF,0xFF,0xB1
 };
 
-// ----------------------------------------------------------------------------
-// Load
-// ----------------------------------------------------------------------------
 void palette_Load(const uint8_t* data)
 {
    int index;

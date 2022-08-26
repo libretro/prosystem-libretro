@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2003, 2004 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// ProSystem.cpp
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2003,2004 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Palette.c
+ * ----------------------------------------------------------------------------
+ */
 #include "ProSystem.h"
 #include <string.h>
 #include "Equates.h"
@@ -42,9 +43,6 @@ static uint32_t prosystem_cycles = 0;
 uint16_t prosystem_frequency     = 60;
 uint16_t prosystem_scanlines     = 262;
 
-// ----------------------------------------------------------------------------
-// Reset
-// ----------------------------------------------------------------------------
 void prosystem_Reset(void)
 {
    if(!cartridge_IsLoaded())
@@ -70,9 +68,6 @@ void prosystem_Reset(void)
    prosystem_cycles = sally_ExecuteRES( );
 }
 
-// ----------------------------------------------------------------------------
-// ExecuteFrame
-// ----------------------------------------------------------------------------
 void prosystem_ExecuteFrame(const uint8_t* input)
 {
    riot_SetInput(input);
@@ -146,9 +141,6 @@ void prosystem_ExecuteFrame(const uint8_t* input)
       prosystem_frame = 0;
 }
 
-// ----------------------------------------------------------------------------
-// Save
-// ----------------------------------------------------------------------------
 bool prosystem_Save(char *buffer, bool compress)
 {
    uint32_t size = 0;
@@ -204,9 +196,6 @@ bool prosystem_Save(char *buffer, bool compress)
    return true;
 }
 
-// ----------------------------------------------------------------------------
-// Load
-// ----------------------------------------------------------------------------
 bool prosystem_Load(const char *buffer)
 {
    uint32_t index;
@@ -273,9 +262,6 @@ bool prosystem_Load(const char *buffer)
    return true;
 }
 
-// ----------------------------------------------------------------------------
-// Close
-// ----------------------------------------------------------------------------
 void prosystem_Close(bool persistent_data)
 {
    bupchip_Release( );

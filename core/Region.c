@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Region.h
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Region.c
+ * ----------------------------------------------------------------------------
+ */
 #include "Region.h"
 #include "Cartridge.h"
 #include "ProSystem.h"
@@ -41,9 +42,9 @@ static const uint16_t REGION_SCANLINES_NTSC = 262;
 static const uint8_t REGION_FREQUENCY_PAL = 50;
 static const uint16_t REGION_SCANLINES_PAL = 312;
 
-// ----------------------------------------------------------------------------
-// PALETTE NTSC
-// ----------------------------------------------------------------------------
+/*
+ * PALETTE NTSC
+ */
 static const uint8_t REGION_PALETTE_NTSC[ ] = {
 0x00,0x00,0x00,0x14,0x14,0x14,0x29,0x29,0x29,0x3D,0x3D,0x3D,
 0x52,0x52,0x52,0x66,0x66,0x66,0x7A,0x7A,0x7A,0x8F,0x8F,0x8F,
@@ -111,9 +112,9 @@ static const uint8_t REGION_PALETTE_NTSC[ ] = {
 0xFF,0xF5,0x74,0xFF,0xFF,0x88,0xFF,0xFF,0x9D,0xFF,0xFF,0xB1
 };
 
-// --------------------------------------------------------------------------------------
-// PALETTE PAL
-// --------------------------------------------------------------------------------------
+/* 
+ * PALETTE PAL
+ */
 static const uint8_t REGION_PALETTE_PAL[ ] = {
   0x00,0x00,0x00,0x1c,0x1c,0x1c,0x39,0x39,0x39,0x59,0x59,0x59,
   0x79,0x79,0x79,0x92,0x92,0x92,0xab,0xab,0xab,0xbc,0xbc,0xbc,
@@ -181,9 +182,6 @@ static const uint8_t REGION_PALETTE_PAL[ ] = {
   0xd6,0xe1,0x49,0xe4,0xf0,0x4e,0xf2,0xff,0x53,0xf2,0xff,0x53,
 };
 
-// ----------------------------------------------------------------------------
-// Reset
-// ----------------------------------------------------------------------------
 void region_Reset(void)
 {
    if(region_type == REGION_PAL || (region_type == REGION_AUTO && cartridge_region == REGION_PAL))
@@ -191,7 +189,7 @@ void region_Reset(void)
       maria_displayArea = REGION_DISPLAY_AREA_PAL;
       maria_visibleArea = REGION_VISIBLE_AREA_PAL;
       if(palette_default)
-         palette_Load(REGION_PALETTE_PAL);  // Added check for default - bberlin
+         palette_Load(REGION_PALETTE_PAL);
       prosystem_frequency = REGION_FREQUENCY_PAL;
       prosystem_scanlines = REGION_SCANLINES_PAL;
       tia_size = 624;
@@ -202,7 +200,7 @@ void region_Reset(void)
       maria_displayArea = REGION_DISPLAY_AREA_NTSC;
       maria_visibleArea = REGION_VISIBLE_AREA_NTSC;
       if(palette_default)
-         palette_Load(REGION_PALETTE_NTSC);  // Added check for default - bberlin
+         palette_Load(REGION_PALETTE_NTSC);
       prosystem_frequency = REGION_FREQUENCY_NTSC;
       prosystem_scanlines = REGION_SCANLINES_NTSC;
       tia_size = 524;

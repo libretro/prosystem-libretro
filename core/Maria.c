@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Maria.c
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Maria.c
+ * ----------------------------------------------------------------------------
+ */
 #include "Maria.h"
 #include "Equates.h"
 #include "Pair.h"
@@ -47,10 +48,9 @@ static uint8_t maria_h08;
 static uint8_t maria_h16;
 static uint8_t maria_wmode;
 
-// ----------------------------------------------------------------------------
-// ReadByte
-// ----------------------------------------------------------------------------
-static uint8_t maria_ReadByte(uint16_t address) {
+static uint8_t maria_ReadByte(uint16_t address)
+{
+   uint32_t page, chrOffset;
    if(cartridge_type != CARTRIDGE_TYPE_SOUPER)
       return memory_ram[address];
    if((cartridge_souper_mode & CARTRIDGE_SOUPER_MODE_MFT) == 0 || address < 0x8000 ||
@@ -58,24 +58,15 @@ static uint8_t maria_ReadByte(uint16_t address) {
    {
       return memory_Read(address);
    }
-   if(address >= 0xc000)
-   {
-      // EXRAM
+   if(address >= 0xc000) /* EXRAM */
       return memory_Read(address - 0x8000);
-   }
-   if(address < 0xa000)
-   {
-      // Fixed ROM
+   if(address < 0xa000)  /* Fixed ROM */
       return memory_Read(address + 0x4000);
-   }
-   uint32_t page = (uint16_t)cartridge_souper_chr_bank[(address & 0x80) != 0? 1: 0];
-   uint32_t chrOffset = (((page & 0xfe) << 4) | (page & 1)) << 7;
+   page      = (uint16_t)cartridge_souper_chr_bank[(address & 0x80) != 0? 1: 0];
+   chrOffset = (((page & 0xfe) << 4) | (page & 1)) << 7;
    return cartridge_LoadROM((address & 0x0f7f) | chrOffset);
 }
 
-// ----------------------------------------------------------------------------
-// StoreCell2
-// ----------------------------------------------------------------------------
 static void maria_StoreCell2(uint8_t data)
 {
    if(maria_horizontal < MARIA_LINERAM_SIZE)
@@ -93,9 +84,6 @@ static void maria_StoreCell2(uint8_t data)
    maria_horizontal++;
 }
 
-// ----------------------------------------------------------------------------
-// StoreCell
-// ----------------------------------------------------------------------------
 static void maria_StoreCell(uint8_t high, uint8_t low)
 {
   if(maria_horizontal < MARIA_LINERAM_SIZE)
@@ -112,9 +100,6 @@ static void maria_StoreCell(uint8_t high, uint8_t low)
   maria_horizontal++;
 }
 
-// ----------------------------------------------------------------------------
-// IsHolyDMA
-// ----------------------------------------------------------------------------
 static bool maria_IsHolyDMA(void)
 {
    if(maria_pp.w > 32767)
@@ -127,9 +112,6 @@ static bool maria_IsHolyDMA(void)
   return false;
 }
 
-// ----------------------------------------------------------------------------
-// GetColor
-// ----------------------------------------------------------------------------
 static uint8_t maria_GetColor(uint8_t data)
 {
   if(data & 3)
@@ -137,9 +119,6 @@ static uint8_t maria_GetColor(uint8_t data)
   return maria_ReadByte(BACKGRND);
 }
 
-// ----------------------------------------------------------------------------
-// StoreGraphic
-// ----------------------------------------------------------------------------
 static void maria_StoreGraphic(void)
 {
    uint8_t data = maria_ReadByte(maria_pp.w);
@@ -176,9 +155,6 @@ static void maria_StoreGraphic(void)
    maria_pp.w++;
 }
 
-// ----------------------------------------------------------------------------
-// WriteLineRAM
-// ----------------------------------------------------------------------------
 static void maria_WriteLineRAM(uint8_t* buffer)
 {
    uint8_t rmode = maria_ReadByte(CTRL) & 3;
@@ -236,9 +212,6 @@ static void maria_WriteLineRAM(uint8_t* buffer)
    }
 }
 
-// ----------------------------------------------------------------------------
-// StoreLineRAM
-// ----------------------------------------------------------------------------
 static void maria_StoreLineRAM(void)
 {
    int index;
@@ -310,9 +283,6 @@ static void maria_StoreLineRAM(void)
    }
 }
 
-// ----------------------------------------------------------------------------
-// Reset
-// ----------------------------------------------------------------------------
 void maria_Reset(void)
 {
    int index;
@@ -321,9 +291,6 @@ void maria_Reset(void)
       maria_surface[index] = 0;
 }
 
-// ----------------------------------------------------------------------------
-// RenderScanline
-// ----------------------------------------------------------------------------
 uint32_t maria_RenderScanline(void)
 {
    maria_cycles = 0;
@@ -368,9 +335,6 @@ uint32_t maria_RenderScanline(void)
    return maria_cycles;
 }
 
-// ----------------------------------------------------------------------------
-// Clear
-// ----------------------------------------------------------------------------
 void maria_Clear(void)
 {
    int index;

@@ -140,19 +140,22 @@ static short sound_Lerp(short a, short b, float t) {
 
 static void sound_ResampleBupChip(const short* source, short* target, int length)
 {
+   int targetIndex;
    uint32_t bupchipBufferSize = CORETONE_BUFFER_SAMPLES * 4;
 
-   for(int targetIndex = 0; targetIndex < length; targetIndex++) {
+   for(targetIndex = 0; targetIndex < length; targetIndex++)
+   {
+      float t;
+      int channel;
       float sourceIndex = (float)targetIndex / (float)length * (float)bupchipBufferSize;
       uint32_t sourceLo = (uint32_t)floorf(sourceIndex), sourceHi = (uint32_t)ceilf(sourceIndex);
       if(sourceHi >= bupchipBufferSize)
          sourceHi = bupchipBufferSize;
-      float t = sourceIndex - (float)sourceLo;
+      t = sourceIndex - (float)sourceLo;
 
-      for(int channel = 0; channel < 2; channel++)
+      for (channel = 0; channel < 2; channel++)
       {
          int sample = sound_Lerp(source[sourceLo * 2 + channel], source[sourceHi * 2 + channel], t);
-
          sample += target[targetIndex * 2 + channel];
          if(sample > INT16_MAX)
             sample = INT16_MAX;
@@ -241,29 +244,32 @@ static void update_input(void)
    unsigned j2_override_down  = 0;
    unsigned j2_override_up    = 0;
 
-   // ----------------------------------------------------------------------------
-   // SetInput
-   // +----------+--------------+-------------------------------------------------
-   // | Offset   | Controller   | Control
-   // +----------+--------------+-------------------------------------------------
-   // | 00       | Joystick 1   | Right
-   // | 01       | Joystick 1   | Left
-   // | 02       | Joystick 1   | Down
-   // | 03       | Joystick 1   | Up
-   // | 04       | Joystick 1   | Button 1
-   // | 05       | Joystick 1   | Button 2
-   // | 06       | Joystick 2   | Right
-   // | 07       | Joystick 2   | Left
-   // | 08       | Joystick 2   | Down
-   // | 09       | Joystick 2   | Up
-   // | 10       | Joystick 2   | Button 1
-   // | 11       | Joystick 2   | Button 2
-   // | 12       | Console      | Reset
-   // | 13       | Console      | Select
-   // | 14       | Console      | Pause
-   // | 15       | Console      | Left Difficulty
-   // | 16       | Console      | Right Difficulty
-   // +----------+--------------+-------------------------------------------------
+    
+   /*
+    * ----------------------------------------------------------------------------
+    * SetInput
+    * +----------+--------------+-------------------------------------------------
+    * | Offset   | Controller   | Control
+    * +----------+--------------+-------------------------------------------------
+    * | 00       | Joystick 1   | Right
+    * | 01       | Joystick 1   | Left
+    * | 02       | Joystick 1   | Down
+    * | 03       | Joystick 1   | Up
+    * | 04       | Joystick 1   | Button 1
+    * | 05       | Joystick 1   | Button 2
+    * | 06       | Joystick 2   | Right
+    * | 07       | Joystick 2   | Left
+    * | 08       | Joystick 2   | Down
+    * | 09       | Joystick 2   | Up
+    * | 10       | Joystick 2   | Button 1
+    * | 11       | Joystick 2   | Button 2
+    * | 12       | Console      | Reset
+    * | 13       | Console      | Select
+    * | 14       | Console      | Pause
+    * | 15       | Console      | Left Difficulty
+    * | 16       | Console      | Right Difficulty
+    * +----------+--------------+-------------------------------------------------
+    */
 
    input_poll_cb();
 
@@ -669,7 +675,7 @@ void retro_run(void)
 
    update_input();
 
-   prosystem_ExecuteFrame(keyboard_data); // wants input
+   prosystem_ExecuteFrame(keyboard_data); /* wants input */
 
    videoWidth  = Rect_GetLength(&maria_visibleArea);
    videoHeight = Rect_GetHeight(&maria_visibleArea);

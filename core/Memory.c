@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Memory.cpp
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Memory.c
+ * ----------------------------------------------------------------------------
+ */
 #include <stdlib.h>
 #include "Memory.h"
 #include "Equates.h"
@@ -34,9 +35,6 @@ uint8_t memory_ram[MEMORY_SIZE] = {0};
 uint8_t memory_rom[MEMORY_SIZE] = {0};
 uint8_t memory_souper_ram[MEMORY_SOUPER_EXRAM_SIZE] = {0};
 
-// ----------------------------------------------------------------------------
-// Reset
-// ----------------------------------------------------------------------------
 void memory_Reset(void)
 {
    uint32_t index;
@@ -49,12 +47,11 @@ void memory_Reset(void)
       memory_rom[index] = 0;
 }
 
-// ----------------------------------------------------------------------------
-// SOUPER GetRamAddress
-// ----------------------------------------------------------------------------
-uint16_t memory_souper_GetRamAddress(uint16_t address) {
+uint16_t memory_souper_GetRamAddress(uint16_t address)
+{
   uint8_t page = (address - 0x4000) >> 12;
-  if((cartridge_souper_mode & CARTRIDGE_SOUPER_MODE_EXS) != 0) {
+  if((cartridge_souper_mode & CARTRIDGE_SOUPER_MODE_EXS) != 0)
+  {
     if(address >= 0x6000 && address < 0x7000)
       page = cartridge_souper_ram_page_bank[0];
     else if(address >= 0x7000 && address < 0x8000)
@@ -63,9 +60,6 @@ uint16_t memory_souper_GetRamAddress(uint16_t address) {
   return (address & 0x0fff) | ((uint16_t)page << 12);
 }
 
-// ----------------------------------------------------------------------------
-// Read
-// ----------------------------------------------------------------------------
 uint8_t memory_Read(uint16_t address)
 {
    switch ( address )
@@ -87,9 +81,6 @@ uint8_t memory_Read(uint16_t address)
    return memory_ram[address];
 }
 
-// ----------------------------------------------------------------------------
-// Write
-// ----------------------------------------------------------------------------
 void memory_Write(uint16_t address, uint8_t data)
 {
    if(!memory_rom[address])
@@ -177,9 +168,6 @@ void memory_Write(uint16_t address, uint8_t data)
       cartridge_Write(address, data);
 }
 
-// ----------------------------------------------------------------------------
-// WriteROM
-// ----------------------------------------------------------------------------
 void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data)
 {
    uint32_t index;
@@ -194,9 +182,6 @@ void memory_WriteROM(uint16_t address, uint16_t size, const uint8_t* data)
    }
 }
 
-// ----------------------------------------------------------------------------
-// ClearROM
-// ----------------------------------------------------------------------------
 void memory_ClearROM(uint16_t address, uint16_t size)
 {
    uint32_t index;

@@ -1,27 +1,28 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Riot.cpp
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Riot.c
+ * ----------------------------------------------------------------------------
+ */
 #include "Riot.h"
 #include "Equates.h"
 #include "Memory.h"
@@ -42,29 +43,30 @@ void riot_Reset(void)
 	riot_SetDRB(0);
 }
 
-// ----------------------------------------------------------------------------
-// SetInput
-// +----------+--------------+-------------------------------------------------
-// | Offset   | Controller   | Control                                                   
-// +----------+--------------+-------------------------------------------------
-// | 00       | Joystick 1   | Right
-// | 01       | Joystick 1   | Left
-// | 02       | Joystick 1   | Down
-// | 03       | Joystick 1   | Up
-// | 04       | Joystick 1   | Button 1
-// | 05       | Joystick 1   | Button 2
-// | 06       | Joystick 2   | Right
-// | 07       | Joystick 2   | Left
-// | 08       | Joystick 2   | Down
-// | 09       | Joystick 2   | Up
-// | 10       | Joystick 2   | Button 1
-// | 11       | Joystick 2   | Button 2
-// | 12       | Console      | Reset
-// | 13       | Console      | Select
-// | 14       | Console      | Pause
-// | 15       | Console      | Left Difficulty
-// | 16       | Console      | Right Difficulty
-// +----------+--------------+-------------------------------------------------
+/* ----------------------------------------------------------------------------
+ * SetInput
+ * +----------+--------------+-------------------------------------------------
+ * | Offset   | Controller   | Control                                         
+ * +----------+--------------+-------------------------------------------------
+ * | 00       | Joystick 1   | Right
+ * | 01       | Joystick 1   | Left
+ * | 02       | Joystick 1   | Down
+ * | 03       | Joystick 1   | Up
+ * | 04       | Joystick 1   | Button 1
+ * | 05       | Joystick 1   | Button 2
+ * | 06       | Joystick 2   | Right
+ * | 07       | Joystick 2   | Left
+ * | 08       | Joystick 2   | Down
+ * | 09       | Joystick 2   | Up
+ * | 10       | Joystick 2   | Button 1
+ * | 11       | Joystick 2   | Button 2
+ * | 12       | Console      | Reset
+ * | 13       | Console      | Select
+ * | 14       | Console      | Pause
+ * | 15       | Console      | Left Difficulty
+ * | 16       | Console      | Right Difficulty
+ * +----------+--------------+-------------------------------------------------
+ */
 void riot_SetInput(const uint8_t* input)
 {
 
@@ -120,26 +122,26 @@ void riot_SetInput(const uint8_t* input)
 see:  http://www.atariage.com/forums/index.php?showtopic=127162
 also see 7800 schematic and RIOT datasheet  */
 
-   if(memory_ram[SWCHB] & 0x04)	//first player in 1 button mode
+   if(memory_ram[SWCHB] & 0x04)	 /* first player in 1 button mode */
    {
-      memory_ram[INPT0] &= 0x7f;		//new style buttons are always off in this mode
+      memory_ram[INPT0] &= 0x7f; /* new style buttons are always off in this mode */
       memory_ram[INPT1] &= 0x7f;
 
-      if(input[0x04] || input[0x05])	//in this mode, either button triggers only the legacy button signal
-         memory_ram[INPT4] &= 0x7f;	//this button signal activates by turning off the high bit
+      if(input[0x04] || input[0x05]) /* in this mode, either button triggers only the legacy button signal */
+         memory_ram[INPT4] &= 0x7f;  /* this button signal activates by turning off the high bit */
       else
          memory_ram[INPT4] |= 0x80;
    }
-   else			//first player in 2 button mode
+   else /* first player in 2 button mode */
    {
-      memory_ram[INPT4] |= 0x80;		//2600 button is always off in this mode
+      memory_ram[INPT4] |= 0x80; /* 2600 button is always off in this mode */
 
-      if(input[0x04])					//left button (button 1)
-         memory_ram[INPT1] |= 0x80;	//these buttons activate by turning on the high bit.
+      if(input[0x04]) /* left button (button 1) */
+         memory_ram[INPT1] |= 0x80; /* these buttons activate by turning on the high bit. */
       else
          memory_ram[INPT1] &= 0x7f;
 
-      if(input[0x05])					//right button (button 2)
+      if(input[0x05]) /* right button (button 2) */
          memory_ram[INPT0] |= 0x80;
       else
          memory_ram[INPT0] &= 0x7f;
@@ -188,10 +190,6 @@ void riot_SetDRB(uint8_t data)
 	riot_drb=data;
 }
 
-
-// ----------------------------------------------------------------------------
-// SetTimer
-// ----------------------------------------------------------------------------
 void riot_SetTimer(uint16_t timer, uint8_t intervals)
 {
    riot_timer = timer;
@@ -224,9 +222,6 @@ void riot_SetTimer(uint16_t timer, uint8_t intervals)
    }
 }
 
-// ----------------------------------------------------------------------------
-// UpdateTimer
-// ----------------------------------------------------------------------------
 void riot_UpdateTimer(uint8_t cycles)
 {
    riot_currentTime -= cycles;

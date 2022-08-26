@@ -1,33 +1,31 @@
-// ----------------------------------------------------------------------------
-//   ___  ___  ___  ___       ___  ____  ___  _  _
-//  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
-// /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
-//
-// ----------------------------------------------------------------------------
-// Copyright 2005 Greg Stanton
-// 
-// This program is free software; you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation; either version 2 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program; if not, write to the Free Software
-// Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-// ----------------------------------------------------------------------------
-// Hash.cpp
-// ----------------------------------------------------------------------------
+/* ----------------------------------------------------------------------------
+ *   ___  ___  ___  ___       ___  ____  ___  _  _
+ *  /__/ /__/ /  / /__  /__/ /__    /   /_   / |/ /
+ * /    / \  /__/ ___/ ___/ ___/   /   /__  /    /  emulator
+ *
+ * ----------------------------------------------------------------------------
+ * Copyright 2005 Greg Stanton
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ * ----------------------------------------------------------------------------
+ * Hash.c
+ * ----------------------------------------------------------------------------
+ */
 #include <stdio.h>
 #include "Hash.h"
 
-// ----------------------------------------------------------------------------
-// Step1
-// ----------------------------------------------------------------------------
 static uint32_t hash_Step1(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s)
 {
    w += (z ^ (x & (y ^ z))) + data;
@@ -36,9 +34,6 @@ static uint32_t hash_Step1(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint3
    return w;
 }
 
-// ----------------------------------------------------------------------------
-// Step2
-// ----------------------------------------------------------------------------
 static uint32_t hash_Step2(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s)
 {
    w += (y ^ (z & (x ^ y))) + data;
@@ -47,20 +42,16 @@ static uint32_t hash_Step2(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint3
    return w;
 }
 
-// ----------------------------------------------------------------------------
-// Step3
-// ----------------------------------------------------------------------------
-static uint32_t hash_Step3(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s) {
+static uint32_t hash_Step3(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s)
+{
   w += (x ^ y ^ z) + data;  
   w = w << s | w >> (32 - s);
   w += x;
   return w;
 }
 
-// ----------------------------------------------------------------------------
-// Step4
-// ----------------------------------------------------------------------------
-static uint32_t hash_Step4(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s) {
+static uint32_t hash_Step4(uint32_t w, uint32_t x, uint32_t y, uint32_t z, uint32_t data, uint32_t s)
+{
   w += (y ^ (x | ~z)) + data;  
   w = w << s | w >> (32 - s);
   w += x;
@@ -76,9 +67,6 @@ static uint32_t end_to_le32(uint32_t n)
 	return n;
 }
 
-// ----------------------------------------------------------------------------
-// Transform
-// ----------------------------------------------------------------------------
 static void hash_Transform(uint32_t out[4], uint32_t in_[16])
 {
    uint32_t a = out[0];
@@ -168,9 +156,6 @@ static void hash_Transform(uint32_t out[4], uint32_t in_[16])
    out[3] += d;
 }
 
-// ----------------------------------------------------------------------------
-// Compute
-// ----------------------------------------------------------------------------
 void hash_Compute(char *s, const uint8_t* source, uint32_t length)
 {
    uint32_t index;
