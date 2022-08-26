@@ -26,6 +26,8 @@
 #include "Cartridge.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
+#include "libretro.h"
 
 #define BUPCHIP_FLAGS_PLAYING   1
 #define BUPCHIP_FLAGS_PAUSED   2
@@ -49,6 +51,18 @@ uint8_t bupchip_current_song;
 
 short bupchip_buffer[CORETONE_BUFFER_LEN * 4];
 
+static void bupchip_ReplaceChar(char *string, char character, char replacement)
+{
+   while(true)
+   {
+      string = strchr(string, '\\');
+      if(string == NULL)
+         return;
+      *string = '/';
+      string++;
+   }
+}
+
 // ----------------------------------------------------------------------------
 // InitFromCDF
 // ----------------------------------------------------------------------------
@@ -62,6 +76,11 @@ bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingD
    while(fileDataCount < sizeof(fileData) / sizeof(fileData[0]) &&
       (line = cartridge_GetNextNonemptyLine(cdf, cdfSize)) != NULL)
    {
+#ifndef _WIN32
+      /* CDF files always use Windows paths. Convert to Unix-style if necessary. */
+      bupchip_ReplaceChar(line, '\\', '/');
+#endif
+
       if(!cartridge_ReadFile(&fileData[fileDataCount].data, &fileData[fileDataCount].size, line, workingDir))
       {
          free(line);
