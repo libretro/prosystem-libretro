@@ -48,13 +48,15 @@ uint8_t cartridge_souper_chr_bank[2];
 uint8_t cartridge_souper_mode;
 uint8_t cartridge_souper_ram_page_bank[2];
 
-uint8_t* cartridge_buffer = NULL;
+uint8_t* cartridge_buffer      = NULL;
 static uint32_t cartridge_size = 0;
 
 char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
 {
    while(*size != 0)
    {
+      char *line_buffer;
+      const char *end;
       const char* line = *stream;
       while(*size > 0 && **stream != '\r' && **stream != '\n')
       {
@@ -63,7 +65,7 @@ char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
       }
 
       /* Skip CR/LF. */
-      const char *end = *stream;
+      end = *stream;
       while(*size > 0 && (**stream == '\r' || **stream == '\n'))
       {
          (*stream)++;
@@ -73,10 +75,10 @@ char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
       if(line == end || line[0] == '\n' || line[0] == '\r')
          continue;
 
-      char* lineBuffer = (char*)malloc(end - line + 1);
-      memcpy(lineBuffer, line, end - line);
-      lineBuffer[end - line] = '\0';
-      return lineBuffer;
+      line_buffer = (char*)malloc(end - line + 1);
+      memcpy(line_buffer, line, end - line);
+      line_buffer[end - line] = '\0';
+      return line_buffer;
    }
 
    return NULL;
@@ -84,17 +86,18 @@ char* cartridge_GetNextNonemptyLine(const char **stream, size_t* size)
 
 bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath, const char* relativeTo)
 {
+   int64_t len    = 0;
    size_t pathLen = strlen(subpath) + strlen(relativeTo) + 1;
-   char* path = (char*)malloc(pathLen + 1);
-   char pathSeparator;
+   char* path     = (char*)malloc(pathLen + 1);
 #ifdef _WIN32
-   pathSeparator = '\\';
+   char pathSeparator = '\\';
 #else
-   pathSeparator = '/';
+   char pathSeparator = '/';
 #endif
-   snprintf(path, pathLen + 1, "%s%c%s", relativeTo, pathSeparator, subpath);
+   strcpy(path, relativeTo);
+   strcat(path, pathSeparator);
+   strcat(path, subpath);
 
-   int64_t len = 0;
    filestream_read_file(path, (void**)outData, &len);
    *outSize = (size_t)len;
    return len > 0;
@@ -105,7 +108,7 @@ static bool cartridge_HasHeader(const uint8_t* header)
    unsigned index;
    const char HEADER_ID[ ] = {"ATARI7800"};
 
-   for(index = 0; index < 9; index++)
+   for (index = 0; index < 9; index++)
    {
       if(HEADER_ID[index] != header[index + 1])
          return false;
@@ -122,7 +125,7 @@ static bool cartridge_CC2(const uint8_t* header)
    unsigned index;
    const char HEADER_ID[ ] = {">>"};
 
-   for(index = 0; index < 2; index++)
+   for (index = 0; index < 2; index++)
    {
       if(HEADER_ID[index] != header[index+1])
          return false;
@@ -151,7 +154,7 @@ static void cartridge_WriteBank(uint16_t address, uint8_t bank)
 {
   uint32_t offset = cartridge_GetBankOffset(bank);
 
-  if(offset < cartridge_size)
+  if (offset < cartridge_size)
   {
     memory_WriteROM(address, 16384, cartridge_buffer + offset);
     cartridge_bank = bank;
@@ -160,7 +163,7 @@ static void cartridge_WriteBank(uint16_t address, uint8_t bank)
 
 static void cartridge_souper_StoreChrBank(uint8_t page, uint8_t bank)
 {
-  if(page < 2)
+  if (page < 2)
     cartridge_souper_chr_bank[page] = bank;
 }
 
@@ -171,7 +174,7 @@ static void cartridge_souper_SetMode(uint8_t data)
 
 static void cartridge_souper_SetRamPageBank(uint8_t which, uint8_t data)
 {
-  if(which < 2)
+  if (which < 2)
     cartridge_souper_ram_page_bank[which] = data & 7;
 }
 
@@ -207,12 +210,12 @@ static void cartridge_ReadHeader(const uint8_t* header)
          cartridge_type = CARTRIDGE_TYPE_NORMAL;
    }
 
-   cartridge_pokey = (header[54] & 1)? true: false;
+   cartridge_pokey         = (header[54] & 1) ? true: false;
    cartridge_controller[0] = header[55];
    cartridge_controller[1] = header[56];
-   cartridge_region = header[57];
-   cartridge_flags = 0;
-   cartridge_bupchip = false;
+   cartridge_region        = header[57];
+   cartridge_flags         = 0;
+   cartridge_bupchip       = false;
 }
 
 uint8_t cartridge_LoadROM(uint32_t address)
@@ -222,7 +225,8 @@ uint8_t cartridge_LoadROM(uint32_t address)
    return cartridge_buffer[address];
 }
 
-bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir)
+bool cartridge_LoadFromCDF(const char* data, size_t size,
+		const char *workingDir)
 {
    static const char *cartridgeTypes[ ] = {
       "EMPTY",
@@ -236,9 +240,10 @@ bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir
    };
    int i;
    char* line;
+   size_t cart_size;
    if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
       return false;
-   if(strcmp(line, "ProSystem") != 0)
+   if (strcmp(line, "ProSystem") != 0)
       return false;
    free(line);
 
@@ -262,22 +267,22 @@ bool cartridge_LoadFromCDF(const char* data, size_t size, const char *workingDir
    /* Read binary file. */
    if((line = cartridge_GetNextNonemptyLine(&data, &size)) == NULL)
       return false;
-   size_t cartSize;
-   if(!cartridge_ReadFile(&cartridge_buffer, &cartSize, line, workingDir))
+   if(!cartridge_ReadFile(&cartridge_buffer, &cart_size, line, workingDir))
       return false;
    free(line);
 
-   cartridge_size = (uint32_t)cartSize;
-   hash_Compute(cartridge_digest, cartridge_buffer, cartridge_size);
+   cartridge_size = (uint32_t)cart_size;
+   hash_Compute(cartridge_digest, cartridge_buffer, cart_size);
 
    cartridge_bupchip = false;
-   if((line = cartridge_GetNextNonemptyLine(&data, &size)) != NULL)
+   if((line = cartridge_GetNextNonemptyLine(&data, &size)))
    {
       cartridge_bupchip = strcmp(line, "CORETONE") == 0;
       free(line);
    }
 
-   if(cartridge_bupchip) {
+   if(cartridge_bupchip)
+   {
       if(!bupchip_InitFromCDF(&data, &size, workingDir))
       {
          free(cartridge_buffer);

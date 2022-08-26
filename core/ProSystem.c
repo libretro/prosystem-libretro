@@ -70,11 +70,12 @@ void prosystem_Reset(void)
 
 void prosystem_ExecuteFrame(const uint8_t* input)
 {
-   riot_SetInput(input);
-
-   uint32_t scanlinesPerBupchipTick = (prosystem_scanlines - 1) / 4;
+   uint32_t scanlinesPerBupchipTick;
    uint32_t bupchipTickScanlines = 0;
-   uint32_t currentBupchipTick = 0;
+   uint32_t currentBupchipTick   = 0;
+
+   riot_SetInput(input);
+   scanlinesPerBupchipTick = (prosystem_scanlines - 1) / 4;
 
    for(maria_scanline = 1; maria_scanline <= prosystem_scanlines; maria_scanline++)
    {
