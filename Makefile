@@ -710,6 +710,10 @@ else
 	LD = $(CC)
 endif
 
+ifeq (,$(findstring msvc,$(platform)))
+LIBS += -lm
+endif
+
 ifeq ($(platform), theos_ios)
 COMMON_FLAGS := -DIOS $(COMMON_DEFINES) $(INCFLAGS) -I$(THEOS_INCLUDE_PATH) -Wno-error
 $(LIBRARY_NAME)_CFLAGS += $(CFLAGS) $(COMMON_FLAGS)

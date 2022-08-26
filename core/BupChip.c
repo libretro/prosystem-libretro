@@ -64,7 +64,7 @@ static void bupchip_ReplaceChar(char *string, char character, char replacement)
    }
 }
 
-bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDir)
+int bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDir)
 {
    size_t fileIndex;
    size_t songIndex = 0;
@@ -99,7 +99,7 @@ bool bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingD
    for(songIndex = 0; songIndex < fileDataCount - 2; songIndex++)
       bupchip_songs[songIndex] = fileData[songIndex + 2];
    bupchip_song_count = (uint8_t)(fileDataCount - 2);
-   return true;
+   return 1;
 
 err:
    for(fileIndex = 0; fileIndex < fileDataCount; fileIndex++)
@@ -110,7 +110,7 @@ err:
    bupchip_song_count      = 0;
    bupchip_instrument_data = NULL;
    bupchip_sample_data     = NULL;
-   return false;
+   return 0;
 }
 
 void bupchip_Stop(void)
