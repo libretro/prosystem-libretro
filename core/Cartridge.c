@@ -94,9 +94,7 @@ bool cartridge_ReadFile(uint8_t** outData, size_t* outSize, const char* subpath,
 #else
    char pathSeparator = '/';
 #endif
-   strcpy(path, relativeTo);
-   strcat(path, pathSeparator);
-   strcat(path, subpath);
+   sprintf(path, "%s%c%s", relativeTo, pathSeparator, subpath);
 
    filestream_read_file(path, (void**)outData, &len);
    *outSize = (size_t)len;
