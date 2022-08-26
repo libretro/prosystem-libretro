@@ -56,9 +56,9 @@ static void bupchip_ReplaceChar(char *string, char character, char replacement)
 {
    while(true)
    {
-      if (!(string = strchr(string, '\\')))
+      if (!(string = strchr(string, character)))
          return;
-      *string = '/';
+      *string = replacement;
       string++;
    }
 }
