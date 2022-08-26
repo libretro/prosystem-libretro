@@ -441,7 +441,14 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code)
 bool retro_load_game(const struct retro_game_info *info)
 {
    enum retro_pixel_format fmt;
+   char biospath[512];
+   const char *system_directory_c             = NULL;
    const struct retro_game_info_ext *info_ext = NULL;
+#ifdef _WIN32
+   char slash = '\\';
+#else
+   char slash = '/';
+#endif
 
    struct retro_input_descriptor desc[] = {
       { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT,   "Left" },
@@ -516,36 +523,26 @@ bool retro_load_game(const struct retro_game_info *info)
        info_ext->persistent_data)
       persistent_data = true;
 
-#ifdef _WIN32
-   char slash = '\\';
-#else
-   char slash = '/';
-#endif
-
    if (info->size >= 10 && memcmp(info->data, "ProSystem", 9) == 0)
    {
       /* CDF file. */
+      int ok;
       char* lastSlash = strrchr(info->path, slash);
       size_t baseSize = lastSlash == NULL ? strlen(info->path) : lastSlash - info->path;
       char* workingDir = malloc(baseSize + 1);
       memcpy(workingDir, info->path, baseSize);
       workingDir[baseSize] = '\0';
 
-      bool ok = cartridge_LoadFromCDF(info->data, info->size, workingDir);
+      ok = cartridge_LoadFromCDF(info->data, info->size, workingDir);
 
       free(workingDir);
 
-      if (!ok)
+      if (ok == 0)
          return false;
    }
    else if (!cartridge_Load(persistent_data,
             (const uint8_t*)info->data, info->size))
-   {
       return false;
-   }
-
-   char biospath[512];
-   const char *system_directory_c = NULL;
 
    environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
 
