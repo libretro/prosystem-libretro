@@ -56,8 +56,7 @@ static void bupchip_ReplaceChar(char *string, char character, char replacement)
 {
    while(true)
    {
-      string = strchr(string, '\\');
-      if(string == NULL)
+      if (!(string = strchr(string, '\\')))
          return;
       *string = '/';
       string++;
@@ -67,16 +66,17 @@ static void bupchip_ReplaceChar(char *string, char character, char replacement)
 int bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDir)
 {
    size_t fileIndex;
-   size_t songIndex = 0;
-   char* line;
+   char *line;
    BupchipFileContents fileData[34];
+   size_t songIndex       = 0;
    uint32_t fileDataCount = 0;
 
    while(fileDataCount < sizeof(fileData) / sizeof(fileData[0]) &&
       (line = cartridge_GetNextNonemptyLine(cdf, cdfSize)) != NULL)
    {
 #ifndef _WIN32
-      /* CDF files always use Windows paths. Convert to Unix-style if necessary. */
+      /* CDF files always use Windows paths. 
+         Convert to Unix-style if necessary. */
       bupchip_ReplaceChar(line, '\\', '/');
 #endif
 
@@ -92,7 +92,7 @@ int bupchip_InitFromCDF(const char** cdf, size_t* cdfSize, const char *workingDi
    if(fileDataCount < 2)
       goto err;
 
-   bupchip_sample_data = fileData[0].data;
+   bupchip_sample_data     = fileData[0].data;
    bupchip_instrument_data = fileData[1].data;
    if(ct_init(bupchip_sample_data, bupchip_instrument_data) != 0)
       goto err;
@@ -145,9 +145,10 @@ void bupchip_Resume(void)
 
 void bupchip_SetVolume(uint8_t volume)
 {
+   int attenuation;
    bupchip_volume = volume & 0x1f;
    /* This matches BupSystem. */
-   int attenuation = volume << 2;
+   attenuation = volume << 2;
    if((volume & 1) != 0)
       attenuation += 0x3;
    ct_attenMusic(attenuation);
@@ -166,24 +167,24 @@ void bupchip_ProcessAudioCommand(unsigned char data)
          ct_stopAll( );
          ct_resume( );
          ct_attenMusic(127);
-         return;
+	 break;
       case 2:
          bupchip_Resume( );
-         return;
+	 break;
       case 3:
          bupchip_Pause( );
-         return;
+	 break;
       }
-      return;
+      break;
    case 0x40:
       bupchip_Stop( );
-      return;
+      break;
    case 0x80:
       bupchip_Play(data & 0x1f);
-      return;
+      break;
    case 0xc0:
       bupchip_SetVolume(data);
-      return;
+      break;
    }
 }
 
