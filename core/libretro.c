@@ -544,14 +544,19 @@ bool retro_load_game(const struct retro_game_info *info)
             (const uint8_t*)info->data, info->size))
       return false;
 
+   database_Load(cartridge_digest);
+
    environ_cb(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &system_directory_c);
 
    /* BIOS is optional */
-   sprintf(biospath, "%s%c%s", system_directory_c, slash, "7800 BIOS (U).rom");
+   if (cartridge_region == REGION_PAL)
+      sprintf(biospath, "%s%c%s", system_directory_c, slash, "7800 BIOS (E).rom");
+   else
+      sprintf(biospath, "%s%c%s", system_directory_c, slash, "7800 BIOS (U).rom");
+   
    if (bios_Load(biospath))
       bios_enabled = true;
 
-   database_Load(cartridge_digest);
    prosystem_Reset();
 
    display_ResetPalette();
