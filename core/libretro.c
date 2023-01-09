@@ -665,6 +665,11 @@ void retro_reset(void)
     prosystem_Reset();
 }
 
+static INLINE uint32_t Rect_GetHeight(struct Rects *rect)
+{
+   return (rect->bottom - rect->top) + 1;
+}
+
 void retro_run(void)
 {
    const uint8_t *buffer = NULL;

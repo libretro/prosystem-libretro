@@ -123,32 +123,26 @@ int32_t ct_sample_setup(uint8_t *pSamplePak)
 	int32p32_t lFr;
 
 	uint32_t *pEntry;
-	uint32_t uiX,uiY;
+	uint32_t uiX;
 
 	/**
 	 * We'll consider a sample package valid for use as long as its magic
 	 * word matches what we expect, the sample count is below our limit,
 	 * and it's living at a 32-Bit aligned address.
 	 */
-	uiY = (uint32_t)pSamplePak;
+	uint32_t uiY = (uint32_t)*pSamplePak;
 	if(0 != (uiY % sizeof(uint32_t)))
-	{
 		return -1;
-	}
 
 	for(uiX = 0; uiX < CORETONE_SMPPAK_HEAD_MAGICLEN; uiX++)
 	{
 		if(szCoreSample_Magic[uiX] != pSamplePak[uiX])
-		{
 			return -1;
-		}
 	}
 
 	memcpy(&uiY, (pSamplePak + CORETONE_SMPPAK_HEAD_COUNT), sizeof(uint32_t));
 	if(uiY > CORETONE_SAMPLES_MAXENTRIES)
-	{
 		return -1;
-	}
 	
 	pCoreSample_PackBase = pSamplePak;
 	pCoreSample_DirBase = (uint32_t*)(pSamplePak + CORETONE_SMPPAK_DIR_BASE);

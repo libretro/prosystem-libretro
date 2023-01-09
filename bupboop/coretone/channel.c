@@ -50,7 +50,7 @@ void ct_channel_render(CoreChannel_t *pChannel, int16_t *pBuffer, const int32_t 
 	scale_R.sWhole = pChannel->cVolMain * pChannel->cVolRight;
 	scale_R.sWhole = scale_R.cPair.cHi;
 
-	switch(pChannel->eMode)
+	switch (pChannel->eMode)
 	{
 		case eCHANNEL_MODE_SINGLESHOT:
 			/**
@@ -207,6 +207,9 @@ void ct_channel_render(CoreChannel_t *pChannel, int16_t *pBuffer, const int32_t 
 					}
 				}
 			}
+			break;
+		case eCHANNEL_MODE_OFF:
+		case eCHANNEL_MODE_FOOTER:
 			break;
 	}
 }

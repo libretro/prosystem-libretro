@@ -48,16 +48,6 @@ static INLINE uint32_t Rect_GetLength(struct Rects *rect)
    return (rect->right - rect->left) + 1;
 }
 
-static INLINE uint32_t Rect_GetHeight(struct Rects *rect)
-{
-   return (rect->bottom - rect->top) + 1;
-}
-
-static INLINE uint32_t Rect_GetArea(struct Rects *rect)
-{
-   return Rect_GetLength(rect) * Rect_GetHeight(rect);
-}
-
 typedef struct Rects rect;
 
 #ifdef __cplusplus

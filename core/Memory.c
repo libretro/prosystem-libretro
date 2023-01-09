@@ -92,10 +92,10 @@ void memory_Write(uint16_t address, uint8_t data)
                memory_ram[WSYNC] = true;
             break;
          case INPTCTRL:
-            if(data == 22 && cartridge_IsLoaded( )) 
-               cartridge_Store( ); 
+            if(data == 22 && cartridge_IsLoaded()) 
+               cartridge_Store(); 
             else if(data == 2 && bios_enabled)
-               bios_Store( );
+               bios_Store();
             break;
          case INPT0:
          case INPT1:

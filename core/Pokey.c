@@ -96,7 +96,7 @@ void pokey_Reset(void)
    int index, channel;
 
    for(index = 0; index < POKEY_POLY17_SIZE; index++)
-      pokey_poly17[index] = rand( ) & 1;
+      pokey_poly17[index] = rand() & 1;
 
    pokey_polyAdjust = 0;
    pokey_poly04Cntr = 0;

@@ -56,7 +56,7 @@ int32_t ct_instr_setup(uint8_t *pInstrPak)
 	double dFr_int,dFr_frac;
 
 	int16p16_t iFr;
-	uint32_t uiX,uiY;
+	uint32_t uiX;
 
 	/**
 	 * In order for an instrument pack to be considered valid it must reside
@@ -64,18 +64,14 @@ int32_t ct_instr_setup(uint8_t *pInstrPak)
 	 *
 	 * Nothing elaborate, assuming good intentions with the data we're given.
 	 */
-	uiY = (uint32_t)pInstrPak;
+	uint32_t uiY = (uint32_t)*pInstrPak;
 	if(0 != (uiY % sizeof(uint32_t)))
-	{
 		return -1;
-	}
 
 	for(uiX = 0; uiX < CORETONE_INSPAK_HEAD_MAGICLEN; uiX++)
 	{
 		if(szCoreInstr_Magic[uiX] != pInstrPak[uiX])
-		{
 			return -1;
-		}
 	}
 
 	memcpy(&uiCoreInstr_Count, (pInstrPak + CORETONE_INSPAK_HEAD_COUNT), sizeof(uint32_t));

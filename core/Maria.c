@@ -124,7 +124,7 @@ static void maria_StoreGraphic(void)
    uint8_t data = maria_ReadByte(maria_pp.w);
    if(maria_wmode)
    {
-      if(maria_IsHolyDMA( ))
+      if(maria_IsHolyDMA())
       {
          maria_StoreCell(0, 0);
          maria_StoreCell(0, 0);
@@ -137,7 +137,7 @@ static void maria_StoreGraphic(void)
    }
    else
    {
-      if(maria_IsHolyDMA( ))
+      if(maria_IsHolyDMA())
       {
          maria_StoreCell2(0);
          maria_StoreCell2(0);
@@ -256,7 +256,7 @@ static void maria_StoreLineRAM(void)
          for(index = 0; index < width; index++)
          {
             maria_cycles += 3;
-            maria_StoreGraphic( );
+            maria_StoreGraphic();
          }
       }
       else
@@ -271,11 +271,11 @@ static void maria_StoreLineRAM(void)
             maria_pp.b.h = maria_ReadByte(CHARBASE) + maria_offset;
 
             maria_cycles += 6;
-            maria_StoreGraphic( );
+            maria_StoreGraphic();
             if(cwidth)
             {
                maria_cycles += 3;
-               maria_StoreGraphic( );
+               maria_StoreGraphic();
             }
          }
       }
@@ -309,7 +309,7 @@ uint32_t maria_RenderScanline(void)
          maria_dp.b.h = maria_ReadByte(maria_dpp.w + 1);
 
          if(maria_ReadByte(maria_dpp.w) & 128)
-            sally_ExecuteNMI( );
+            sally_ExecuteNMI();
       }
       else if(maria_scanline >= maria_visibleArea.top && maria_scanline <= maria_visibleArea.bottom)
          maria_WriteLineRAM(maria_surface + ((maria_scanline - maria_displayArea.top) * Rect_GetLength(&maria_displayArea)));
@@ -318,7 +318,7 @@ uint32_t maria_RenderScanline(void)
       {
          maria_dp.b.l = maria_ReadByte(maria_dpp.w + 2);
          maria_dp.b.h = maria_ReadByte(maria_dpp.w + 1);
-         maria_StoreLineRAM( );
+         maria_StoreLineRAM();
          maria_offset--;
          if(maria_offset < 0)
          {
@@ -328,7 +328,7 @@ uint32_t maria_RenderScanline(void)
             maria_offset = maria_ReadByte(maria_dpp.w) & 15;
 
             if(maria_ReadByte(maria_dpp.w) & 128)
-               sally_ExecuteNMI( );
+               sally_ExecuteNMI();
          }
       }    
    }

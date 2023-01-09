@@ -116,14 +116,14 @@ err:
 void bupchip_Stop(void)
 {
    bupchip_flags &= ~BUPCHIP_FLAGS_PLAYING;
-   ct_stopMusic( );
+   ct_stopMusic();
 }
 
 void bupchip_Play(unsigned char song)
 {
    if(song >= bupchip_song_count)
    {
-      bupchip_Stop( );
+      bupchip_Stop();
       return;
    }
    bupchip_flags |= BUPCHIP_FLAGS_PLAYING;
@@ -134,13 +134,13 @@ void bupchip_Play(unsigned char song)
 void bupchip_Pause(void)
 {
    bupchip_flags |= BUPCHIP_FLAGS_PAUSED;
-   ct_pause( );
+   ct_pause();
 }
 
 void bupchip_Resume(void)
 {
    bupchip_flags &= ~BUPCHIP_FLAGS_PAUSED;
-   ct_resume( );
+   ct_resume();
 }
 
 void bupchip_SetVolume(uint8_t volume)
@@ -162,22 +162,22 @@ void bupchip_ProcessAudioCommand(unsigned char data)
       switch(data)
       {
       case 0:
-         bupchip_flags = 0;
+         bupchip_flags  = 0;
          bupchip_volume = 0x1f;
-         ct_stopAll( );
-         ct_resume( );
+         ct_stopAll();
+         ct_resume();
          ct_attenMusic(127);
 	 break;
       case 2:
-         bupchip_Resume( );
+         bupchip_Resume();
 	 break;
       case 3:
-         bupchip_Pause( );
+         bupchip_Pause();
 	 break;
       }
       break;
    case 0x40:
-      bupchip_Stop( );
+      bupchip_Stop();
       break;
    case 0x80:
       bupchip_Play(data & 0x1f);
@@ -209,13 +209,13 @@ void bupchip_Release(void)
 
 void bupchip_StateLoaded(void)
 {
-   ct_stopAll( );
+   ct_stopAll();
    if((bupchip_flags & BUPCHIP_FLAGS_PLAYING) == 0)
       return;
    ct_playMusic(bupchip_songs[bupchip_current_song].data);
    if((bupchip_flags & BUPCHIP_FLAGS_PAUSED) != 0)
-      ct_pause( );
+      ct_pause();
    else
-      ct_resume( );
+      ct_resume();
    bupchip_SetVolume(bupchip_volume);
 }

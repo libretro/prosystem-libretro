@@ -38,7 +38,6 @@
 #include "BupChip.h"
 #define PRO_SYSTEM_STATE_HEADER "PRO-SYSTEM STATE"
 
-static uint8_t prosystem_frame   = 0;
 static uint32_t prosystem_cycles = 0;
 uint16_t prosystem_frequency     = 60;
 uint16_t prosystem_scanlines     = 262;
@@ -48,24 +47,23 @@ void prosystem_Reset(void)
    if(!cartridge_IsLoaded())
       return;
 
-   prosystem_frame = 0;
    sally_Reset();
-   region_Reset( );
-   tia_Clear( );
-   tia_Reset( );
-   pokey_Clear( );
-   pokey_Reset( );
-   memory_Reset( );
-   maria_Clear( );
-   maria_Reset( );
-   riot_Reset ( );
+   region_Reset();
+   tia_Clear();
+   tia_Reset();
+   pokey_Clear();
+   pokey_Reset();
+   memory_Reset();
+   maria_Clear();
+   maria_Reset();
+   riot_Reset ();
 
    if(bios_enabled)
-      bios_Store( );
+      bios_Store();
    else
-      cartridge_Store( );
+      cartridge_Store();
 
-   prosystem_cycles = sally_ExecuteRES( );
+   prosystem_cycles = sally_ExecuteRES();
 }
 
 void prosystem_ExecuteFrame(const uint8_t* input)
@@ -96,19 +94,19 @@ void prosystem_ExecuteFrame(const uint8_t* input)
 
          if(memory_ram[WSYNC] && !(cartridge_flags & CARTRIDGE_WSYNC_MASK))
          {
-            prosystem_cycles = 456;
+            prosystem_cycles  = 456;
             memory_ram[WSYNC] = false;
             break;
          }
       }
 
-      cycles = maria_RenderScanline( );
+      cycles = maria_RenderScanline();
       if(cartridge_flags & CARTRIDGE_CYCLE_STEALING_MASK)
          prosystem_cycles += cycles;
 
       while(prosystem_cycles < 456)
       {
-         cycles = sally_ExecuteInstruction( );
+         cycles = sally_ExecuteInstruction();
          prosystem_cycles += (cycles << 2);
          if(riot_timing)
             riot_UpdateTimer(cycles);
@@ -135,11 +133,6 @@ void prosystem_ExecuteFrame(const uint8_t* input)
          }
       }
    }
-
-   prosystem_frame++;
-
-   if(prosystem_frame >= prosystem_frequency)
-      prosystem_frame = 0;
 }
 
 bool prosystem_Save(char *buffer, bool compress)
@@ -257,7 +250,7 @@ bool prosystem_Load(const char *buffer)
       bupchip_flags = buffer[offset++];
       bupchip_volume = buffer[offset++];
       bupchip_current_song = buffer[offset++];
-      bupchip_StateLoaded( );
+      bupchip_StateLoaded();
    }
 
    return true;
@@ -265,11 +258,11 @@ bool prosystem_Load(const char *buffer)
 
 void prosystem_Close(bool persistent_data)
 {
-   bupchip_Release( );
+   bupchip_Release();
    cartridge_Release(persistent_data);
-   maria_Reset( );
-   maria_Clear( );
-   memory_Reset( );
-   tia_Reset( );
-   tia_Clear( );
+   maria_Reset();
+   maria_Clear();
+   memory_Reset();
+   tia_Reset();
+   tia_Clear();
 }
