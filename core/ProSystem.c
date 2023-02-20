@@ -193,8 +193,7 @@ bool prosystem_Save(char *buffer, bool compress)
 bool prosystem_Load(const char *buffer)
 {
    uint32_t index;
-   char digest[33] = {0};
-   uint32_t date   = 0;
+   char digest[33];
    uint32_t offset = 0;
 
    for(index = 0; index < 16; index++)
@@ -218,11 +217,11 @@ bool prosystem_Load(const char *buffer)
    if(strcmp(cartridge_digest, digest) != 0)
       return false;
 
-   sally_a = buffer[offset++];
-   sally_x = buffer[offset++];
-   sally_y = buffer[offset++];
-   sally_p = buffer[offset++];
-   sally_s = buffer[offset++];
+   sally_a      = buffer[offset++];
+   sally_x      = buffer[offset++];
+   sally_y      = buffer[offset++];
+   sally_p      = buffer[offset++];
+   sally_s      = buffer[offset++];
    sally_pc.b.l = buffer[offset++];
    sally_pc.b.h = buffer[offset++];
 

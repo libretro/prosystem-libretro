@@ -381,18 +381,16 @@ void check_variables(bool first_run)
  * libretro implementation
  ************************************/
 
-static struct retro_system_av_info g_av_info;
-
 void retro_get_system_info(struct retro_system_info *info)
 {
    memset(info, 0, sizeof(*info));
-	info->library_name = "ProSystem";
+   info->library_name = "ProSystem";
 #ifndef GIT_VERSION
 #define GIT_VERSION ""
 #endif
-	info->library_version = "1.3e" GIT_VERSION;
-	info->need_fullpath = false;
-	info->valid_extensions = "a78|bin|cdf";
+   info->library_version  = "1.3e" GIT_VERSION;
+   info->need_fullpath    = false;
+   info->valid_extensions = "a78|bin|cdf";
 }
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
