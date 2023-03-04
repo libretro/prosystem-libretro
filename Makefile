@@ -176,6 +176,7 @@ else ifeq ($(platform), wiiu)
 	CC = $(DEVKITPPC)/bin/powerpc-eabi-gcc$(EXE_EXT)
 	AR = $(DEVKITPPC)/bin/powerpc-eabi-ar$(EXE_EXT)
 	CFLAGS += -DGEKKO -DWIIU -DHW_RVL -mrvl -mcpu=750 -meabi -mhard-float -D__ppc__ -DMSB_FIRST
+	CFLAGS += -ffunction-sections -fdata-sections -D__wiiu__ -D__wut__
 	STATIC_LINKING=1
 	FLAGS += -DMSB_FIRST
 
