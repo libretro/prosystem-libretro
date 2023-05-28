@@ -193,7 +193,7 @@ bool prosystem_Save(char *buffer, bool compress)
 bool prosystem_Load(const char *buffer)
 {
    uint32_t index;
-   char digest[33];
+   char digest[33] = {0};
    uint32_t offset = 0;
 
    for(index = 0; index < 16; index++)
