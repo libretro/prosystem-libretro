@@ -413,7 +413,7 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
 
 size_t retro_serialize_size(void) 
 { 
-   return 49221;
+   return 50063;
 }
 
 bool retro_serialize(void *data, size_t size)

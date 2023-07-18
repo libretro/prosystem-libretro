@@ -67,6 +67,23 @@ extern void pokey_Clear(void);
 extern uint8_t pokey_buffer[POKEY_BUFFER_SIZE];
 extern uint32_t pokey_size;
 
+extern uint32_t pokey_soundCntr;
+extern uint8_t pokey_audf[4];
+extern uint8_t pokey_audc[4];
+extern uint8_t pokey_audctl;
+extern uint8_t pokey_output[4];
+extern uint8_t pokey_outVol[4];
+extern uint32_t pokey_poly17Size;
+extern uint32_t pokey_polyAdjust;
+extern uint32_t pokey_poly04Cntr;
+extern uint32_t pokey_poly05Cntr;
+extern uint32_t pokey_poly17Cntr;
+extern uint32_t pokey_divideMax[4];
+extern uint32_t pokey_divideCount[4];
+extern uint32_t pokey_sampleMax;
+extern uint32_t pokey_sampleCount[2];
+extern uint32_t pokey_baseMultiplier;
+
 #ifdef __cplusplus
 }
 #endif
