@@ -135,7 +135,7 @@ void prosystem_ExecuteFrame(const uint8_t* input)
    }
 }
 
-bool prosystem_Save(char *buffer, bool compress)
+bool prosystem_Save(char *buffer, bool save_audio)
 {
    uint32_t size = 0;
    uint32_t index;
@@ -166,56 +166,59 @@ bool prosystem_Save(char *buffer, bool compress)
       buffer[size + index] = memory_ram[index];
    size += 16384;
 
-   for(index = 0; index < TIA_BUFFER_SIZE; index++)
-      buffer[size + index] = tia_buffer[index];
-   size += TIA_BUFFER_SIZE;
-
-   for(index = 0; index < 2; index++)
+   if (save_audio)
    {
-      buffer[size++] = tia_volume[index];
-      buffer[size++] = tia_counterMax[index];
-      buffer[size++] = tia_counter[index];
-      buffer[size++] = tia_audc[index];
-      buffer[size++] = tia_audf[index];
-      buffer[size++] = tia_audv[index];
+      for(index = 0; index < TIA_BUFFER_SIZE; index++)
+         buffer[size + index] = tia_buffer[index];
+      size += TIA_BUFFER_SIZE;
 
-      save_uint32_to_buffer(buffer, &size, tia_poly4Cntr[index]);
-      save_uint32_to_buffer(buffer, &size, tia_poly5Cntr[index]);
-      save_uint32_to_buffer(buffer, &size, tia_poly9Cntr[index]);
+      for(index = 0; index < 2; index++)
+      {
+         buffer[size++] = tia_volume[index];
+         buffer[size++] = tia_counterMax[index];
+         buffer[size++] = tia_counter[index];
+         buffer[size++] = tia_audc[index];
+         buffer[size++] = tia_audf[index];
+         buffer[size++] = tia_audv[index];
+
+         save_uint32_to_buffer(buffer, &size, tia_poly4Cntr[index]);
+         save_uint32_to_buffer(buffer, &size, tia_poly5Cntr[index]);
+         save_uint32_to_buffer(buffer, &size, tia_poly9Cntr[index]);
+      }
+      buffer[size++] = tia_soundCntr;
+
+      save_uint32_to_buffer(buffer, &size, pokey_soundCntr);
+
+      for(index = 0; index < 4; index++)
+      {
+         buffer[size++] = pokey_audf[index];
+         buffer[size++] = pokey_audc[index];
+         buffer[size++] = pokey_output[index];
+         buffer[size++] = pokey_outVol[index];
+      }
+      buffer[size++] = pokey_audctl;
+
+      save_uint32_to_buffer(buffer, &size, pokey_poly17Size);
+      save_uint32_to_buffer(buffer, &size, pokey_polyAdjust);
+      save_uint32_to_buffer(buffer, &size, pokey_poly04Cntr);
+      save_uint32_to_buffer(buffer, &size, pokey_poly05Cntr);
+      save_uint32_to_buffer(buffer, &size, pokey_poly17Cntr);
+
+      for(index = 0; index < 4; index++)
+      {
+         save_uint32_to_buffer(buffer, &size, pokey_divideMax[index]);
+         save_uint32_to_buffer(buffer, &size, pokey_divideCount[index]);
+      }
+
+      save_uint32_to_buffer(buffer, &size, pokey_sampleMax);
+
+      for(index = 0; index < 2; index++)
+      {
+         save_uint32_to_buffer(buffer, &size, pokey_sampleCount[index]);
+      }
+
+      save_uint32_to_buffer(buffer, &size, pokey_baseMultiplier);
    }
-   buffer[size++] = tia_soundCntr;
-
-   save_uint32_to_buffer(buffer, &size, pokey_soundCntr);
-
-   for(index = 0; index < 4; index++)
-   {
-      buffer[size++] = pokey_audf[index];
-      buffer[size++] = pokey_audc[index];
-      buffer[size++] = pokey_output[index];
-      buffer[size++] = pokey_outVol[index];
-   }
-   buffer[size++] = pokey_audctl;
-
-   save_uint32_to_buffer(buffer, &size, pokey_poly17Size);
-   save_uint32_to_buffer(buffer, &size, pokey_polyAdjust);
-   save_uint32_to_buffer(buffer, &size, pokey_poly04Cntr);
-   save_uint32_to_buffer(buffer, &size, pokey_poly05Cntr);
-   save_uint32_to_buffer(buffer, &size, pokey_poly17Cntr);
-
-   for(index = 0; index < 4; index++)
-   {
-      save_uint32_to_buffer(buffer, &size, pokey_divideMax[index]);
-      save_uint32_to_buffer(buffer, &size, pokey_divideCount[index]);
-   }
-
-   save_uint32_to_buffer(buffer, &size, pokey_sampleMax);
-
-   for(index = 0; index < 2; index++)
-   {
-      save_uint32_to_buffer(buffer, &size, pokey_sampleCount[index]);
-   }
-
-   save_uint32_to_buffer(buffer, &size, pokey_baseMultiplier);
 
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
    {
@@ -241,7 +244,7 @@ bool prosystem_Save(char *buffer, bool compress)
    return true;
 }
 
-bool prosystem_Load(const char *buffer)
+bool prosystem_Load(const char *buffer, bool load_audio)
 {
    uint32_t index;
    char digest[33] = {0};
@@ -282,55 +285,58 @@ bool prosystem_Load(const char *buffer)
       memory_ram[index] = buffer[offset + index];
    offset += 16384;
 
-   for(index = 0; index < TIA_BUFFER_SIZE; index++)
-      tia_buffer[index] = buffer[offset + index];
-   offset += TIA_BUFFER_SIZE;
-
-   for(index = 0; index < 2; index++)
+   if (load_audio)
    {
-      tia_volume[index] = buffer[offset++];
-      tia_counterMax[index] = buffer[offset++];
-      tia_counter[index] = buffer[offset++];
-      tia_audc[index] = buffer[offset++];
-      tia_audf[index] = buffer[offset++];
-      tia_audv[index] = buffer[offset++];
-      tia_poly4Cntr[index] = read_uint32_from_buffer(buffer, &offset);
-      tia_poly5Cntr[index] = read_uint32_from_buffer(buffer, &offset);
-      tia_poly9Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+      for(index = 0; index < TIA_BUFFER_SIZE; index++)
+         tia_buffer[index] = buffer[offset + index];
+      offset += TIA_BUFFER_SIZE;
+
+      for(index = 0; index < 2; index++)
+      {
+         tia_volume[index] = buffer[offset++];
+         tia_counterMax[index] = buffer[offset++];
+         tia_counter[index] = buffer[offset++];
+         tia_audc[index] = buffer[offset++];
+         tia_audf[index] = buffer[offset++];
+         tia_audv[index] = buffer[offset++];
+         tia_poly4Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+         tia_poly5Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+         tia_poly9Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+      }
+      tia_soundCntr = buffer[offset++];
+
+      pokey_soundCntr = read_uint32_from_buffer(buffer, &offset);
+
+      for(index = 0; index < 4; index++)
+      {
+         pokey_audf[index] = buffer[offset++];
+         pokey_audc[index] = buffer[offset++];
+         pokey_output[index] = buffer[offset++];
+         pokey_outVol[index] = buffer[offset++];
+      }
+      pokey_audctl = buffer[offset++];
+
+      pokey_poly17Size = read_uint32_from_buffer(buffer, &offset);
+      pokey_polyAdjust = read_uint32_from_buffer(buffer, &offset);
+      pokey_poly04Cntr = read_uint32_from_buffer(buffer, &offset);
+      pokey_poly05Cntr = read_uint32_from_buffer(buffer, &offset);
+      pokey_poly17Cntr = read_uint32_from_buffer(buffer, &offset);
+
+      for(index = 0; index < 4; index++)
+      {
+         pokey_divideMax[index] = read_uint32_from_buffer(buffer, &offset);
+         pokey_divideCount[index] = read_uint32_from_buffer(buffer, &offset);
+      }
+
+      pokey_sampleMax = read_uint32_from_buffer(buffer, &offset);
+
+      for(index = 0; index < 2; index++)
+      {
+         pokey_sampleCount[index] = read_uint32_from_buffer(buffer, &offset);
+      }
+
+      pokey_baseMultiplier = read_uint32_from_buffer(buffer, &offset);
    }
-   tia_soundCntr = buffer[offset++];
-
-   pokey_soundCntr = read_uint32_from_buffer(buffer, &offset);
-
-   for(index = 0; index < 4; index++)
-   {
-      pokey_audf[index] = buffer[offset++];
-      pokey_audc[index] = buffer[offset++];
-      pokey_output[index] = buffer[offset++];
-      pokey_outVol[index] = buffer[offset++];
-   }
-   pokey_audctl = buffer[offset++];
-
-   pokey_poly17Size = read_uint32_from_buffer(buffer, &offset);
-   pokey_polyAdjust = read_uint32_from_buffer(buffer, &offset);
-   pokey_poly04Cntr = read_uint32_from_buffer(buffer, &offset);
-   pokey_poly05Cntr = read_uint32_from_buffer(buffer, &offset);
-   pokey_poly17Cntr = read_uint32_from_buffer(buffer, &offset);
-
-   for(index = 0; index < 4; index++)
-   {
-      pokey_divideMax[index] = read_uint32_from_buffer(buffer, &offset);
-      pokey_divideCount[index] = read_uint32_from_buffer(buffer, &offset);
-   }
-
-   pokey_sampleMax = read_uint32_from_buffer(buffer, &offset);
-
-   for(index = 0; index < 2; index++)
-   {
-      pokey_sampleCount[index] = read_uint32_from_buffer(buffer, &offset);
-   }
-
-   pokey_baseMultiplier = read_uint32_from_buffer(buffer, &offset);
 
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
    {
