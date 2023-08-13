@@ -135,7 +135,7 @@ void prosystem_ExecuteFrame(const uint8_t* input)
    }
 }
 
-bool prosystem_Save(char *buffer, bool save_audio)
+bool prosystem_Save(char *buffer, bool fast_saves)
 {
    uint32_t size = 0;
    uint32_t index;
@@ -166,8 +166,16 @@ bool prosystem_Save(char *buffer, bool save_audio)
       buffer[size + index] = memory_ram[index];
    size += 16384;
 
-   if (save_audio)
+   if (fast_saves)
    {
+      if (bios_enabled)
+      {
+         save_uint32_to_buffer(buffer, &size, bios_size);
+         for(index = MEMORY_SIZE - bios_size; index <= MEMORY_SIZE; index++)
+            buffer[size + index] = memory_ram[index];
+         size += bios_size;
+      }
+ 
       for(index = 0; index < TIA_BUFFER_SIZE; index++)
          buffer[size + index] = tia_buffer[index];
       size += TIA_BUFFER_SIZE;
@@ -244,7 +252,7 @@ bool prosystem_Save(char *buffer, bool save_audio)
    return true;
 }
 
-bool prosystem_Load(const char *buffer, bool load_audio)
+bool prosystem_Load(const char *buffer, bool fast_saves)
 {
    uint32_t index;
    char digest[33] = {0};
@@ -285,8 +293,16 @@ bool prosystem_Load(const char *buffer, bool load_audio)
       memory_ram[index] = buffer[offset + index];
    offset += 16384;
 
-   if (load_audio)
+   if (fast_saves)
    {
+      if (bios_enabled)
+      {
+         bios_size = read_uint32_from_buffer(buffer, &offset);
+         for(index = MEMORY_SIZE - bios_size; index <= MEMORY_SIZE; index++)
+            memory_ram[index] = buffer[offset + index];
+         offset += bios_size;
+      }
+
       for(index = 0; index < TIA_BUFFER_SIZE; index++)
          tia_buffer[index] = buffer[offset + index];
       offset += TIA_BUFFER_SIZE;

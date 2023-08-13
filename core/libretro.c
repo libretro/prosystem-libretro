@@ -60,7 +60,10 @@ static bool low_pass_enabled           = false;
 static int32_t low_pass_range          = 0;
 static int32_t low_pass_prev           = 0; /* Previous sample */
 
-#define SAVE_STATE_SIZE 50112
+/* Save state info */
+#define SAVE_STATE_SIZE                49221
+#define FAST_SAVE_STATE_SIZE           83968
+static bool fast_savestates;
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -413,13 +416,6 @@ void retro_set_controller_port_device(unsigned port, unsigned device)
    (void)device;
 }
 
-size_t retro_serialize_size(void) 
-{ 
-   return SAVE_STATE_SIZE;
-}
-
-static bool fast_savestates;
-
 bool get_fast_savestates(void)
 {
    int result = -1;
@@ -435,21 +431,30 @@ bool get_fast_savestates(void)
    }
 }
 
+size_t retro_serialize_size(void) 
+{
+   fast_savestates = get_fast_savestates();
+   if (fast_savestates)
+      return FAST_SAVE_STATE_SIZE;
+   else
+      return SAVE_STATE_SIZE;
+}
+
 bool retro_serialize(void *data, size_t size)
 {
-   if (size != SAVE_STATE_SIZE)
+   fast_savestates = get_fast_savestates();
+   if ((fast_savestates && size != FAST_SAVE_STATE_SIZE) || (!fast_savestates && size != SAVE_STATE_SIZE))
       return false;
 
-   fast_savestates = get_fast_savestates();
    return prosystem_Save((char*)data, fast_savestates);
 }
 
 bool retro_unserialize(const void *data, size_t size)
 {
-   if (size != SAVE_STATE_SIZE)
+   fast_savestates = get_fast_savestates();
+   if ((fast_savestates && size != FAST_SAVE_STATE_SIZE) || (!fast_savestates && size != SAVE_STATE_SIZE))
       return false;
 
-   fast_savestates = get_fast_savestates();
    return prosystem_Load((const char*)data, fast_savestates);
 }
 
