@@ -59,6 +59,17 @@ extern void tia_Process(uint32_t length);
 extern uint8_t tia_buffer[TIA_BUFFER_SIZE];
 extern uint32_t tia_size;
 
+extern uint8_t tia_volume[2];
+extern uint8_t tia_counterMax[2];
+extern uint8_t tia_counter[2];
+extern uint8_t tia_audc[2];
+extern uint8_t tia_audf[2];
+extern uint8_t tia_audv[2];
+extern uint32_t tia_poly4Cntr[2];
+extern uint32_t tia_poly5Cntr[2];
+extern uint32_t tia_poly9Cntr[2];
+extern uint32_t tia_soundCntr;
+
 #ifdef __cplusplus
 }
 #endif

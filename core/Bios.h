@@ -39,6 +39,7 @@ extern void bios_Store(void);
 extern void bios_Release(void);
 
 extern bool bios_enabled;
+extern uint16_t bios_size;
 
 #ifdef __cplusplus
 }
