@@ -407,8 +407,10 @@ void save_uint32_to_buffer(char* buffer, uint32_t* size, uint32_t data)
 {
    uint8_t shiftby = 32;
    uint32_t index = *size;
+   int i;
+
    *size += 8;
-   for(int i = 0; i < 8; i++)
+   for(i = 0; i < 8; i++)
    {
       buffer[index++] = (data >> (shiftby -= 4)) & 0xF;
    }
