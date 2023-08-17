@@ -405,11 +405,10 @@ uint32_t read_uint32_from_buffer(const char* buffer, uint32_t* offset)
 
 void save_uint32_to_buffer(char* buffer, uint32_t* size, uint32_t data)
 {
+   int i;
    uint8_t shiftby = 32;
    uint32_t index = *size;
    *size += 8;
-   for(int i = 0; i < 8; i++)
-   {
+   for (i = 0; i < 8; i++)
       buffer[index++] = (data >> (shiftby -= 4)) & 0xF;
-   }
 }
