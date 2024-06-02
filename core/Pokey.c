@@ -71,25 +71,25 @@ uint32_t pokey_size = 524;
 
 static uint32_t pokey_frequency = 1787520;
 static uint32_t pokey_sampleRate = 31440;
-static uint32_t pokey_soundCntr = 0;
-static uint8_t pokey_audf[4];
-static uint8_t pokey_audc[4];
-static uint8_t pokey_audctl;
-static uint8_t pokey_output[4];
-static uint8_t pokey_outVol[4];
+uint32_t pokey_soundCntr = 0;
+uint8_t pokey_audf[4];
+uint8_t pokey_audc[4];
+uint8_t pokey_audctl;
+uint8_t pokey_output[4];
+uint8_t pokey_outVol[4];
 static uint8_t pokey_poly04[POKEY_POLY4_SIZE] = {1,1,0,1,1,1,0,0,0,0,1,0,1,0,0};
 static uint8_t pokey_poly05[POKEY_POLY5_SIZE] = {0,0,1,1,0,0,0,1,1,1,1,0,0,1,0,1,0,1,1,0,1,1,1,0,1,0,0,0,0,0,1};
 static uint8_t pokey_poly17[POKEY_POLY17_SIZE];
-static uint32_t pokey_poly17Size;
-static uint32_t pokey_polyAdjust;
-static uint32_t pokey_poly04Cntr;
-static uint32_t pokey_poly05Cntr;
-static uint32_t pokey_poly17Cntr;
-static uint32_t pokey_divideMax[4];
-static uint32_t pokey_divideCount[4];
-static uint32_t pokey_sampleMax;
-static uint32_t pokey_sampleCount[2];
-static uint32_t pokey_baseMultiplier;
+uint32_t pokey_poly17Size;
+uint32_t pokey_polyAdjust;
+uint32_t pokey_poly04Cntr;
+uint32_t pokey_poly05Cntr;
+uint32_t pokey_poly17Cntr;
+uint32_t pokey_divideMax[4];
+uint32_t pokey_divideCount[4];
+uint32_t pokey_sampleMax;
+uint32_t pokey_sampleCount[2];
+uint32_t pokey_baseMultiplier;
 
 void pokey_Reset(void)
 {

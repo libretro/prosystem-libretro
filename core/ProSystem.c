@@ -135,7 +135,7 @@ void prosystem_ExecuteFrame(const uint8_t* input)
    }
 }
 
-bool prosystem_Save(char *buffer, bool compress)
+bool prosystem_Save(char *buffer, bool fast_saves)
 {
    uint32_t size = 0;
    uint32_t index;
@@ -166,6 +166,68 @@ bool prosystem_Save(char *buffer, bool compress)
       buffer[size + index] = memory_ram[index];
    size += 16384;
 
+   if (fast_saves)
+   {
+      if (bios_enabled)
+      {
+         save_uint32_to_buffer(buffer, &size, bios_size);
+         for(index = MEMORY_SIZE - bios_size; index <= MEMORY_SIZE; index++)
+            buffer[size + index] = memory_ram[index];
+         size += bios_size;
+      }
+ 
+      for(index = 0; index < TIA_BUFFER_SIZE; index++)
+         buffer[size + index] = tia_buffer[index];
+      size += TIA_BUFFER_SIZE;
+
+      for(index = 0; index < 2; index++)
+      {
+         buffer[size++] = tia_volume[index];
+         buffer[size++] = tia_counterMax[index];
+         buffer[size++] = tia_counter[index];
+         buffer[size++] = tia_audc[index];
+         buffer[size++] = tia_audf[index];
+         buffer[size++] = tia_audv[index];
+
+         save_uint32_to_buffer(buffer, &size, tia_poly4Cntr[index]);
+         save_uint32_to_buffer(buffer, &size, tia_poly5Cntr[index]);
+         save_uint32_to_buffer(buffer, &size, tia_poly9Cntr[index]);
+      }
+      buffer[size++] = tia_soundCntr;
+
+      save_uint32_to_buffer(buffer, &size, pokey_soundCntr);
+
+      for(index = 0; index < 4; index++)
+      {
+         buffer[size++] = pokey_audf[index];
+         buffer[size++] = pokey_audc[index];
+         buffer[size++] = pokey_output[index];
+         buffer[size++] = pokey_outVol[index];
+      }
+      buffer[size++] = pokey_audctl;
+
+      save_uint32_to_buffer(buffer, &size, pokey_poly17Size);
+      save_uint32_to_buffer(buffer, &size, pokey_polyAdjust);
+      save_uint32_to_buffer(buffer, &size, pokey_poly04Cntr);
+      save_uint32_to_buffer(buffer, &size, pokey_poly05Cntr);
+      save_uint32_to_buffer(buffer, &size, pokey_poly17Cntr);
+
+      for(index = 0; index < 4; index++)
+      {
+         save_uint32_to_buffer(buffer, &size, pokey_divideMax[index]);
+         save_uint32_to_buffer(buffer, &size, pokey_divideCount[index]);
+      }
+
+      save_uint32_to_buffer(buffer, &size, pokey_sampleMax);
+
+      for(index = 0; index < 2; index++)
+      {
+         save_uint32_to_buffer(buffer, &size, pokey_sampleCount[index]);
+      }
+
+      save_uint32_to_buffer(buffer, &size, pokey_baseMultiplier);
+   }
+
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
    {
       for(index = 0; index < 16384; index++)
@@ -190,10 +252,10 @@ bool prosystem_Save(char *buffer, bool compress)
    return true;
 }
 
-bool prosystem_Load(const char *buffer)
+bool prosystem_Load(const char *buffer, bool fast_saves)
 {
    uint32_t index;
-   char digest[33];
+   char digest[33] = {0};
    uint32_t offset = 0;
 
    for(index = 0; index < 16; index++)
@@ -231,6 +293,67 @@ bool prosystem_Load(const char *buffer)
       memory_ram[index] = buffer[offset + index];
    offset += 16384;
 
+   if (fast_saves)
+   {
+      if (bios_enabled)
+      {
+         bios_size = read_uint32_from_buffer(buffer, &offset);
+         for(index = MEMORY_SIZE - bios_size; index <= MEMORY_SIZE; index++)
+            memory_ram[index] = buffer[offset + index];
+         offset += bios_size;
+      }
+
+      for(index = 0; index < TIA_BUFFER_SIZE; index++)
+         tia_buffer[index] = buffer[offset + index];
+      offset += TIA_BUFFER_SIZE;
+
+      for(index = 0; index < 2; index++)
+      {
+         tia_volume[index] = buffer[offset++];
+         tia_counterMax[index] = buffer[offset++];
+         tia_counter[index] = buffer[offset++];
+         tia_audc[index] = buffer[offset++];
+         tia_audf[index] = buffer[offset++];
+         tia_audv[index] = buffer[offset++];
+         tia_poly4Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+         tia_poly5Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+         tia_poly9Cntr[index] = read_uint32_from_buffer(buffer, &offset);
+      }
+      tia_soundCntr = buffer[offset++];
+
+      pokey_soundCntr = read_uint32_from_buffer(buffer, &offset);
+
+      for(index = 0; index < 4; index++)
+      {
+         pokey_audf[index] = buffer[offset++];
+         pokey_audc[index] = buffer[offset++];
+         pokey_output[index] = buffer[offset++];
+         pokey_outVol[index] = buffer[offset++];
+      }
+      pokey_audctl = buffer[offset++];
+
+      pokey_poly17Size = read_uint32_from_buffer(buffer, &offset);
+      pokey_polyAdjust = read_uint32_from_buffer(buffer, &offset);
+      pokey_poly04Cntr = read_uint32_from_buffer(buffer, &offset);
+      pokey_poly05Cntr = read_uint32_from_buffer(buffer, &offset);
+      pokey_poly17Cntr = read_uint32_from_buffer(buffer, &offset);
+
+      for(index = 0; index < 4; index++)
+      {
+         pokey_divideMax[index] = read_uint32_from_buffer(buffer, &offset);
+         pokey_divideCount[index] = read_uint32_from_buffer(buffer, &offset);
+      }
+
+      pokey_sampleMax = read_uint32_from_buffer(buffer, &offset);
+
+      for(index = 0; index < 2; index++)
+      {
+         pokey_sampleCount[index] = read_uint32_from_buffer(buffer, &offset);
+      }
+
+      pokey_baseMultiplier = read_uint32_from_buffer(buffer, &offset);
+   }
+
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
    {
       for(index = 0; index < 16384; index++)
@@ -264,4 +387,28 @@ void prosystem_Close(bool persistent_data)
    memory_Reset();
    tia_Reset();
    tia_Clear();
+}
+
+uint32_t read_uint32_from_buffer(const char* buffer, uint32_t* offset)
+{
+    uint32_t index = *offset;
+    *offset += 8;
+    return (uint32_t)buffer[index]     << 28 |
+           (uint32_t)buffer[index + 1] << 24 |
+           (uint32_t)buffer[index + 2] << 20 |
+           (uint32_t)buffer[index + 3] << 16 |
+           (uint32_t)buffer[index + 4] << 12 |
+           (uint32_t)buffer[index + 5] << 8  |
+           (uint32_t)buffer[index + 6] << 4  |
+           (uint32_t)buffer[index + 7];
+}
+
+void save_uint32_to_buffer(char* buffer, uint32_t* size, uint32_t data)
+{
+   int i;
+   uint8_t shiftby = 32;
+   uint32_t index = *size;
+   *size += 8;
+   for (i = 0; i < 8; i++)
+      buffer[index++] = (data >> (shiftby -= 4)) & 0xF;
 }

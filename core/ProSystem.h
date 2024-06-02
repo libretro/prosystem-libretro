@@ -36,9 +36,11 @@ extern "C" {
 
 extern void prosystem_Reset(void);
 extern void prosystem_ExecuteFrame(const uint8_t* input);
-extern bool prosystem_Save(char *buffer, bool compress);
-extern bool prosystem_Load(const char *buffer);
+extern bool prosystem_Save(char *buffer, bool fast_saves);
+extern bool prosystem_Load(const char *buffer, bool fast_saves);
 extern void prosystem_Close(bool persistent_data);
+uint32_t read_uint32_from_buffer(const char* buffer, uint32_t* offset);
+void save_uint32_to_buffer(char* buffer, uint32_t* size, uint32_t data);
 
 extern uint16_t prosystem_frequency;
 extern uint16_t prosystem_scanlines;

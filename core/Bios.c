@@ -39,7 +39,7 @@ int64_t rfread(void* buffer,
 bool bios_enabled = false;
 
 static uint8_t* bios_data = NULL;
-static uint16_t bios_size = 0;
+uint16_t bios_size = 0;
 
 bool bios_Load(const char *filename)
 {
