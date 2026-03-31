@@ -13,9 +13,10 @@
 
 /*
  ********************************
- * VERSION: 1.3
+ * VERSION: 1.4
  ********************************
  *
+ * - 1.4: Add core options v2 categories with legacy fallback
  * - 1.3: Move translations to libretro_core_options_intl.h
  *        - libretro_core_options_intl.h includes BOM and utf-8
  *          fix for MSVC 2010-2013
@@ -115,6 +116,103 @@ struct retro_core_option_definition option_defs_us[] = {
 
 /*
  ********************************
+ * Core Option Definitions (v2)
+ ********************************
+*/
+
+struct retro_core_option_v2_category option_cats_us[] = {
+   //{ "system",   "System",   NULL },
+   { "video",    "Video",    NULL },
+   { "audio",    "Audio",    NULL },
+   { "input",    "Input",    NULL },
+   //{ "advanced", "Advanced", NULL },
+   { NULL, NULL, NULL },
+};
+
+struct retro_core_option_v2_definition option_defs_us_v2[] = {
+   {
+      "prosystem_color_depth",
+      "Color Depth (Restart)",
+      NULL,
+      "Specifies number of colors to display on-screen. 24-bit may increase performance overheads on some platforms.",
+      NULL,
+      "video",
+      {
+         { "16bit", "Thousands (16-bit)" },
+         { "24bit", "Millions (24-bit)" },
+         { NULL, NULL },
+      },
+      "16bit"
+   },
+   {
+      "prosystem_low_pass_filter",
+      "Audio Filter",
+      NULL,
+      "Enables a low pass audio filter to soften the 'harsh' sound produced by the Atari 7800's TIA chip.",
+      NULL,
+      "audio",
+      {
+         { "disabled", NULL },
+         { "enabled",  NULL },
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   {
+      "prosystem_low_pass_range",
+      "Audio Filter Level",
+      NULL,
+      "Specifies the cut-off frequency of the low pass audio filter. A higher value increases the perceived 'strength' of the filter, since a wider range of the high frequency spectrum is attenuated.",
+      NULL,
+      "audio",
+      {
+         { "5",  "5%" },
+         { "10", "10%" },
+         { "15", "15%" },
+         { "20", "20%" },
+         { "25", "25%" },
+         { "30", "30%" },
+         { "35", "35%" },
+         { "40", "40%" },
+         { "45", "45%" },
+         { "50", "50%" },
+         { "55", "55%" },
+         { "60", "60%" },
+         { "65", "65%" },
+         { "70", "70%" },
+         { "75", "75%" },
+         { "80", "80%" },
+         { "85", "85%" },
+         { "90", "90%" },
+         { "95", "95%" },
+         { NULL, NULL },
+      },
+      "60"
+   },
+   {
+      "prosystem_gamepad_dual_stick_hack",
+      "Dual Stick Controller",
+      NULL,
+      "Maps Player 2's joystick to the right analog stick of Player 1's RetroPad. Enables dual stick control in supported games (e.g. Robotron: 2084, T:ME Salvo).",
+      NULL,
+      "input",
+      {
+         { "disabled", NULL},
+         { "enabled",  NULL},
+         { NULL, NULL },
+      },
+      "disabled"
+   },
+   { NULL, NULL, NULL, NULL, NULL, NULL, {{0}}, NULL },
+};
+
+struct retro_core_options_v2 core_options_us_v2 = {
+   option_cats_us,
+   option_defs_us_v2
+};
+
+/*
+ ********************************
  * Language Mapping
  ********************************
 */
@@ -147,6 +245,34 @@ struct retro_core_option_definition *option_defs_intl[RETRO_LANGUAGE_LAST] = {
    NULL,           /* RETRO_LANGUAGE_FINNISH */
 
 };
+
+struct retro_core_options_v2 *option_defs_v2_intl[RETRO_LANGUAGE_LAST] = {
+   &core_options_us_v2, /* RETRO_LANGUAGE_ENGLISH */
+   NULL,                /* RETRO_LANGUAGE_JAPANESE */
+   NULL,                /* RETRO_LANGUAGE_FRENCH */
+   NULL,                /* RETRO_LANGUAGE_SPANISH */
+   NULL,                /* RETRO_LANGUAGE_GERMAN */
+   NULL,                /* RETRO_LANGUAGE_ITALIAN */
+   NULL,                /* RETRO_LANGUAGE_DUTCH */
+   NULL,                /* RETRO_LANGUAGE_PORTUGUESE_BRAZIL */
+   NULL,                /* RETRO_LANGUAGE_PORTUGUESE_PORTUGAL */
+   NULL,                /* RETRO_LANGUAGE_RUSSIAN */
+   NULL,                /* RETRO_LANGUAGE_KOREAN */
+   NULL,                /* RETRO_LANGUAGE_CHINESE_TRADITIONAL */
+   NULL,                /* RETRO_LANGUAGE_CHINESE_SIMPLIFIED */
+   NULL,                /* RETRO_LANGUAGE_ESPERANTO */
+   NULL,                /* RETRO_LANGUAGE_POLISH */
+   NULL,                /* RETRO_LANGUAGE_VIETNAMESE */
+   NULL,                /* RETRO_LANGUAGE_ARABIC */
+   NULL,                /* RETRO_LANGUAGE_GREEK */
+   NULL,                /* RETRO_LANGUAGE_TURKISH */
+   NULL,                /* RETRO_LANGUAGE_SLOVAK */
+   NULL,                /* RETRO_LANGUAGE_PERSIAN */
+   NULL,                /* RETRO_LANGUAGE_HEBREW */
+   NULL,                /* RETRO_LANGUAGE_ASTURIAN */
+   NULL,                /* RETRO_LANGUAGE_FINNISH */
+
+};
 #endif
 
 /*
@@ -170,7 +296,25 @@ static INLINE void libretro_set_core_options(retro_environment_t environ_cb)
    if (!environ_cb)
       return;
 
-   if (environ_cb(RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION, &version) && (version >= 1))
+   if (environ_cb(RETRO_ENVIRONMENT_GET_CORE_OPTIONS_VERSION, &version) && (version >= 2))
+   {
+#ifndef HAVE_NO_LANGEXTRA
+      struct retro_core_options_v2_intl core_options_intl;
+      unsigned language = 0;
+
+      core_options_intl.us    = &core_options_us_v2;
+      core_options_intl.local = NULL;
+
+      if (environ_cb(RETRO_ENVIRONMENT_GET_LANGUAGE, &language) &&
+          (language < RETRO_LANGUAGE_LAST) && (language != RETRO_LANGUAGE_ENGLISH))
+         core_options_intl.local = option_defs_v2_intl[language];
+
+      environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_V2_INTL, &core_options_intl);
+#else
+      environ_cb(RETRO_ENVIRONMENT_SET_CORE_OPTIONS_V2, &core_options_us_v2);
+#endif
+   }
+   else if (version >= 1)
    {
 #ifndef HAVE_NO_LANGEXTRA
       struct retro_core_options_intl core_options_intl;

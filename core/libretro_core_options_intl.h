@@ -11,9 +11,10 @@
 
 /*
  ********************************
- * VERSION: 1.3
+ * VERSION: 1.4
  ********************************
  *
+ * - 1.4: Add core options v2 categories with legacy fallback
  * - 1.3: Move translations to libretro_core_options_intl.h
  *        - libretro_core_options_intl.h includes BOM and utf-8
  *          fix for MSVC 2010-2013
