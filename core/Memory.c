@@ -28,6 +28,7 @@
 #include "Equates.h"
 #include "Bios.h"
 #include "Cartridge.h"
+#include "Pokey.h"
 #include "Tia.h"
 #include "Riot.h"
 
@@ -149,6 +150,15 @@ void memory_Write(uint16_t address, uint8_t data)
             if(cartridge_type == CARTRIDGE_TYPE_SOUPER && address >= 0x4000 && address < 0x8000)
             {
                memory_souper_ram[memory_souper_GetRamAddress(address)] = data;
+               break;
+            }
+            /* Route writes to POKEY mapped below $4000 ($0440, $0450, $0800).
+             * Writes to POKEY at $4000 are handled in cartridge_Write (ROM space). */
+            if(cartridge_pokey_address && cartridge_pokey_address < 0x4000 &&
+               address >= cartridge_pokey_address &&
+               address < (uint16_t)(cartridge_pokey_address + 9))
+            {
+               pokey_SetRegister((uint16_t)(POKEY_AUDF1 + (address - cartridge_pokey_address)), data);
                break;
             }
             memory_ram[address] = data;

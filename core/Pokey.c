@@ -39,7 +39,6 @@
  * Pokey.c
  * ----------------------------------------------------------------------------
  */
-#include <stdlib.h>
 #include "Pokey.h"
 #define POKEY_NOTPOLY5 0x80
 #define POKEY_POLY4 0x40
@@ -77,8 +76,9 @@ uint8_t pokey_audc[4];
 uint8_t pokey_audctl;
 uint8_t pokey_output[4];
 uint8_t pokey_outVol[4];
-static uint8_t pokey_poly04[POKEY_POLY4_SIZE] = {1,1,0,1,1,1,0,0,0,0,1,0,1,0,0};
-static uint8_t pokey_poly05[POKEY_POLY5_SIZE] = {0,0,1,1,0,0,0,1,1,1,1,0,0,1,0,1,0,1,1,0,1,1,1,0,1,0,0,0,0,0,1};
+static uint8_t pokey_poly04[POKEY_POLY4_SIZE];
+static uint8_t pokey_poly05[POKEY_POLY5_SIZE];
+static uint8_t pokey_poly09[POKEY_POLY9_SIZE];
 static uint8_t pokey_poly17[POKEY_POLY17_SIZE];
 uint32_t pokey_poly17Size;
 uint32_t pokey_polyAdjust;
@@ -91,12 +91,60 @@ uint32_t pokey_sampleMax;
 uint32_t pokey_sampleCount[2];
 uint32_t pokey_baseMultiplier;
 
+/* Generate poly4 or poly5 using XNOR left-shift LFSR (matches MAME poly_init_4_5).
+ * Produces maximal-length sequences of period 15 (size=4) or 31 (size=5). */
+static void pokey_gen_poly45(uint8_t *poly, int size)
+{
+   uint32_t mask   = (uint32_t)((1 << size) - 1);
+   uint32_t lfsr   = 0;
+   int      xorbit = size - 1;
+   int      i;
+   for(i = 0; i < (int)mask; i++)
+   {
+      lfsr    = ((lfsr << 1) | (~((lfsr >> 2) ^ (lfsr >> xorbit)) & 1u)) & mask;
+      poly[i] = (uint8_t)(lfsr & 1);
+   }
+}
+
+/* Generate poly9 using XOR right-shift LFSR (matches MAME poly_init_9_17, size=9).
+ * Taps at bits 0 and 5; period 511. */
+static void pokey_gen_poly9(uint8_t *poly)
+{
+   uint32_t lfsr = (uint32_t)POKEY_POLY9_SIZE; /* 0x1ff: all 9 bits set */
+   uint32_t i, bit;
+   for(i = 0; i < POKEY_POLY9_SIZE; i++)
+   {
+      bit     = ((lfsr >> 0) ^ (lfsr >> 5)) & 1u;
+      poly[i] = (uint8_t)(lfsr & 1);
+      lfsr    = (lfsr >> 1) | (bit << 8);
+   }
+}
+
+/* Generate poly17 using MAME's exact poly_init_9_17 algorithm (size=17).
+ * Period 131071. Bit 7 is fed by XOR of bits 8 and 13; old bit 0 wraps to bit 16. */
+static void pokey_gen_poly17(uint8_t *poly)
+{
+   uint32_t lfsr = (uint32_t)POKEY_POLY17_SIZE; /* 0x1ffff: all 17 bits set */
+   uint32_t i, in8, in;
+   for(i = 0; i < POKEY_POLY17_SIZE; i++)
+   {
+      in8     = ((lfsr >> 8) ^ (lfsr >> 13)) & 1u;
+      in      = lfsr & 1u;
+      lfsr    = lfsr >> 1;
+      lfsr    = (lfsr & 0xff7fu) | (in8 << 7);
+      lfsr    = (in << 16) | lfsr;
+      poly[i] = (uint8_t)(lfsr & 1);
+   }
+}
+
 void pokey_Reset(void)
 {
    int index, channel;
 
-   for(index = 0; index < POKEY_POLY17_SIZE; index++)
-      pokey_poly17[index] = rand() & 1;
+   pokey_gen_poly45(pokey_poly04, 4);
+   pokey_gen_poly45(pokey_poly05, 5);
+   pokey_gen_poly9(pokey_poly09);
+   pokey_gen_poly17(pokey_poly17);
 
    pokey_polyAdjust = 0;
    pokey_poly04Cntr = 0;
@@ -325,6 +373,8 @@ void pokey_Process(uint32_t length)
                pokey_output[nextEvent] = !pokey_output[nextEvent];
             else if (pokey_audc[nextEvent] & POKEY_POLY4)
                pokey_output[nextEvent] = pokey_poly04[pokey_poly04Cntr];
+            else if(pokey_poly17Size == POKEY_POLY9_SIZE)
+               pokey_output[nextEvent] = pokey_poly09[pokey_poly17Cntr];
             else
                pokey_output[nextEvent] = pokey_poly17[pokey_poly17Cntr];
          }

@@ -119,7 +119,7 @@ void prosystem_ExecuteFrame(const uint8_t* input)
          }
       }
       tia_Process(2);
-      if(cartridge_pokey)
+      if(cartridge_pokey_address)
          pokey_Process(2);
 
       if(cartridge_bupchip)
