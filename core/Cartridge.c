@@ -456,7 +456,7 @@ void cartridge_Write(uint16_t address, uint8_t data)
    /* Route writes to POKEY at $4000 (cartridge ROM space).
     * Non-$4000 POKEY addresses live in RAM space and are intercepted in memory_Write. */
    if(cartridge_pokey_address == 0x4000 &&
-      address >= 0x4000 && address < 0x4009)
+      address >= 0x4000 && address < 0x400a)
    {
       pokey_SetRegister((uint16_t)(POKEY_AUDF1 + (address - 0x4000)), data);
    }

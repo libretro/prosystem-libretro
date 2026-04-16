@@ -52,6 +52,7 @@
 #define POKEY_AUDF4 0x4006
 #define POKEY_AUDC4 0x4007
 #define POKEY_AUDCTL 0x4008
+#define POKEY_SKCTL  0x4009
 
 #include <stdint.h>
 
@@ -83,6 +84,8 @@ extern uint32_t pokey_divideCount[4];
 extern uint32_t pokey_sampleMax;
 extern uint32_t pokey_sampleCount[2];
 extern uint32_t pokey_baseMultiplier;
+extern uint8_t pokey_skctl;
+extern uint8_t pokey_filterSample[2];
 
 #ifdef __cplusplus
 }

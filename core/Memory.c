@@ -156,7 +156,7 @@ void memory_Write(uint16_t address, uint8_t data)
              * Writes to POKEY at $4000 are handled in cartridge_Write (ROM space). */
             if(cartridge_pokey_address && cartridge_pokey_address < 0x4000 &&
                address >= cartridge_pokey_address &&
-               address < (uint16_t)(cartridge_pokey_address + 9))
+               address < (uint16_t)(cartridge_pokey_address + 10))
             {
                pokey_SetRegister((uint16_t)(POKEY_AUDF1 + (address - cartridge_pokey_address)), data);
                break;
