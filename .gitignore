@@ -4,3 +4,4 @@
 *.dylib
 *.exe
 .vscode/pro-deployer.json
+CLAUDE.md
