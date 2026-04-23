@@ -71,7 +71,7 @@ extern void cartridge_Release(bool persistent_data);
 extern char cartridge_digest[33];
 extern uint8_t cartridge_type;
 extern uint8_t cartridge_region;
-extern bool cartridge_pokey;
+extern uint16_t cartridge_pokey_address;
 extern uint8_t cartridge_controller[2];
 extern uint8_t cartridge_bank;
 extern uint32_t cartridge_flags;

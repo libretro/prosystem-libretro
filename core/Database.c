@@ -33,7 +33,7 @@ typedef struct cartridge_db
    char digest[256];
    char title[256];
    uint8_t type;
-   bool pokey;
+   bool pokey;         /* legacy: true = POKEY at $4000 */
    uint8_t controller1;
    uint8_t controller2;
    uint8_t region;
@@ -41,6 +41,7 @@ typedef struct cartridge_db
    int8_t crossx;
    int8_t crossy;
    uint8_t hblank;
+   uint16_t pokey_address; /* explicit POKEY address; 0 falls back to pokey bool */
 } cartridge_db_t;
 
 static const struct cartridge_db db_list[] = 
@@ -239,6 +240,20 @@ static const struct cartridge_db db_list[] =
       0,                                          /* crossx */
       0,                                          /* crossy */
       0                                           /* hblank */
+   },
+   {
+      "00688131ee74f6c84048c7fa5c71114a",         /* digest */
+      "Bentley Bear's Crystal Quest",             /* title */
+      2,                                          /* type: SUPERCART_LARGE */
+      false,                                      /* pokey */
+      1,                                          /* controller 1 */
+      1,                                          /* controller 2 */
+      0,                                          /* region */
+      0,                                          /* flags */
+      0,                                          /* crossx */
+      0,                                          /* crossy */
+      0,                                          /* hblank */
+      0x0450                                      /* pokey_address */
    },
    {
       "5a09946e57dbe30408a8f253a28d07db",         /* digest */
@@ -1541,6 +1556,20 @@ static const struct cartridge_db db_list[] =
       0                                           /* hblank */
    },
    {
+      "5d9ac066e685432825d968f166b042ec",         /* digest */
+      "Tiger-Heli",                               /* title */
+      2,                                          /* type: SUPERCART_LARGE */
+      false,                                      /* pokey */
+      1,                                          /* controller 1 */
+      1,                                          /* controller 2 */
+      0,                                          /* region */
+      0,                                          /* flags */
+      0,                                          /* crossx */
+      0,                                          /* crossy */
+      0,                                          /* hblank */
+      0x0450                                      /* pokey_address */
+   },
+   {
       "1af475ff6429a160752b592f0f92b287",         /* digest */
       "Title Match Pro Wrestling",                /* title */
       0,                                          /* type */
@@ -1747,7 +1776,10 @@ void database_Load(const char *digest)
       if (!strcmp(db_list[i].digest, digest))
       {
          cartridge_type          = db_list[i].type;
-         cartridge_pokey         = db_list[i].pokey;
+         if(db_list[i].pokey_address)
+            cartridge_pokey_address = db_list[i].pokey_address;
+         else
+            cartridge_pokey_address = db_list[i].pokey ? 0x4000 : 0;
          cartridge_controller[0] = db_list[i].controller1;
          cartridge_controller[1] = db_list[i].controller2;
          cartridge_region        = db_list[i].region;

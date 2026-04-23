@@ -37,7 +37,7 @@
 char cartridge_digest[33];
 uint8_t cartridge_type;
 uint8_t cartridge_region;
-bool cartridge_pokey;
+uint16_t cartridge_pokey_address;
 uint8_t cartridge_controller[2];
 uint8_t cartridge_bank;
 uint32_t cartridge_flags;
@@ -208,7 +208,19 @@ static void cartridge_ReadHeader(const uint8_t* header)
          cartridge_type = CARTRIDGE_TYPE_NORMAL;
    }
 
-   cartridge_pokey         = (header[54] & 1) ? true: false;
+   /* Detect POKEY address from A78 header bitmask.
+    * header[53] = high byte (bits 8-15), header[54] = low byte (bits 0-7).
+    * Priority: $800 > $440 > $450 > $4000 (highest-numbered bits checked first). */
+   if(header[53] & 0x80)       /* bit 15 = POKEY at $0800 */
+      cartridge_pokey_address = 0x0800;
+   else if(header[53] & 0x04)  /* bit 10 = POKEY at $0440 */
+      cartridge_pokey_address = 0x0440;
+   else if(header[54] & 0x40)  /* bit  6 = POKEY at $0450 */
+      cartridge_pokey_address = 0x0450;
+   else if(header[54] & 0x01)  /* bit  0 = POKEY at $4000 */
+      cartridge_pokey_address = 0x4000;
+   else
+      cartridge_pokey_address = 0;
    cartridge_controller[0] = header[55];
    cartridge_controller[1] = header[56];
    cartridge_region        = header[57];
@@ -441,38 +453,12 @@ void cartridge_Write(uint16_t address, uint8_t data)
          break;
    }
 
-   if(cartridge_pokey && address >= 0x4000 && address < 0x4009)
+   /* Route writes to POKEY at $4000 (cartridge ROM space).
+    * Non-$4000 POKEY addresses live in RAM space and are intercepted in memory_Write. */
+   if(cartridge_pokey_address == 0x4000 &&
+      address >= 0x4000 && address < 0x400a)
    {
-      switch(address)
-      {
-         case POKEY_AUDF1:
-            pokey_SetRegister(POKEY_AUDF1, data);
-            break;
-         case POKEY_AUDC1:
-            pokey_SetRegister(POKEY_AUDC1, data);
-            break;
-         case POKEY_AUDF2:
-            pokey_SetRegister(POKEY_AUDF2, data);
-            break;
-         case POKEY_AUDC2:
-            pokey_SetRegister(POKEY_AUDC2, data);
-            break;
-         case POKEY_AUDF3:
-            pokey_SetRegister(POKEY_AUDF3, data);
-            break;
-         case POKEY_AUDC3:
-            pokey_SetRegister(POKEY_AUDC3, data);
-            break;
-         case POKEY_AUDF4:
-            pokey_SetRegister(POKEY_AUDF4, data);
-            break;
-         case POKEY_AUDC4:
-            pokey_SetRegister(POKEY_AUDC4, data);
-            break;
-         case POKEY_AUDCTL:
-            pokey_SetRegister(POKEY_AUDCTL, data);
-            break;
-      }
+      pokey_SetRegister((uint16_t)(POKEY_AUDF1 + (address - 0x4000)), data);
    }
 }
 

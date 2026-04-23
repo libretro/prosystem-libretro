@@ -119,7 +119,7 @@ void prosystem_ExecuteFrame(const uint8_t* input)
          }
       }
       tia_Process(2);
-      if(cartridge_pokey)
+      if(cartridge_pokey_address)
          pokey_Process(2);
 
       if(cartridge_bupchip)
@@ -226,6 +226,10 @@ bool prosystem_Save(char *buffer, bool fast_saves)
       }
 
       save_uint32_to_buffer(buffer, &size, pokey_baseMultiplier);
+
+      buffer[size++] = pokey_skctl;
+      buffer[size++] = pokey_filterSample[0];
+      buffer[size++] = pokey_filterSample[1];
    }
 
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
@@ -352,6 +356,10 @@ bool prosystem_Load(const char *buffer, bool fast_saves)
       }
 
       pokey_baseMultiplier = read_uint32_from_buffer(buffer, &offset);
+
+      pokey_skctl = buffer[offset++];
+      pokey_filterSample[0] = buffer[offset++];
+      pokey_filterSample[1] = buffer[offset++];
    }
 
    if(cartridge_type == CARTRIDGE_TYPE_SUPERCART_RAM)
