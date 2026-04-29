@@ -185,14 +185,23 @@ static void cartridge_ReadHeader(const uint8_t* header)
 
    if(header[53] == 0)
    {
+      /* Bit-priority parse of the A78 cart-type bitmask (byte 54).
+       * Highest-priority bit wins. Backwards-compatible with the previous
+       * value-equality form (each former bucket's dominant bit picks the same
+       * branch) and additionally handles real-world carts where bit 4
+       * (Bank 6 @ $4000) co-occurs with bit 1 (SuperGame), e.g. value 0x12
+       * used by Pac-Man Collection 40th Anniversary Edition. */
+      uint8_t b = header[54];
       if(cartridge_size > 131072)
          cartridge_type = CARTRIDGE_TYPE_SUPERCART_LARGE;
-      else if(header[54] == 2 || header[54] == 3)
-         cartridge_type = CARTRIDGE_TYPE_SUPERCART;
-      else if(header[54] == 4 || header[54] == 5 || header[54] == 6 || header[54] == 7)
-         cartridge_type = CARTRIDGE_TYPE_SUPERCART_RAM;
-      else if(header[54] == 8 || header[54] == 9 || header[54] == 10 || header[54] == 11)
+      else if(b & 0x10)             /* bit 4: bank 6 fixed at $4000 */
          cartridge_type = CARTRIDGE_TYPE_SUPERCART_ROM;
+      else if(b & 0x08)             /* bit 3: ROM at $4000 */
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART_ROM;
+      else if(b & 0x04)             /* bit 2: RAM at $4000 */
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART_RAM;
+      else if(b & 0x02)             /* bit 1: SuperGame bankswitched */
+         cartridge_type = CARTRIDGE_TYPE_SUPERCART;
       else
          cartridge_type = CARTRIDGE_TYPE_NORMAL;
    }
