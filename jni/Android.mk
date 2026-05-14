@@ -16,6 +16,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := retro
 LOCAL_SRC_FILES := $(SOURCES_C)
 LOCAL_CFLAGS    := $(COREFLAGS)
-LOCAL_LDFLAGS   := -Wl,-version-script=$(ROOT_DIR)/link.T
+LOCAL_LDFLAGS   := -Wl,-version-script=$(ROOT_DIR)/link.T,-z,max-page-size=16384
 LOCAL_LDLIBS    := -lz
 include $(BUILD_SHARED_LIBRARY)
