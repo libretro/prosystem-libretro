@@ -64,14 +64,17 @@ int32_t ct_instr_setup(uint8_t *pInstrPak)
 	 *
 	 * Nothing elaborate, assuming good intentions with the data we're given.
 	 */
-	uint32_t uiY = (uint32_t)*pInstrPak;
-	if(0 != (uiY % sizeof(uint32_t)))
+	if(0 != (uintptr_t)pInstrPak % sizeof(uint32_t))
+	{
 		return -1;
+	}
 
 	for(uiX = 0; uiX < CORETONE_INSPAK_HEAD_MAGICLEN; uiX++)
 	{
 		if(szCoreInstr_Magic[uiX] != pInstrPak[uiX])
+		{
 			return -1;
+		}
 	}
 
 	memcpy(&uiCoreInstr_Count, (pInstrPak + CORETONE_INSPAK_HEAD_COUNT), sizeof(uint32_t));
